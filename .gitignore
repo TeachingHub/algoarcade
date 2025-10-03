@@ -1,0 +1,29 @@
+# Java/Spring Boot
+*.class
+*.jar
+*.war
+*.log
+*.iml
+
+# React
+node_modules/
+built/
+*.js
+*.jsx
+*.ts
+*.tsx
+*.map
+
+# Firebase credentials
+firebase-config.json
+firebase-*.json
+
+# Common development files
+.DS_Store
+.env
+.idea/
+.vscode/
+*.swp
+*.swo
+*.tmp
+*.bak
