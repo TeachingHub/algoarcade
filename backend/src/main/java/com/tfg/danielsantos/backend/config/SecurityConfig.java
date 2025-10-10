@@ -58,7 +58,7 @@ public class SecurityConfig {
                 // Rutas públicas
                 .requestMatchers("/api/v1/health").permitAll()      // Health check
                 .requestMatchers("/api/v1/info").permitAll()        // Info endpoint
-                .requestMatchers("/auth/**").permitAll()            // Endpoints de autenticación
+                .requestMatchers("/api/v1/auth/**").permitAll()            // Endpoints de autenticación
                 
                 // Cualquier otra ruta requiere autenticación
                 .anyRequest().authenticated()

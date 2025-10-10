@@ -1,4 +1,4 @@
-package com.tfg.danielsantos.backend.controller;
+package com.tfg.danielsantos.backend.controller.api.v1;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
@@ -29,7 +29,7 @@ import java.util.Map;
  * @version 1.0
  */
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/v1/auth")
 @CrossOrigin(origins = "*")
 public class AuthController {
 

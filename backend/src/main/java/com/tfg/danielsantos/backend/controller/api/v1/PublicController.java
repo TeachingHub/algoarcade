@@ -1,4 +1,4 @@
-package com.tfg.danielsantos.backend.controller;
+package com.tfg.danielsantos.backend.controller.api.v1;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

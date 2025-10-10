@@ -35,7 +35,7 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
      */
     private static final List<String> EXCLUDED_PATHS = Arrays.asList(
         "/api/v1/public",   // Endpoints públicos (versionados)
-        "/api/v1/auth",     // Endpoints de autenticación (versionados)
+        "/api/v1/auth/",     // Endpoints de autenticación (versionados)
         "/api/v1/health",   // Health check versionado
         "/api/v1/info",     // Info endpoint versionado
         "/test-auth.html",  // Página de testing de autenticación
