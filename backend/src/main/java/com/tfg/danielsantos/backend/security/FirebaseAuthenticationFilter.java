@@ -15,13 +15,51 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 @Component
 public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     private FirebaseAuth firebaseAuth;
+
+    /**
+     * Lista de rutas que NO necesitan autenticación con Firebase
+     * 
+     * Estas rutas son públicas y el filtro NO las procesará.
+     * El filtro se "salta" estas rutas gracias al método shouldNotFilter()
+     * 
+     * IMPORTANTE: Actualizar esta lista si cambias el versionado de la API
+     */
+    private static final List<String> EXCLUDED_PATHS = Arrays.asList(
+        "/api/v1/public",   // Endpoints públicos (versionados)
+        "/api/v1/auth",     // Endpoints de autenticación (versionados)
+        "/api/v1/health",   // Health check versionado
+        "/api/v1/info",     // Info endpoint versionado
+        "/test-auth.html",  // Página de testing de autenticación
+        "/static",          // Recursos estáticos (CSS, JS, imágenes)
+        "/css",             // Archivos CSS
+        "/js",              // Archivos JavaScript
+        "/images",          // Imágenes
+        "/",                // Raíz
+        "/index.html",      // Página principal
+        "/health",          // Health check (sin versión)
+        "/actuator"         // Actuator endpoints (sin versión)
+    );
+
+    /**
+     * Este método decide si el filtro debe ejecutarse o no para una petición específica.
+     * Si retorna true, el filtro NO se ejecuta (la petición pasa directamente).
+     * Si retorna false, el filtro SÍ se ejecuta (valida el token).
+     */
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getRequestURI();
+        // Verifica si la ruta comienza con alguna de las rutas excluidas
+        return EXCLUDED_PATHS.stream().anyMatch(path::startsWith);
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, 

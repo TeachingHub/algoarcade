@@ -22,17 +22,50 @@ public class SecurityConfig {
     @Autowired
     private FirebaseAuthenticationFilter firebaseAuthenticationFilter;
 
+
+    /**
+     * Configuración principal de seguridad
+     * 
+     * Define qué rutas son públicas y cuáles requieren autenticación.
+     * También configura CORS y el filtro de Firebase.
+     * 
+     * Rutas públicas:
+     * - /api/v1/health - Health check del servidor
+     * - /api/v1/info - Información de la API
+     * - /auth/** - Todas las rutas de autenticación (register, login, delete)
+     * 
+     * Funcionamiento:
+     * 1. CORS: Permite peticiones desde cualquier origen
+     * 2. CSRF: Deshabilitado (no lo necesitamos con JWT/tokens)
+     * 3. Sessions: STATELESS (no usamos sesiones, solo tokens)
+     * 4. Authorization: Define rutas públicas vs protegidas
+     * 5. Filter: Agrega FirebaseAuthenticationFilter a la cadena
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+            // Configurar CORS (permitir peticiones desde frontend)
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            
+            // Deshabilitar CSRF (no lo necesitamos con tokens JWT)
             .csrf(csrf -> csrf.disable())
+            
+            // Sin sesiones (stateless) - cada petición debe tener su token
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            
+            // Configurar qué rutas requieren autenticación
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/api/public/**", "/health", "/actuator/**").permitAll()
-                .requestMatchers("/api/auth/**").permitAll()
+                // Rutas públicas
+                .requestMatchers("/api/v1/health").permitAll()      // Health check
+                .requestMatchers("/api/v1/info").permitAll()        // Info endpoint
+                .requestMatchers("/auth/**").permitAll()            // Endpoints de autenticación
+                
+                // Cualquier otra ruta requiere autenticación
                 .anyRequest().authenticated()
             )
+            
+            // Agregar el filtro de Firebase ANTES del filtro de autenticación estándar
+            // Esto permite que Firebase valide el token antes que Spring Security
             .addFilterBefore(firebaseAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
