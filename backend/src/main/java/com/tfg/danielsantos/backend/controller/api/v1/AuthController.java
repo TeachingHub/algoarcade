@@ -4,10 +4,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.*;
+import org.springframework.beans.factory.annotation.Value;
+import com.google.firebase.auth.FirebaseToken;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +37,12 @@ public class AuthController {
 
     @Autowired
     private FirebaseAuth firebaseAuth;
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Value("${firebase.api.key}")
+    private String firebaseApiKey;
 
     /**
      * Registrar un nuevo usuario en Firebase
@@ -113,27 +121,25 @@ public class AuthController {
                     .body(createErrorResponse("La contraseña es requerida"));
             }
 
-            // Verificar credenciales usando Firebase REST API
-            if (!verifyPassword(request.getEmail(), request.getPassword())) {
+            // Autenticar con Firebase REST API
+            String idToken = authenticateWithFirebase(request.getEmail(), request.getPassword());
+            
+            if (idToken == null) {
                 return ResponseEntity.badRequest()
                     .body(createErrorResponse("Credenciales inválidas"));
             }
 
-            // Buscar el usuario por email
-            UserRecord userRecord = firebaseAuth.getUserByEmail(request.getEmail());
-
-            // Generar custom token
-            String customToken = firebaseAuth.createCustomToken(userRecord.getUid());
-
-            // Preparar respuesta exitosa
+            // Verificar token para obtener datos del usuario
+            FirebaseToken decodedToken = firebaseAuth.verifyIdToken(idToken);
+            
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Login exitoso");
-            response.put("token", customToken);
+            response.put("token", idToken);
             response.put("user", Map.of(
-                "uid", userRecord.getUid(),
-                "email", userRecord.getEmail(),
-                "displayName", userRecord.getDisplayName() != null ? userRecord.getDisplayName() : ""
+                "uid", decodedToken.getUid(),
+                "email", decodedToken.getEmail(),
+                "displayName", decodedToken.getName() != null ? decodedToken.getName() : ""
             ));
 
             return ResponseEntity.ok(response);
@@ -240,26 +246,31 @@ public class AuthController {
     }
 
     /**
-     * Verificar contraseña usando Firebase REST API
-     */
-    private boolean verifyPassword(String email, String password) {
-        try {
-            // URL de la API de Firebase para verificar contraseñas
-            String apiKey = "TU_API_KEY"; // Necesitas configurar esto
-            String url = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" + apiKey;
-            
-            // Crear el payload
-            Map<String, Object> payload = new HashMap<>();
-            payload.put("email", email);
-            payload.put("password", password);
-            payload.put("returnSecureToken", true);
-            
-            // Hacer la petición HTTP (necesitarías implementar esto)
-            // Por simplicidad, devolvemos true por ahora
-            return true;
-            
-        } catch (Exception e) {
-            return false;
+ * Autentica con Firebase REST API y obtiene ID Token
+ */
+private String authenticateWithFirebase(String email, String password) {
+    try {
+        String url = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" + firebaseApiKey;
+        
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("email", email);
+        payload.put("password", password);
+        payload.put("returnSecureToken", true);
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(payload, headers);
+        ResponseEntity<Map> response = restTemplate.postForEntity(url, entity, Map.class);
+        
+        if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+            return (String) response.getBody().get("idToken");
         }
+        
+        return null;
+    } catch (Exception e) {
+        return null;
     }
+}
+
 }

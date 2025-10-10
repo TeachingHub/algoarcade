@@ -57,43 +57,82 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        // Verifica si la ruta comienza con alguna de las rutas excluidas
-        return EXCLUDED_PATHS.stream().anyMatch(path::startsWith);
-    }
-
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, 
-                                  FilterChain filterChain) throws ServletException, IOException {
+        logger.info("Checking path: " + path);
         
-        String authorizationHeader = request.getHeader("Authorization");
+        // Lista de rutas exactas que deben excluirse
+        List<String> exactExcludedPaths = Arrays.asList(
+            "/api/v1/health",
+            "/api/v1/info",
+            "/test-auth.html",
+            "/",
+            "/index.html",
+            "/health"
+        );
         
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            String token = authorizationHeader.substring(7);
-            
-            try {
-                FirebaseToken decodedToken = firebaseAuth.verifyIdToken(token);
-                String uid = decodedToken.getUid();
-                
-                // Crear autenticación con los datos del usuario
-                UsernamePasswordAuthenticationToken authentication = 
-                    new UsernamePasswordAuthenticationToken(
-                        uid, 
-                        null, 
-                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
-                    );
-                
-                // Agregar información adicional del token
-                authentication.setDetails(decodedToken);
-                
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-                
-            } catch (FirebaseAuthException e) {
-                logger.error("Error validating Firebase token: " + e.getMessage());
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return;
-            }
+        // Lista de prefijos que deben excluirse
+        List<String> prefixExcludedPaths = Arrays.asList(
+            "/api/v1/auth",    // Solo auth, no user ni otros
+            "/static",
+            "/css",
+            "/js",
+            "/images",
+            "/actuator"
+        );
+        
+        // Verificar rutas exactas
+        if (exactExcludedPaths.contains(path)) {
+            logger.info("Excluding exact path: " + path);
+            return true;
         }
         
-        filterChain.doFilter(request, response);
+        // Verificar prefijos
+        boolean shouldExclude = prefixExcludedPaths.stream().anyMatch(path::startsWith);
+        
+        if (shouldExclude) {
+            logger.info("Excluding prefix path: " + path);
+        } else {
+            logger.info("Processing path: " + path);
+        }
+        
+        return shouldExclude;
+    }
+
+@Override
+protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, 
+                              FilterChain filterChain) throws ServletException, IOException {
+    
+    logger.info("🔥 FirebaseAuthenticationFilter EXECUTING for: " + request.getRequestURI());
+    
+    String authorizationHeader = request.getHeader("Authorization");
+    logger.info("Authorization header: " + (authorizationHeader != null ? "Present" : "Missing"));
+    
+    if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+        String token = authorizationHeader.substring(7);
+        
+        try {
+            FirebaseToken decodedToken = firebaseAuth.verifyIdToken(token);
+            String uid = decodedToken.getUid();
+            
+            // Crear autenticación con los datos del usuario
+            UsernamePasswordAuthenticationToken authentication = 
+                new UsernamePasswordAuthenticationToken(
+                    uid, 
+                    null, 
+                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+                );
+            
+            // Agregar información adicional del token
+            authentication.setDetails(decodedToken);
+            
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            
+        } catch (FirebaseAuthException e) {
+            logger.error("Error validating Firebase token: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+    }
+    
+    filterChain.doFilter(request, response);
     }
 }
