@@ -10,6 +10,11 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
 import org.springframework.beans.factory.annotation.Value;
 import com.google.firebase.auth.FirebaseToken;
+import com.tfg.danielsantos.backend.dto.RegisterRequest;
+import com.tfg.danielsantos.backend.dto.LoginRequest;
+import com.tfg.danielsantos.backend.dto.ApiResponse;
+
+import jakarta.validation.Valid;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +37,6 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/api/v1/auth")
-@CrossOrigin(origins = "*")
 public class AuthController {
 
     @Autowired
@@ -48,10 +52,7 @@ public class AuthController {
      * Registrar un nuevo usuario en Firebase
      */
     @PostMapping("/register")
-    public ResponseEntity<Map<String, Object>> register(@RequestBody RegisterRequest request) throws FirebaseAuthException {
-        // Validaciones básicas - si fallan, se lanza IllegalArgumentException
-        validateRegisterRequest(request);
-
+    public ResponseEntity<ApiResponse> register(@Valid @RequestBody RegisterRequest request) throws FirebaseAuthException {
         // Crear el usuario en Firebase - si falla, se lanza FirebaseAuthException
         UserRecord.CreateRequest createRequest = new UserRecord.CreateRequest()
             .setEmail(request.getEmail())
@@ -65,26 +66,20 @@ public class AuthController {
         UserRecord userRecord = firebaseAuth.createUser(createRequest);
 
         // Respuesta exitosa
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("message", "Usuario registrado exitosamente");
-        response.put("user", Map.of(
+        Map<String, Object> userData = Map.of(
             "uid", userRecord.getUid(),
             "email", userRecord.getEmail(),
             "displayName", userRecord.getDisplayName() != null ? userRecord.getDisplayName() : ""
-        ));
+        );
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse(true, "Usuario registrado exitosamente", userData));
     }
 
     /**
      * Iniciar sesión de usuario
      */
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest request) throws Exception {
-        // Validaciones - si fallan, se lanza IllegalArgumentException
-        validateLoginRequest(request);
-
+    public ResponseEntity<ApiResponse> login(@Valid @RequestBody LoginRequest request) throws Exception {
         // Autenticar con Firebase REST API
         String idToken = authenticateWithFirebase(request.getEmail(), request.getPassword());
         
@@ -95,24 +90,20 @@ public class AuthController {
         // Verificar token - si falla, se lanza FirebaseAuthException
         FirebaseToken decodedToken = firebaseAuth.verifyIdToken(idToken);
         
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("message", "Login exitoso");
-        response.put("token", idToken);
-        response.put("user", Map.of(
+        Map<String, Object> userData = Map.of(
             "uid", decodedToken.getUid(),
             "email", decodedToken.getEmail(),
             "displayName", decodedToken.getName() != null ? decodedToken.getName() : ""
-        ));
+        );
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse(true, "Login exitoso", Map.of("token", idToken, "user", userData)));
     }
 
     /**
      * Eliminar cuenta de usuario
      */
     @DeleteMapping("/delete")
-    public ResponseEntity<Map<String, Object>> deleteAccount(Authentication authentication) throws FirebaseAuthException {
+    public ResponseEntity<ApiResponse> deleteAccount(Authentication authentication) throws FirebaseAuthException {
         // Verificar autenticación
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new IllegalArgumentException("Usuario no autenticado");
@@ -125,37 +116,12 @@ public class AuthController {
         firebaseAuth.deleteUser(uid);
 
         // Respuesta exitosa
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("message", "Cuenta eliminada exitosamente");
-        response.put("deletedUser", Map.of(
+        Map<String, Object> deletedUser = Map.of(
             "uid", uid,
             "email", userRecord.getEmail()
-        ));
+        );
 
-        return ResponseEntity.ok(response);
-    }
-
-    // MÉTODOS PRIVADOS DE VALIDACIÓN
-
-    private void validateRegisterRequest(RegisterRequest request) {
-        if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
-            throw new IllegalArgumentException("El email es requerido");
-        }
-        
-        if (request.getPassword() == null || request.getPassword().length() < 6) {
-            throw new IllegalArgumentException("La contraseña debe tener al menos 6 caracteres");
-        }
-    }
-
-    private void validateLoginRequest(LoginRequest request) {
-        if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
-            throw new IllegalArgumentException("El email es requerido");
-        }
-
-        if (request.getPassword() == null || request.getPassword().trim().isEmpty()) {
-            throw new IllegalArgumentException("La contraseña es requerida");
-        }
+        return ResponseEntity.ok(new ApiResponse(true, "Cuenta eliminada exitosamente", deletedUser));
     }
 
     /**
@@ -184,32 +150,5 @@ public class AuthController {
         } catch (Exception e) {
             return null;
         }
-    }
-
-    // CLASES INTERNAS
-    public static class RegisterRequest {
-        private String email;
-        private String password;
-        private String displayName;
-
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
-        
-        public String getPassword() { return password; }
-        public void setPassword(String password) { this.password = password; }
-        
-        public String getDisplayName() { return displayName; }
-        public void setDisplayName(String displayName) { this.displayName = displayName; }
-    }
-
-    public static class LoginRequest {
-        private String email;
-        private String password;
-
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
-        
-        public String getPassword() { return password; }
-        public void setPassword(String password) { this.password = password; }
     }
 }

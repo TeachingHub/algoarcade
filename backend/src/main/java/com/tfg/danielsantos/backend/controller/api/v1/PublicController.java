@@ -2,6 +2,7 @@ package com.tfg.danielsantos.backend.controller.api.v1;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.tfg.danielsantos.backend.dto.ApiResponse;  // Importa ApiResponse
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +22,6 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/api/v1")
-@CrossOrigin(origins = "*")
 public class PublicController {
 
     /**
@@ -33,13 +33,12 @@ public class PublicController {
      * @return Estado del servidor con timestamp
      */
     @GetMapping("/health")
-    public ResponseEntity<Map<String, Object>> health() {
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", "UP");
-        response.put("message", "Servidor funcionando correctamente");
-        response.put("timestamp", System.currentTimeMillis());
+    public ResponseEntity<ApiResponse> health() {
+        Map<String, Object> data = new HashMap<>();
+        data.put("status", "UP");
+        data.put("timestamp", System.currentTimeMillis());
         
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse(true, "Servidor funcionando correctamente", data));
     }
 
     /**
@@ -51,15 +50,15 @@ public class PublicController {
      * @return Información básica de la API
      */
     @GetMapping("/info")
-    public ResponseEntity<Map<String, Object>> info() {
-        Map<String, Object> response = new HashMap<>();
-        response.put("name", "TFG Backend API");
-        response.put("version", "1.0.0");
-        response.put("apiVersion", "v1");
-        response.put("description", "API para autenticación con Firebase");
-        response.put("firebase", "configurado");
-        response.put("security", "habilitado");
+    public ResponseEntity<ApiResponse> info() {
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "TFG Backend API");
+        data.put("version", "1.0.0");
+        data.put("apiVersion", "v1");
+        data.put("description", "API para autenticación con Firebase");
+        data.put("firebase", "configurado");
+        data.put("security", "habilitado");
         
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse(true, "Información de la API", data));
     }
 }

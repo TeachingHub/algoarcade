@@ -8,20 +8,20 @@ import org.springframework.web.bind.annotation.*;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
+import com.tfg.danielsantos.backend.dto.ApiResponse;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/profile")
-@CrossOrigin(origins = "*")
 public class ProfileController {
 
     @Autowired
     private FirebaseAuth firebaseAuth;
 
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getProfile(Authentication authentication) throws FirebaseAuthException {
+    public ResponseEntity<ApiResponse> getProfile(Authentication authentication) throws FirebaseAuthException {
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new IllegalArgumentException("Usuario no autenticado");
         }
@@ -37,6 +37,6 @@ public class ProfileController {
         profile.put("creationTime", userRecord.getUserMetadata().getCreationTimestamp());
         profile.put("lastSignIn", userRecord.getUserMetadata().getLastSignInTimestamp());
 
-        return ResponseEntity.ok(profile);
+        return ResponseEntity.ok(new ApiResponse(true, "Perfil de usuario", profile));
     }
 }

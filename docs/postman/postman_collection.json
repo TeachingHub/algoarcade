@@ -50,8 +50,12 @@
                 "exec": [
                   "if (pm.response.code === 200) {",
                   "    const response = pm.response.json();",
-                  "    pm.collectionVariables.set('auth_token', response.token);",
-                  "    console.log('Token guardado:', response.token);",
+                  "    if (response.data && response.data.token) {",
+                  "        pm.collectionVariables.set('auth_token', response.data.token);",
+                  "        console.log('Token guardado:', response.data.token);",
+                  "    } else {",
+                  "        console.error('Token no encontrado en la respuesta');",
+                  "    }",
                   "}"
                 ]
               }
