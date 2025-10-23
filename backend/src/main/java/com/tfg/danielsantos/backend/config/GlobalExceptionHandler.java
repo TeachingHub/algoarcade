@@ -15,14 +15,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Manejador global de excepciones
- * 
- * Este controlador captura TODAS las excepciones que ocurran en cualquier 
- * controlador de la aplicación y las convierte en respuestas JSON consistentes.
- * 
- * @author Daniel Santos
- */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 

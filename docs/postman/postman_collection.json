@@ -1,7 +1,7 @@
 {
   "info": {
-    "name": "Mi API Backend - Colección de Pruebas (Actualizada)",
-    "description": "Colección completa para probar la API Spring Boot con Firebase auth. Incluye todas las rutas públicas y protegidas.",
+    "name": "TFG Backend API v1",
+    "description": "Colección de Postman para la API de autenticación con Firebase",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -11,159 +11,140 @@
       "type": "string"
     },
     {
-      "key": "jwt_token",
+      "key": "auth_token",
       "value": "",
-      "type": "string"
-    },
-    {
-      "key": "email",
-      "value": "test@example.com",
-      "type": "string"
-    },
-    {
-      "key": "password",
-      "value": "password123",
       "type": "string"
     }
   ],
   "item": [
     {
-      "name": "Health Check",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/api/v1/health",
-          "host": ["{{base_url}}"],
-          "path": ["api", "v1", "health"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get API Info",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/api/v1/info",
-          "host": ["{{base_url}}"],
-          "path": ["api", "v1", "info"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Register User",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n    \"email\": \"{{email}}\",\n    \"password\": \"{{password}}\",\n    \"displayName\": \"Test User\"\n}"
-        },
-        "url": {
-          "raw": "{{base_url}}/api/v1/auth/register",
-          "host": ["{{base_url}}"],
-          "path": ["api", "v1", "auth", "register"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Login User",
-      "event": [
+      "name": "Auth",
+      "item": [
         {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "if (pm.response.code === 200) {",
-              "    var jsonData = pm.response.json();",
-              "    pm.collectionVariables.set('jwt_token', jsonData.token);",
-              "}"
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
-            "type": "text/javascript"
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\",\n  \"displayName\": \"Test User\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "register"]
+            }
           }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n    \"email\": \"{{email}}\",\n    \"password\": \"{{password}}\"\n}"
         },
-        "url": {
-          "raw": "{{base_url}}/api/v1/auth/login",
-          "host": ["{{base_url}}"],
-          "path": ["api", "v1", "auth", "login"]
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('auth_token', response.token);",
+                  "    console.log('Token guardado:', response.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Delete Account",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/delete",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "delete"]
+            }
+          }
         }
-      },
-      "response": []
+      ]
     },
     {
-      "name": "Get User Profile (Protegido)",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "Bearer {{jwt_token}}"
+      "name": "Profile",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/profile",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "profile"]
+            }
           }
-        ],
-        "url": {
-          "raw": "{{base_url}}/api/v1/user/profile",
-          "host": ["{{base_url}}"],
-          "path": ["api", "v1", "user", "profile"]
         }
-      },
-      "response": []
+      ]
     },
     {
-      "name": "Delete Account via Auth (Protegido)",
-      "request": {
-        "method": "DELETE",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "Bearer {{jwt_token}}"
+      "name": "Public",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/health",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "health"]
+            }
           }
-        ],
-        "url": {
-          "raw": "{{base_url}}/api/v1/auth/delete",
-          "host": ["{{base_url}}"],
-          "path": ["api", "v1", "auth", "delete"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Delete Account via User (Protegido)",
-      "request": {
-        "method": "DELETE",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "Bearer {{jwt_token}}"
+        },
+        {
+          "name": "API Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/info",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "info"]
+            }
           }
-        ],
-        "url": {
-          "raw": "{{base_url}}/api/v1/user/profile",
-          "host": ["{{base_url}}"],
-          "path": ["api", "v1", "user", "profile"]
         }
-      },
-      "response": []
+      ]
     }
   ]
 }

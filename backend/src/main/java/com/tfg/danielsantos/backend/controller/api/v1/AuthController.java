@@ -119,7 +119,7 @@ public class AuthController {
         }
 
         String uid = authentication.getName();
-        
+    
         // Verificar que el usuario existe y eliminarlo
         UserRecord userRecord = firebaseAuth.getUser(uid);
         firebaseAuth.deleteUser(uid);

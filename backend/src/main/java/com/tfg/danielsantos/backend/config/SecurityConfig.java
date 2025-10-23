@@ -55,14 +55,16 @@ public class SecurityConfig {
             
             // Configurar qué rutas requieren autenticación
             .authorizeHttpRequests(authz -> authz
-                // Rutas públicas
-                .requestMatchers("/api/v1/health").permitAll()      // Health check
-                .requestMatchers("/api/v1/info").permitAll()        // Info endpoint
-                .requestMatchers("/api/v1/auth/**").permitAll()            // Endpoints de autenticación
-                
-                // Cualquier otra ruta requiere autenticación
-                .anyRequest().authenticated()
-            )
+            // Rutas públicas
+            .requestMatchers("/api/v1/health").permitAll()     
+            .requestMatchers("/api/v1/info").permitAll()
+            .requestMatchers("/api/v1/auth/register").permitAll()
+            .requestMatchers("/api/v1/auth/login").permitAll()
+            .requestMatchers("/api/v1/auth/delete").authenticated()
+
+            // Cualquier otra ruta requiere autenticación
+            .anyRequest().authenticated()
+        )
             
             // Agregar el filtro de Firebase ANTES del filtro de autenticación estándar
             // Esto permite que Firebase valide el token antes que Spring Security
