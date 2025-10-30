@@ -1,6 +1,9 @@
 package com.tfg.danielsantos.backend.config;
 
 import com.google.firebase.auth.FirebaseAuthException;
+import com.tfg.danielsantos.backend.exception.AuthenticationException;
+import com.tfg.danielsantos.backend.exception.ResourceNotFoundException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -26,19 +29,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(FirebaseAuthException.class)
     public ResponseEntity<Map<String, Object>> handleFirebaseAuthException(
             FirebaseAuthException ex, WebRequest request) {
-        
+
         logger.error("Error de autenticación Firebase: {}", ex.getMessage());
-        
+
         String errorCode = ex.getErrorCode() != null ? ex.getErrorCode().toString() : "UNKNOWN_ERROR";
         String userMessage = getUserFriendlyFirebaseMessage(errorCode);
-        
+
         Map<String, Object> error = createErrorResponse(
-            "Error de autenticación", 
-            userMessage,
-            HttpStatus.UNAUTHORIZED,
-            request.getDescription(false)
+                "Error de autenticación",
+                userMessage,
+                HttpStatus.UNAUTHORIZED,
+                request.getDescription(false)
         );
-        
+
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
 
@@ -48,25 +51,25 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationException(
             MethodArgumentNotValidException ex, WebRequest request) {
-        
+
         logger.error("Error de validación: {}", ex.getMessage());
-        
+
         // Extraer todos los errores de validación
         StringBuilder errorMessage = new StringBuilder("Errores de validación: ");
         ex.getBindingResult().getFieldErrors().forEach(error -> {
             errorMessage.append(error.getField())
-                       .append(" - ")
-                       .append(error.getDefaultMessage())
-                       .append("; ");
+                    .append(" - ")
+                    .append(error.getDefaultMessage())
+                    .append("; ");
         });
-        
+
         Map<String, Object> error = createErrorResponse(
-            "Error de validación", 
-            errorMessage.toString(),
-            HttpStatus.BAD_REQUEST,
-            request.getDescription(false)
+                "Error de validación",
+                errorMessage.toString(),
+                HttpStatus.BAD_REQUEST,
+                request.getDescription(false)
         );
-        
+
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
@@ -76,16 +79,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalArgumentException(
             IllegalArgumentException ex, WebRequest request) {
-        
+
         logger.error("Argumento inválido: {}", ex.getMessage());
-        
+
         Map<String, Object> error = createErrorResponse(
-            "Datos inválidos", 
-            ex.getMessage(),
-            HttpStatus.BAD_REQUEST,
-            request.getDescription(false)
+                "Datos inválidos",
+                ex.getMessage(),
+                HttpStatus.BAD_REQUEST,
+                request.getDescription(false)
         );
-        
+
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
@@ -95,17 +98,57 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Map<String, Object>> handleAccessDeniedException(
             AccessDeniedException ex, WebRequest request) {
-        
+
         logger.error("Acceso denegado: {}", ex.getMessage());
-        
+
         Map<String, Object> error = createErrorResponse(
-            "Acceso denegado", 
-            "No tienes permisos para realizar esta acción",
-            HttpStatus.FORBIDDEN,
-            request.getDescription(false)
+                "Acceso denegado",
+                "No tienes permisos para realizar esta acción",
+                HttpStatus.FORBIDDEN,
+                request.getDescription(false)
         );
-        
+
         return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+    }
+
+    /**
+     * Errores de autenticación genéricos
+     */
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<Map<String, Object>> handleAuthenticationException(
+            AuthenticationException ex, WebRequest request) {
+
+        logger.error("Error de autenticación: {}", ex.getMessage());
+
+        Map<String, Object> error = createErrorResponse(
+                "Error de autenticación",
+                ex.getMessage(),
+                HttpStatus.UNAUTHORIZED,
+                request.getDescription(false)
+        );
+
+        error.put("errorCode", ex.getErrorCode());
+
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
+
+    /**
+     * Errores de recurso no encontrado
+     */
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleResourceNotFoundException(
+            ResourceNotFoundException ex, WebRequest request) {
+
+        logger.error("Recurso no encontrado: {}", ex.getMessage());
+
+        Map<String, Object> error = createErrorResponse(
+                "Recurso no encontrado",
+                ex.getMessage(),
+                HttpStatus.NOT_FOUND,
+                request.getDescription(false)
+        );
+
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
     /**
@@ -114,23 +157,23 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGenericException(
             Exception ex, WebRequest request) {
-        
+
         logger.error("Error interno del servidor", ex);
-        
+
         Map<String, Object> error = createErrorResponse(
-            "Error interno del servidor", 
-            "Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo más tarde.",
-            HttpStatus.INTERNAL_SERVER_ERROR,
-            request.getDescription(false)
+                "Error interno del servidor",
+                "Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo más tarde.",
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                request.getDescription(false)
         );
-        
+
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     /**
      * Respuesta de error estandarizada
      */
-    private Map<String, Object> createErrorResponse(String title, String message, 
+    private Map<String, Object> createErrorResponse(String title, String message,
                                                    HttpStatus status, String path) {
         Map<String, Object> error = new HashMap<>();
         error.put("success", false);
@@ -145,7 +188,7 @@ public class GlobalExceptionHandler {
 
     /**
      * Convierte códigos de error de Firebase en mensajes amigables
-     * 
+     *
      * @param errorCode El código de error como String
      * @return Mensaje amigable para el usuario
      */
