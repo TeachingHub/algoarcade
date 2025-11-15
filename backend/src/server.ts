@@ -9,5 +9,8 @@ app.use(cookieParser());
 
 app.use("/api/auth", authController);
 
+app.use((req, res) => {
+  res.status(404).json({ message: "Endpoint not found" });
+});
 
 app.listen(PORT, () => console.log(`🚀 Servidor en http://localhost:${PORT}`));
