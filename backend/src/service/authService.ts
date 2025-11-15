@@ -13,13 +13,20 @@ export async function registerUser({ email, password, displayName }: RegisterUse
     })
 }
 
-export async function login({ email, password }: LoginRequest) {
+export async function login({ email, password }: LoginRequest): Promise<LoginResponse> {
     const apiKey = FIREBASE_API_KEY;
     if (!apiKey) throw new Error("FIREBASE_API_KEY no configurada")
 
-    const data : LoginResponse = await httpService.POST(
+    const data = await httpService.POST(
         `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`,
         { email, password, returnSecureToken: true }
     )
-    return data
-}
+    return {
+        uid: data.localId,
+        displayName: data.displayName,
+        email: data.email,
+        authToken: data.idToken,
+        refreshToken: data.refreshToken,
+        expiresIn: data.expiresIn
+    }
+}   

@@ -10,7 +10,10 @@ export type LoginRequest = {
 };
 
 export type LoginResponse = {
-  idToken : string;
+  uid : string;
+  displayName : string;
+  email : string;
+  authToken : string;
   refreshToken : string;
   expiresIn : string;
 }

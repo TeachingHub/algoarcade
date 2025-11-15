@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { registerUser, login } from "../service/authService";
 import { HttpError } from "../errors/HttpError";
+import { COOKIES } from "../config/constants";
 
 const router = Router();
 
@@ -24,8 +25,10 @@ router.post("/login", async (req, res) => {
 
   try {
     const data = await login({ email, password });
-    res.cookie("authCookie",data.idToken,{secure:true})
-    //console.log(data)
+
+    res.cookie(COOKIES.AUTH_TOKEN, data.authToken, { secure: true , httpOnly: true });
+    res.cookie(COOKIES.REFRESH_TOKEN, data.refreshToken, { secure: true, httpOnly: true });
+
     return res.status(200).json({ message: "User logged in successfully" });
   } catch (err: any) {
     if (err instanceof HttpError) {
