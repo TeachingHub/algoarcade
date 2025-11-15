@@ -19,3 +19,9 @@ export type LoginResponse = {
   refreshToken: string;
   expiresIn: string;
 }
+
+export type RefreshAuthTokenResponse = {
+  authToken: string;
+  refreshToken: string;
+  expiresIn: string;
+}
