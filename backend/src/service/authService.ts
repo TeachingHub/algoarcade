@@ -22,11 +22,20 @@ export async function login({ email, password }: LoginRequest): Promise<LoginRes
         { email, password, returnSecureToken: true }
     )
     return {
-        uid: data.localId,
-        displayName: data.displayName,
-        email: data.email,
+        user: {
+            uid: data.localId,
+            displayName: data.displayName,
+            email: data.email
+        },
         authToken: data.idToken,
         refreshToken: data.refreshToken,
         expiresIn: data.expiresIn
     }
 }   
+
+export async function logout(cookie: string) {
+    const decodedToken = await auth.verifyIdToken(cookie);
+    const uid = decodedToken.uid;
+
+    await auth.revokeRefreshTokens(uid)
+}

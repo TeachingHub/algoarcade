@@ -10,10 +10,12 @@ export type LoginRequest = {
 };
 
 export type LoginResponse = {
-  uid : string;
-  displayName : string;
-  email : string;
-  authToken : string;
-  refreshToken : string;
-  expiresIn : string;
+  user: {
+    uid: string;
+    displayName: string;
+    email: string;
+  }
+  authToken: string;
+  refreshToken: string;
+  expiresIn: string;
 }
