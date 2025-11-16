@@ -1,11 +1,109 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+}
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  /* Deep space blue background */
+  --background: oklch(0.15 0.08 250);
+  /* Bright yellow-white for text */
+  --foreground: oklch(0.98 0.12 95);
+  
+  /* Card with slightly lighter blue */
+  --card: oklch(0.2 0.1 250);
+  --card-foreground: oklch(0.98 0.12 95);
+  
+  /* Popover */
+  --popover: oklch(0.18 0.09 250);
+  --popover-foreground: oklch(0.98 0.12 95);
+  
+  /* Vibrant yellow as primary */
+  --primary: oklch(0.88 0.18 95);
+  --primary-foreground: oklch(0.15 0.08 250);
+  
+  /* Electric blue as secondary */
+  --secondary: oklch(0.55 0.18 240);
+  --secondary-foreground: oklch(0.98 0.12 95);
+  
+  /* Muted blue-grey */
+  --muted: oklch(0.3 0.06 250);
+  --muted-foreground: oklch(0.7 0.05 250);
+  
+  /* Accent cyan */
+  --accent: oklch(0.65 0.15 200);
+  --accent-foreground: oklch(0.15 0.08 250);
+  
+  /* Destructive red */
+  --destructive: oklch(0.55 0.22 25);
+  --destructive-foreground: oklch(0.98 0.12 95);
+  
+  /* Borders and inputs */
+  --border: oklch(0.35 0.1 250);
+  --input: oklch(0.25 0.08 250);
+  --ring: oklch(0.88 0.18 95);
+  
+  /* Chart colors - vibrant arcade palette */
+  --chart-1: oklch(0.88 0.18 95); /* yellow */
+  --chart-2: oklch(0.65 0.15 200); /* cyan */
+  --chart-3: oklch(0.7 0.2 330); /* magenta */
+  --chart-4: oklch(0.7 0.18 140); /* green */
+  --chart-5: oklch(0.6 0.2 30); /* orange */
+  
+  /* Pixel-perfect corners */
+  --radius: 0rem;
+
+
+  /* sizes */
+  --navbar-height: 80px;
+  --max-width: 1400px;
+  --sidebar-width: 264px;
+
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 16px;
+  --border-radius-full: 9999px;
+
+  --font-size-xxs: 10px;
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-xxl: 24px;
+  --font-size-xxxl: 32px;
+  --font-size-larger: 48px;
+  --font-size-largest: 72px;
+
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-bold: 700;
+
+  --space-xs: 4px;
+  --space-xm: 6px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 20px;
+  --space-xxl: 24px;
+  --space-xxxl: 32px;
+  --space-larger: 48px;
+  --space-largest: 64px;
+}
+
+body {
+  font-family: 'Press Start 2P', 'Courier New', monospace;
   line-height: 1.5;
-  font-weight: 400;
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-md);
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: var(--foreground);
+  background-color: var(--background);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -13,56 +111,14 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+h1, h2, h3, h4, h5, h6 {
+  font-weight: var(--font-weight-bold);
+  line-height: 1.25;
+  color: var(--primary);
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+p {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--accent);
 }

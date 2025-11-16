@@ -1,7 +1,10 @@
+import Layout from "../layouts/Layout"
+
 export default function Index(){
     return(
-        <div>
-            <h1>Welcome to the Index Page</h1>
-        </div>
+        <Layout>
+            <h1>ALGOARCADE</h1>
+            <p> {'>'} APRENDE ALGORITMOS JUGANDO_</p>
+        </Layout>
     )
 }

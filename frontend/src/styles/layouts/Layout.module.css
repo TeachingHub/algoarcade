@@ -1,0 +1,22 @@
+
+
+.layout {
+    position: relative;
+    width: 100%;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: var(--background);
+
+    .main {
+        width: 100%;
+        max-width: calc(var(--max-width) + var(--space-xl) * 2);
+        min-height: 100dvh;
+        padding: var(--space-xl);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+}
