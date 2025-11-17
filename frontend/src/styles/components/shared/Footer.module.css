@@ -16,6 +16,8 @@
         justify-content: flex-start;
         gap: var(--space-md);
         padding: 0 var(--space-xl);
+        margin-top: var(--space-xxxl);
+
 
         .sections {
             display: flex;
@@ -34,7 +36,6 @@
             h3 {
                 font-size: var(--font-size-lg);
                 margin-bottom: var(--space-xs);
-                margin-top: var(--space-xl);
             }
 
             p {
