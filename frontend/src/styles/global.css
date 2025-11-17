@@ -9,49 +9,50 @@
 
 :root {
   /* Deep space blue background */
-  --background: oklch(0.15 0.08 250);
+  --background: #00082b;
   /* Bright yellow-white for text */
-  --foreground: oklch(0.98 0.12 95);
+  --foreground: #fff897;
   
   /* Card with slightly lighter blue */
-  --card: oklch(0.2 0.1 250);
-  --card-foreground: oklch(0.98 0.12 95);
+  --card: #001340;
+  --card-foreground: #fff897;
   
   /* Popover */
-  --popover: oklch(0.18 0.09 250);
-  --popover-foreground: oklch(0.98 0.12 95);
+  --popover: #000f37;
+  --popover-foreground: #fff897;
   
   /* Vibrant yellow as primary */
-  --primary: oklch(0.88 0.18 95);
-  --primary-foreground: oklch(0.15 0.08 250);
+  --primary: #fdd505;
+  --primary-foreground: #00082b;
   
   /* Electric blue as secondary */
-  --secondary: oklch(0.55 0.18 240);
-  --secondary-foreground: oklch(0.98 0.12 95);
+  --secondary: #0079ce;
+  --secondary-foreground: #fff897;
   
   /* Muted blue-grey */
-  --muted: oklch(0.3 0.06 250);
-  --muted-foreground: oklch(0.7 0.05 250);
+  --muted: #142f4b;
+  --muted-foreground: #87a1bd;
   
   /* Accent cyan */
-  --accent: oklch(0.65 0.15 200);
-  --accent-foreground: oklch(0.15 0.08 250);
+  --accent: #00a9b3;
+  --accent-foreground: #00082b;
   
   /* Destructive red */
-  --destructive: oklch(0.55 0.22 25);
-  --destructive-foreground: oklch(0.98 0.12 95);
+  --destructive: #d40924;
+  --destructive-foreground: #fff897;
   
   /* Borders and inputs */
-  --border: oklch(0.35 0.1 250);
-  --input: oklch(0.25 0.08 250);
-  --ring: oklch(0.88 0.18 95);
+  --border: #003c6c;
+  --input: #002246;
+  --ring: #fdd505;
+  --yellow-box-shadow: #b79801;
   
   /* Chart colors - vibrant arcade palette */
-  --chart-1: oklch(0.88 0.18 95); /* yellow */
-  --chart-2: oklch(0.65 0.15 200); /* cyan */
-  --chart-3: oklch(0.7 0.2 330); /* magenta */
-  --chart-4: oklch(0.7 0.18 140); /* green */
-  --chart-5: oklch(0.6 0.2 30); /* orange */
+  --chart-1: #fdd505; /* yellow */
+  --chart-2: #00a9b3; /* cyan */
+  --chart-3: #e068d8; /* magenta */
+  --chart-4: #59b842; /* green */
+  --chart-5: #de3e2d; /* orange */
   
   /* Pixel-perfect corners */
   --radius: 0rem;
@@ -59,7 +60,7 @@
 
   /* sizes */
   --navbar-height: 80px;
-  --max-width: 1400px;
+  --max-width: 1700px;
   --sidebar-width: 264px;
 
   --border-radius-sm: 4px;

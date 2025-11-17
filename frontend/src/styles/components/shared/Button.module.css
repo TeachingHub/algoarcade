@@ -10,16 +10,19 @@
     border: none;
     transition: all 0.2s ease;
     font-size: var(--font-size-sm);
+    border-radius: 4px;
 
 }
 
 .primary {
     background-color: var(--primary);
     color: var(--accent-foreground);
+    box-shadow: 0px 4px 0px var(--yellow-box-shadow);
 }
 
 .primary:hover {
-    transform: translateY(2px) translateX(2px);
+  transform: translateY(2px);
+  box-shadow: 0px 2px 0px var(--yellow-box-shadow);
 }
 
 .secondary {
