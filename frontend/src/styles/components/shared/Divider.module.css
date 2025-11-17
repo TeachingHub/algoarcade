@@ -1,0 +1,32 @@
+.divider {
+    border: none;
+    border-top: 3px solid var(--border);
+    margin: var(--space-lg) 0;
+    max-width: var(--max-width);
+    width: 80%;
+
+    .small {
+        width: 40%;
+    }
+
+    .medium {
+        width: 60%;
+    }
+
+    .large {
+        width: 80%;
+    }
+
+    .xlarge {
+        width: 100%;
+    }
+
+    .thin {
+        border-top: 1px;
+    }
+    .thick {
+        border-top: 5px;
+    }
+
+
+}

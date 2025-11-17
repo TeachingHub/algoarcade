@@ -1,0 +1,33 @@
+    
+.footer {
+    background-color: var(--card);
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--footer-min-height);
+    border-top: 5px solid var(--border);
+
+        .content {
+        width: 100%;
+        max-width: var(--max-width);
+        min-height: var(--navbar-height);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 var(--space-xl);
+            
+            .sections {
+                display: flex;
+                align-items: center;
+                gap: var(--space-largest);
+            }
+    
+
+
+
+
+        
+    }
+}

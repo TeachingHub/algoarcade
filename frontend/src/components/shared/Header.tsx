@@ -16,7 +16,6 @@ export default function Header() {
                         <Button style={["link"]} label="BLOG" />
                     </div>
                     <Button style={["primary"]} label="LOGIN" />
-
                 </div>
             </div>
         </header>

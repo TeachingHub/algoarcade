@@ -60,6 +60,7 @@
 
   /* sizes */
   --navbar-height: 80px;
+  --footer-min-height: 200px;
   --max-width: 1700px;
   --sidebar-width: 264px;
 
