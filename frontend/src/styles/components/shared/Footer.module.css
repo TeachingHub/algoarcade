@@ -1,4 +1,3 @@
-    
 .footer {
     background-color: var(--card);
     width: 100%;
@@ -8,26 +7,53 @@
     min-height: var(--footer-min-height);
     border-top: 5px solid var(--border);
 
-        .content {
-        width: 100%;
+    .content {
+        width: 90%;
         max-width: var(--max-width);
-        min-height: var(--navbar-height);
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: space-between;
+        justify-content: flex-start;
+        gap: var(--space-md);
         padding: 0 var(--space-xl);
-            
-            .sections {
-                display: flex;
-                align-items: center;
-                gap: var(--space-largest);
+
+        .sections {
+            display: flex;
+            flex-direction: row;
+            gap: var(--space-md);
+            width: 100%;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .section {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xxs);
+
+            h3 {
+                font-size: var(--font-size-lg);
+                margin-bottom: var(--space-xs);
+                margin-top: var(--space-xl);
             }
-    
 
+            p {
+                font-size: var(--font-size-xs);
+                margin: 0;
+            }
+        }
 
+        .bottom {
+            display: flex;
+            justify-content: center;
+            padding-top: var(--space-sm);
+            margin-bottom: var(--space-xxl);
 
+            p {
+                margin: 0;
+                font-size: var(--font-size-xs);
+            }
+        }
 
-        
     }
 }
