@@ -4,29 +4,28 @@
     margin: var(--space-lg) 0;
     max-width: var(--max-width);
     width: 80%;
+}
 
-    .small {
-        width: 40%;
-    }
+.small {
+    width: 40%;
+}
 
-    .medium {
-        width: 60%;
-    }
+.medium {
+    width: 60%;
+}
 
-    .large {
-        width: 80%;
-    }
+.large {
+    width: 80%;
+}
 
-    .xlarge {
-        width: 100%;
-    }
+.xlarge {
+    width: 100%;
+}
 
-    .thin {
-        border-top: 1px;
-    }
-    .thick {
-        border-top: 5px;
-    }
+.thin {
+    border-top: 1px solid var(--border);
+}
 
-
+.thick {
+    border-top: 5px solid var(--border);
 }

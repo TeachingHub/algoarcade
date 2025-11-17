@@ -26,7 +26,7 @@ export default function Footer() {
                     </div>
                 
                 </div>
-                <Divider size="medium" thickness="thin" />
+                <Divider size="large" thickness="medium" />
                 <div className={styles.bottom}>
                     <p>© 2025 ALGOARCADE. All rights reserved.</p>
                 </div>
