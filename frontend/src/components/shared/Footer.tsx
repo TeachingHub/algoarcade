@@ -9,29 +9,16 @@ export default function Footer() {
                 <div className={styles.sections}>
                     <div className={styles.section}>
                         <h3>About Us</h3>
-                        <p>Information about the company.</p>
-                        <p>Information about the company.</p>
-                        <p>Information about the company.</p>
-                        <p>Information about the company.</p>
-                        <p>Information about the company.</p>
-                        <p>Information about the company.</p>
-                        <p>Information about the company.</p>
+                        <p>Proyecto ALGOARCADE.</p>
+                        <p>TFG de ingeniería de software.</p>
+                        
                     </div>
                     <div className={styles.section}>
                         <h3>Contact</h3>
-                        <p>Email: contact@algoarcade.com</p>
-                        <p>Email: contact@algoarcade.com</p>
-                        <p>Email: contact@algoarcade.com</p>
-                        <p>Email: contact@algoarcade.com</p>
+                        <p>Email: dani@santos-studio.es</p>
                     </div>
                     <div className={styles.section}>
                         <h3>Juegos</h3>
-                        <p> {'>'}juego 1: TSP</p>
-                        <p> {'>'}juego 2: Pathfinder A*</p>
-                        <p> {'>'}juego 3: visualgo</p>
-                        <p> {'>'}juego 1: TSP</p>
-                        <p> {'>'}juego 2: Pathfinder A*</p>
-                        <p> {'>'}juego 3: visualgo</p>
                         <p> {'>'}juego 1: TSP</p>
                         <p> {'>'}juego 2: Pathfinder A*</p>
                         <p> {'>'}juego 3: visualgo</p>
