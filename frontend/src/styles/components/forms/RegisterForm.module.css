@@ -1,4 +1,4 @@
-.loginContainer {
+.registerContainer {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -6,7 +6,7 @@
     width: 100%;
 }
 
-.loginBox {
+.registerBox {
     background-color: var(--card);
     border: 3px solid var(--border);
     padding: var(--space-xxxl);
@@ -55,43 +55,12 @@
     letter-spacing: 1px;
 }
 
-/* Removed .input styles - now handled by Input component */
-
 .options {
     display: flex;
-    justify-content: space-between;
+    justify-content: center; /* Changed to center since we might not have "forgot password" here */
     align-items: center;
     flex-wrap: wrap;
     gap: var(--space-md);
-}
-
-.checkboxGroup {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-}
-
-.checkbox {
-    width: 16px;
-    height: 16px;
-    accent-color: var(--primary);
-}
-
-.checkboxLabel {
-    color: var(--muted-foreground);
-    font-size: var(--font-size-xxs);
-    cursor: pointer;
-}
-
-.forgotLink {
-    color: var(--primary);
-    font-size: var(--font-size-xxs);
-    text-decoration: none;
-    transition: opacity 0.2s ease;
-}
-
-.forgotLink:hover {
-    opacity: 0.8;
 }
 
 .footer {
@@ -103,30 +72,14 @@
     border-top: 2px solid var(--border);
 }
 
-.signupText {
+.loginText {
     color: var(--muted-foreground);
     font-size: var(--font-size-xs);
     margin: 0;
 }
 
-.backToHome {
-    text-align: center;
-    margin-top: var(--space-md);
-}
-
-.backLink {
-    color: var(--accent);
-    font-size: var(--font-size-xs);
-    text-decoration: none;
-    transition: color 0.2s ease;
-}
-
-.backLink:hover {
-    color: var(--primary);
-}
-
 @media (max-width: 600px) {
-    .loginBox {
+    .registerBox {
         padding: var(--space-xl);
         margin: var(--space-md);
     }

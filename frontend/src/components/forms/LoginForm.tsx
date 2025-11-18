@@ -1,5 +1,6 @@
 import styles from "@/styles/components/forms/LoginForm.module.css";
 import Button from "@/components/shared/Button";
+import Input from "@/components/shared/Input";
 
 export default function LoginForm() {
     return (
@@ -16,18 +17,16 @@ export default function LoginForm() {
                 <form className={styles.form}>
                     <div className={styles.inputGroup}>
                         <label className={styles.label}>EMAIL ADDRESS</label>
-                        <input 
-                            type="email" 
-                            className={styles.input}
+                        <Input
+                            type="email"
                             placeholder="player@algoarcade.com"
                         />
                     </div>
 
                     <div className={styles.inputGroup}>
                         <label className={styles.label}>PASSWORD</label>
-                        <input 
-                            type="password" 
-                            className={styles.input}
+                        <Input
+                            type="password"
                             placeholder="••••••••"
                         />
                     </div>
@@ -44,17 +43,17 @@ export default function LoginForm() {
                         </a>
                     </div>
 
-                    <Button style={["primary"]} label="LOGIN" />
+                    <Button style={["primary"]} label="LOGIN"/>
                 </form>
 
                 <div className={styles.footer}>
                     <p className={styles.signupText}>Don't have an account?</p>
-                    <Button style={["secondary"]} label="CREATE ACCOUNT" />
+                    <Button style={["secondary"]} label="CREATE ACCOUNT" to="/register" />
                 </div>
 
-                <div className={styles.backToHome}>
+                {/* <div className={styles.backToHome}>
                     <a href="/" className={styles.backLink}>Back to Home</a>
-                </div>
+                </div> */}
             </div>
         </div>
     );
