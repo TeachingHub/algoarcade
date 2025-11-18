@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { registerUser, login, logout, refreshAuthToken } from "../service/authService";
+import { registerUser, login, logout, refreshAuthToken, getPublicUser } from "../service/authService";
 import { HttpError } from "../errors/HttpError";
 import { COOKIES } from "../config/constants";
 import { PublicUser } from "../types/user";
@@ -39,7 +39,9 @@ router.post("/login", async (req, res) => {
     res.cookie(COOKIES.AUTH_TOKEN, data.authToken, { secure: true, httpOnly: true });
     res.cookie(COOKIES.REFRESH_TOKEN, data.refreshToken, { secure: true, httpOnly: true });
 
-    return res.status(200).json({ message: "User logged in successfully" });
+    const publicUser: PublicUser = getPublicUser(data.user);
+
+    return res.status(200).json({ message: "User logged in successfully", user: publicUser });
   } catch (err: any) {
     if (err instanceof HttpError) {
       return res.status(err.statusCode).json({ error: err.message })

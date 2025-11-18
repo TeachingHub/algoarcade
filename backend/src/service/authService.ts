@@ -2,7 +2,7 @@ import { FIREBASE_API_KEY } from "../config/enviroments";
 import { auth, db } from "../db/firebaseAdmin";
 import { HttpError } from "../errors/HttpError";
 import { RegisterUserRequest, LoginRequest, LoginResponse, RefreshAuthTokenResponse } from "../types/auth";
-import { UserDocument } from "../types/user";
+import { PublicUser, UserDocument } from "../types/user";
 import { httpService } from "./httpService";
 
 
@@ -34,15 +34,26 @@ export async function login({ email, password }: LoginRequest): Promise<LoginRes
         `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`,
         { email, password, returnSecureToken: true }
     )
+    const userDocument = (await db.collection("users").doc(data.localId).get()).data() as UserDocument;
+    const date = (userDocument.createdAt as any).toDate ? (userDocument.createdAt as any).toDate() : userDocument.createdAt;
     return {
         user: {
-            uid: data.localId,
-            displayName: data.displayName,
-            email: data.email
+            email: data.email,
+            username: data.displayName,
+            role: userDocument.role,
+            createdAt: date,
         },
         authToken: data.idToken,
         refreshToken: data.refreshToken,
         expiresIn: data.expiresIn
+    }
+}
+
+export function getPublicUser(user: UserDocument): PublicUser {
+    return {
+        username: user.username,
+        role: user.role,
+        createdAt: user.createdAt,
     }
 }
 
