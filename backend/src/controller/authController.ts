@@ -2,7 +2,7 @@ import { Router, Request, Response } from "express";
 import { registerUser, login, logout, refreshAuthToken } from "../service/authService";
 import { HttpError } from "../errors/HttpError";
 import { COOKIES } from "../config/constants";
-import { refreshToken } from "firebase-admin/app";
+import { PublicUser } from "../types/user";
 
 const router = Router();
 
@@ -12,10 +12,19 @@ const router = Router();
 
 router.post("/register", async (req: Request, res: Response) => {
   try {
-    await registerUser(req.body);
-    res.status(201).send({ message: "User registered successfully" });
+    const createdUser = await registerUser(req.body);
+    const PublicUser: PublicUser = {
+      username: createdUser.username,
+      role: createdUser.role,
+      createdAt: createdUser.createdAt,
+    }
+
+    res.status(201).json({ message: "User registered successfully", user: PublicUser });
   } catch (error: any) {
-    res.status(400).send({ error: error.message });
+    if (error instanceof HttpError) {
+      return res.status(error.statusCode).json({ error: error.message })
+    }
+    res.status(500).json({ error: "Internal Server Error" });
   }
 })
 
