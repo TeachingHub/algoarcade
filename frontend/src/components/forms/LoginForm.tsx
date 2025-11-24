@@ -1,8 +1,29 @@
+import { useState } from "react";
+import { useNavigate } from "react-router";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/firebase/config";
 import styles from "@/styles/components/forms/LoginForm.module.css";
 import Button from "@/components/shared/Button";
 import Input from "@/components/shared/Input";
 
 export default function LoginForm() {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const navigate = useNavigate();
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError("");
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            navigate("/");
+        } catch (err: any) {
+            setError("Failed to login. Please check your credentials.");
+            console.error(err);
+        }
+    };
+
     return (
         <div className={styles.loginContainer}>
             <div className={styles.loginBox}>
@@ -14,12 +35,16 @@ export default function LoginForm() {
                     </p>
                 </div>
 
-                <form className={styles.form}>
+                <form className={styles.form} onSubmit={handleSubmit}>
+                    {error && <p style={{ color: 'red', textAlign: 'center', marginBottom: '1rem' }}>{error}</p>}
                     <div className={styles.inputGroup}>
                         <label className={styles.label}>EMAIL ADDRESS</label>
                         <Input
                             type="email"
                             placeholder="player@algoarcade.com"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
                         />
                     </div>
 
@@ -28,6 +53,9 @@ export default function LoginForm() {
                         <Input
                             type="password"
                             placeholder="••••••••"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
                         />
                     </div>
 
@@ -43,17 +71,13 @@ export default function LoginForm() {
                         </a>
                     </div>
 
-                    <Button style={["primary"]} label="LOGIN"/>
+                    <Button style={["primary"]} label="LOGIN" type="submit" />
                 </form>
 
                 <div className={styles.footer}>
                     <p className={styles.signupText}>Don't have an account?</p>
                     <Button style={["secondary"]} label="CREATE ACCOUNT" to="/register" />
                 </div>
-
-                {/* <div className={styles.backToHome}>
-                    <a href="/" className={styles.backLink}>Back to Home</a>
-                </div> */}
             </div>
         </div>
     );

@@ -1,8 +1,39 @@
+import { useState } from "react";
+import { useNavigate } from "react-router";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth } from "@/firebase/config";
 import styles from "@/styles/components/forms/RegisterForm.module.css";
 import Button from "@/components/shared/Button";
 import Input from "@/components/shared/Input";
 
 export default function RegisterForm() {
+    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const navigate = useNavigate();
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError("");
+
+        if (password.length < 8) {
+            setError("Password must be at least 8 characters long.");
+            return;
+        }
+
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            await updateProfile(userCredential.user, {
+                displayName: username
+            });
+            navigate("/");
+        } catch (err: any) {
+            setError("Failed to create account. " + err.message);
+            console.error(err);
+        }
+    };
+
     return (
         <div className={styles.registerContainer}>
             <div className={styles.registerBox}>
@@ -14,12 +45,15 @@ export default function RegisterForm() {
                     </p>
                 </div>
 
-                <form className={styles.form}>
+                <form className={styles.form} onSubmit={handleSubmit}>
+                    {error && <p style={{ color: 'red', textAlign: 'center', marginBottom: '1rem' }}>{error}</p>}
                     <div className={styles.inputGroup}>
                         <label className={styles.label}>USERNAME</label>
                         <Input
                             type="text"
                             placeholder="PlayerOne"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
                             required
                         />
                     </div>
@@ -29,6 +63,8 @@ export default function RegisterForm() {
                         <Input
                             type="email"
                             placeholder="player@algoarcade.com"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             required
                         />
                     </div>
@@ -38,11 +74,13 @@ export default function RegisterForm() {
                         <Input
                             type="password"
                             placeholder="••••••••"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             required
                         />
                     </div>
 
-                    <Button style={["primary"]} label="CREATE ACCOUNT" />
+                    <Button style={["primary"]} label="CREATE ACCOUNT" type="submit" />
                 </form>
 
                 <div className={styles.footer}>
