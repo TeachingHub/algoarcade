@@ -1,17 +1,44 @@
-import { BrowserRouter, Route, Routes } from "react-router";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import Index from "./pages/Index";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import ProfilePage from "./pages/ProfilePage";
+import { useAuth } from "./context/AuthContext";
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+}
+
 
 export default function Router() {
   return (
     <BrowserRouter>
-    <Routes>
-     <Route index element={<Index/>}></Route>
-     <Route path="/login" element={<LoginPage />} />
-     <Route path="/Register" element={<RegisterPage />} />
-    </Routes>
-    
+      <Routes>
+        <Route index element={<Index />}></Route>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="*" element={<Navigate to="/404" replace />} />
+        {/* <Route path="/404" element={<NotFound />} /> */}
+      </Routes>
+
     </BrowserRouter>
   );
 }

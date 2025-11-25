@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/config";
+import { useAuth } from "@/context/AuthContext";
 import styles from "@/styles/components/forms/LoginForm.module.css";
 import Button from "@/components/shared/Button";
 import Input from "@/components/shared/Input";
@@ -11,6 +12,13 @@ export default function LoginForm() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    const { user } = useAuth();
+
+    useEffect(() => {
+        if (user) {
+            navigate("/profile");
+        }
+    }, [user, navigate]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

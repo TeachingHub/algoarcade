@@ -1,8 +1,10 @@
 import styles from "@/styles/components/shared/Header.module.css";
 import Button from "./Button";
-
+import { useAuth } from "@/context/AuthContext";
 
 export default function Header() {
+    const { user } = useAuth();
+
     return (
         <header className={styles.header}>
             <div className={styles.content}>
@@ -11,11 +13,15 @@ export default function Header() {
                 </div>
                 <div className={styles.navigation}>
                     <div className={styles.navLinks}>
-                        <Button style={["link"]} label="HOME" />
+                        <Button style={["link"]} label="HOME" to="/" />
                         <Button style={["link"]} label="GAMES" />
                         <Button style={["link"]} label="BLOG" />
                     </div>
-                    <Button to="/login" style={["primary"]} label="LOGIN" />
+                    {user ? (
+                        <Button to="/profile" style={["primary"]} label={user.displayName || "PROFILE"} />
+                    ) : (
+                        <Button to="/login" style={["primary"]} label="LOGIN" />
+                    )}
                 </div>
             </div>
         </header>

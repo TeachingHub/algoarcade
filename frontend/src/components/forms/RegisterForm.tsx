@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "@/firebase/config";
+import { useAuth } from "@/context/AuthContext";
 import styles from "@/styles/components/forms/RegisterForm.module.css";
 import Button from "@/components/shared/Button";
 import Input from "@/components/shared/Input";
@@ -12,6 +13,13 @@ export default function RegisterForm() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    const { user } = useAuth();
+
+    useEffect(() => {
+        if (user) {
+            navigate("/profile");
+        }
+    }, [user, navigate]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -29,8 +37,16 @@ export default function RegisterForm() {
             });
             navigate("/");
         } catch (err: any) {
-            setError("Failed to create account. " + err.message);
             console.error(err);
+            if (err.code === 'auth/email-already-in-use') {
+                setError("This email is already registered. Please login instead.");
+            } else if (err.code === 'auth/weak-password') {
+                setError("Password should be at least 8 characters long.");
+            } else if (err.code === 'auth/invalid-email') {
+                setError("Please enter a valid email address.");
+            } else {
+                setError("Failed to create account. Please try again later.");
+            }
         }
     };
 
