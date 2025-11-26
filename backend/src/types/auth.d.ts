@@ -1,23 +1,5 @@
 export type RegisterUserRequest = {
+  uid: string;
   email: string;
-  password: string;
-  displayName: string;
+  username: string;
 };
-
-export type LoginRequest = {
-  email: string;
-  password: string;
-};
-
-export type LoginResponse = {
-  user: UserDocument;
-  authToken: string;
-  refreshToken: string;
-  expiresIn: string;
-}
-
-export type RefreshAuthTokenResponse = {
-  authToken: string;
-  refreshToken: string;
-  expiresIn: string;
-}

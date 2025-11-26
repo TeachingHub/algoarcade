@@ -35,6 +35,26 @@ export default function RegisterForm() {
             await updateProfile(userCredential.user, {
                 displayName: username
             });
+            console.log(userCredential);
+            const response = await fetch("http://localhost:3000/api/auth/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                uid: userCredential.user.uid,       // La pieza clave
+                email: userCredential.user.email,
+                username: userCredential.user.displayName
+            }),
+        });
+
+        if (!response.ok) {
+            // Si tu backend falla (ej: username duplicado), podrías querer borrar el usuario de Firebase
+            // para no dejar datos inconsistentes, o simplemente mostrar el error.
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Error creando usuario en backend");
+        }
+            
             navigate("/");
         } catch (err: any) {
             console.error(err);
