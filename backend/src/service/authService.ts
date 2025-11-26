@@ -3,11 +3,15 @@ import { RegisterUserRequest } from "../types/auth";
 import { PublicUser, UserDocument } from "../types/user";
 import { db } from "../db/firebaseAdmin";
 
+export async function isUsernameTaken(username: string): Promise<boolean> {
+    const userDocs = await db.collection("users").where("username", "==", username).get();
+    return !userDocs.empty;
+}
+
 export async function registerUser({ uid, email, username }: RegisterUserRequest): Promise<UserDocument> {
     if (!uid || !email || !username) throw new HttpError(400, "Please, provide all the required fields")
 
-    const userAlreadyExists = await db.collection("users").where("username", "==", username).get();
-    if (!userAlreadyExists.empty) throw new HttpError(409, "Username already exists")
+    if (await isUsernameTaken(username)) throw new HttpError(409, "Username already exists")
 
     const userDocument: UserDocument = {
         email,

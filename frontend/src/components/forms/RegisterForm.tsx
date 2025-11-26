@@ -21,6 +21,30 @@ export default function RegisterForm() {
         }
     }, [user, navigate]);
 
+    const checkUsernameAvailability = async (username: string) => {
+        const response = await fetch(`http://localhost:3000/api/auth/check-username?username=${username}`);
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.error || "Username not available");
+        }
+        return true; 
+    };
+
+    const registerInBackend = async (uid: string, email: string, username: string) => {
+        const response = await fetch("http://localhost:3000/api/auth/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ uid, email, username }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Backend registration failed");
+        }
+        return response.json();
+    };
+
+    // 3. Tu handleSubmit limpio
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
@@ -31,44 +55,35 @@ export default function RegisterForm() {
         }
 
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            await updateProfile(userCredential.user, {
-                displayName: username
-            });
-            console.log(userCredential);
-            const response = await fetch("http://localhost:3000/api/auth/register", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                uid: userCredential.user.uid,       // La pieza clave
-                email: userCredential.user.email,
-                username: userCredential.user.displayName
-            }),
-        });
+            await checkUsernameAvailability(username); 
 
-        if (!response.ok) {
-            // Si tu backend falla (ej: username duplicado), podrías querer borrar el usuario de Firebase
-            // para no dejar datos inconsistentes, o simplemente mostrar el error.
-            const errorData = await response.json();
-            throw new Error(errorData.error || "Error creando usuario en backend");
-        }
-            
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            await updateProfile(user, { displayName: username });
+
+            try {
+                await registerInBackend(user.uid, user.email!, username);
+            } catch (backendError: any) {
+                console.error("Rollback: Deleting Firebase user due to backend error");
+                await user.delete(); 
+                throw backendError; 
+            }
+
             navigate("/");
+
         } catch (err: any) {
             console.error(err);
             if (err.code === 'auth/email-already-in-use') {
-                setError("This email is already registered. Please login instead.");
-            } else if (err.code === 'auth/weak-password') {
-                setError("Password should be at least 8 characters long.");
-            } else if (err.code === 'auth/invalid-email') {
-                setError("Please enter a valid email address.");
+                setError("This email is already registered.");
+            } else if (err.message.includes("Username")) { 
+                setError(err.message);
             } else {
-                setError("Failed to create account. Please try again later.");
+                setError("Failed to create account. " + err.message);
             }
         }
     };
+
 
     return (
         <div className={styles.registerContainer}>
