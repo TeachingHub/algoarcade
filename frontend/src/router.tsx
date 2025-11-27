@@ -4,6 +4,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ProfilePage from "./pages/ProfilePage";
 import { useAuth } from "./context/AuthContext";
+import EditProfilePage from "./pages/EditProfilePage";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -35,6 +36,11 @@ export default function Router() {
             </ProtectedRoute>
           }
         />
+        <Route path="/profile/edit" element={
+          <ProtectedRoute>
+            <EditProfilePage />
+          </ProtectedRoute>
+        } />
         <Route path="*" element={<Navigate to="/404" replace />} />
         {/* <Route path="/404" element={<NotFound />} /> */}
       </Routes>

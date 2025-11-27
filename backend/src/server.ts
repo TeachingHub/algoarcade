@@ -2,6 +2,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import { PORT } from "./config/enviroments";
 import authController from "./controller/authController";
+import userController from "./controller/userContoller";
 import cors from "cors";
 
 const app = express();
@@ -14,6 +15,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api/auth", authController);
+app.use("/api/users", userController);
 
 app.use((req, res) => {
   res.status(404).json({ message: "Endpoint not found" });

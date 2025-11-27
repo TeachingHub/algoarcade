@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { auth } from "@/firebase/config";
+import { collection, doc, getDocs, query, setDoc, where } from "firebase/firestore";
+import { auth, db } from "@/firebase/config";
 import { useAuth } from "@/context/AuthContext";
 import styles from "@/styles/components/forms/RegisterForm.module.css";
 import Button from "@/components/shared/Button";
@@ -21,53 +22,34 @@ export default function RegisterForm() {
         }
     }, [user, navigate]);
 
-    const checkUsernameAvailability = async (username: string) => {
-        const response = await fetch(`http://localhost:3000/api/auth/check-username?username=${username}`);
-        if (!response.ok) {
-            const data = await response.json();
-            throw new Error(data.error || "Username not available");
-        }
-        return true; 
-    };
-
-    const registerInBackend = async (uid: string, email: string, username: string) => {
-        const response = await fetch("http://localhost:3000/api/auth/register", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ uid, email, username }),
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || "Backend registration failed");
-        }
-        return response.json();
-    };
-
-    // 3. Tu handleSubmit limpio
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
 
-        if (password.length < 8) {
-            setError("Password must be at least 8 characters long.");
-            return;
-        }
+        if (password.length < 8) return setError("Password must be at least 8 characters long.");
+        if (!/[^a-zA-Z0-9]/.test(password)) return setError("Password must contain at least one special character (e.g., !, @, #).");
 
         try {
-            await checkUsernameAvailability(username); 
-
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-
-            await updateProfile(user, { displayName: username });
+            const q = query(collection(db, "users"), where("username", "==", username));
+            const querySnapshot = await getDocs(q);
+            if (!querySnapshot.empty) throw new Error("Username already taken");
+            const { user } = await createUserWithEmailAndPassword(auth, email, password);
 
             try {
-                await registerInBackend(user.uid, user.email!, username);
-            } catch (backendError: any) {
-                console.error("Rollback: Deleting Firebase user due to backend error");
-                await user.delete(); 
-                throw backendError; 
+                const defaultAvatar = "/avatar.png";
+                await updateProfile(user, { displayName: username, photoURL: defaultAvatar });
+
+                await setDoc(doc(db, "users", user.uid), {
+                    username,
+                    email,
+                    role: "USER",
+                    profilePic: defaultAvatar,
+                    createdAt: new Date()
+                });
+
+            } catch (backendError) {
+                await user.delete();
+                throw backendError;
             }
 
             navigate("/");
@@ -76,10 +58,10 @@ export default function RegisterForm() {
             console.error(err);
             if (err.code === 'auth/email-already-in-use') {
                 setError("This email is already registered.");
-            } else if (err.message.includes("Username")) { 
-                setError(err.message);
+            } else if (err.code === 'auth/password-does-not-meet-requirements') {
+                setError("Password needs a special character (e.g., !, @, #).");
             } else {
-                setError("Failed to create account. " + err.message);
+                setError(err.message);
             }
         }
     };
