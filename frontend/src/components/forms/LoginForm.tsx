@@ -84,7 +84,7 @@ export default function LoginForm() {
 
                 <div className={styles.footer}>
                     <p className={styles.signupText}>Don't have an account?</p>
-                    <Button style={["secondary"]} label="CREATE ACCOUNT" to="/register" />
+                    <Button style={["link"]} label="CREATE ACCOUNT" to="/register" />
                 </div>
             </div>
         </div>

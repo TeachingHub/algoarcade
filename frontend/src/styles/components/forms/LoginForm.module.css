@@ -55,8 +55,6 @@
     letter-spacing: 1px;
 }
 
-/* Removed .input styles - now handled by Input component */
-
 .options {
     display: flex;
     justify-content: space-between;

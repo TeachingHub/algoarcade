@@ -7,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import styles from "@/styles/components/forms/RegisterForm.module.css";
 import Button from "@/components/shared/Button";
 import Input from "@/components/shared/Input";
+import { validatePassword } from "@/services/validationService";
 
 export default function RegisterForm() {
     const [username, setUsername] = useState("");
@@ -26,8 +27,12 @@ export default function RegisterForm() {
         e.preventDefault();
         setError("");
 
-        if (password.length < 8) return setError("Password must be at least 8 characters long.");
-        if (!/[^a-zA-Z0-9]/.test(password)) return setError("Password must contain at least one special character (e.g., !, @, #).");
+        const passwordValidation = await validatePassword(password);
+        if (!passwordValidation.valid) {
+            setError(passwordValidation.error || "Invalid password");
+            return;
+        }
+
 
         try {
             const q = query(collection(db, "users"), where("username", "==", username));
@@ -118,7 +123,7 @@ export default function RegisterForm() {
 
                 <div className={styles.footer}>
                     <p className={styles.loginText}>Already have an account?</p>
-                    <Button style={["secondary"]} label="LOGIN" to="/login" />
+                    <Button style={["link"]} label="LOGIN" to="/login" />
                 </div>
             </div>
         </div>
