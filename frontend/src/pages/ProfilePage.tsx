@@ -4,9 +4,10 @@ import Button from "@/components/shared/Button";
 import { useNavigate } from "react-router";
 import styles from "@/styles/pages/Profile.module.css";
 import { logoutUser } from "@/services/authService";
+import Divider from "@/components/shared/Divider";
 
 export default function ProfilePage() {
-    const { user } = useAuth();
+    const { user, userProfile } = useAuth();
     const navigate = useNavigate();
 
     const handleLogout = async () => {
@@ -47,8 +48,8 @@ export default function ProfilePage() {
                         </div>
                     </div>
                 </div>
-
-                <div className={styles.infoSection}>
+                <Divider size="xlarge" thickness="medium" />
+                <div>
                     <div className={styles.infoItem}>
                         <span className={styles.label}>ID:</span>
                         <span className={styles.value}>{user?.uid}</span>
@@ -57,15 +58,23 @@ export default function ProfilePage() {
                         <span className={styles.label}>EMAIL:</span>
                         <span className={styles.value}>{user?.email}</span>
                     </div>
+                    <div className={styles.infoItem} style={{ marginTop: '0.5rem' }}>
+                        <span className={styles.label}>ROLE:</span>
+                        <span className={styles.value}>{userProfile?.role}</span>
+                    </div>
+                    <div className={styles.infoItem} style={{ marginTop: '0.5rem' }}>
+                        <span className={styles.label}>MEMBER SINCE:</span>
+                        <span className={styles.value}>
+                            {userProfile?.createdAt?.toDate().toLocaleDateString()}
+                        </span>
+                    </div>
                 </div>
-
-                <div style={{ marginTop: "2rem", borderTop: "4px solid var(--input)", paddingTop: "1rem" }}>
-                    <Button
-                        style={["secondary"]}
-                        label="LOGOUT"
-                        onClick={handleLogout}
-                    />
-                </div>
+                <Divider size="xlarge" thickness="medium" />
+                <Button
+                    style={["secondary"]}
+                    label="LOGOUT"
+                    onClick={handleLogout}
+                />
             </div>
         </Layout>
     );
