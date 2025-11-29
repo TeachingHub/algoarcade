@@ -1,14 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { collection, doc, getDocs, query, setDoc, where } from "firebase/firestore";
-import { auth, db } from "@/firebase/config";
 import { useAuth } from "@/context/AuthContext";
 import styles from "@/styles/components/forms/RegisterForm.module.css";
 import Button from "@/components/shared/Button";
 import Input from "@/components/shared/Input";
-import { validatePassword } from "@/services/validationService";
+import { validatePassword, validateUsernameAvailability } from "@/services/validationService";
 import Divider from "../shared/Divider";
+import { registerUser } from "@/services/authService";
 
 export default function RegisterForm() {
     const [username, setUsername] = useState("");
@@ -28,36 +26,23 @@ export default function RegisterForm() {
         e.preventDefault();
         setError("");
 
+        // Password validation
         const passwordValidation = await validatePassword(password);
         if (!passwordValidation.valid) {
             setError(passwordValidation.error || "Invalid password");
             return;
         }
 
-
         try {
-            const q = query(collection(db, "users"), where("username", "==", username));
-            const querySnapshot = await getDocs(q);
-            if (!querySnapshot.empty) throw new Error("Username already taken");
-            const { user } = await createUserWithEmailAndPassword(auth, email, password);
-
-            try {
-                const defaultAvatar = "/avatar.png";
-                await updateProfile(user, { displayName: username, photoURL: defaultAvatar });
-
-                await setDoc(doc(db, "users", user.uid), {
-                    username,
-                    email,
-                    role: "USER",
-                    profilePic: defaultAvatar,
-                    createdAt: new Date()
-                });
-
-            } catch (backendError) {
-                await user.delete();
-                throw backendError;
+            // Username validation
+            const isUsernameAvailable = await validateUsernameAvailability(username);
+            if (!isUsernameAvailable) {
+                setError("Username already taken");
+                return;
             }
 
+            // Register user
+            await registerUser(email, password, username);
             navigate("/");
 
         } catch (err: any) {
@@ -67,7 +52,7 @@ export default function RegisterForm() {
             } else if (err.code === 'auth/password-does-not-meet-requirements') {
                 setError("Password needs a special character (e.g., !, @, #).");
             } else {
-                setError(err.message);
+                setError(err.message || "Failed to register");
             }
         }
     };

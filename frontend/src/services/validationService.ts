@@ -1,5 +1,6 @@
 import { validatePassword as validatePasswordFirebase, type PasswordValidationStatus } from "firebase/auth";
-import { auth } from "../firebase/config";
+import { auth, db } from "../firebase/config";
+import { collection, getDocs, query, where } from "firebase/firestore";
 
 interface ValidatePasswordResult {
     valid: boolean;
@@ -40,4 +41,15 @@ function parsePasswordError(status: PasswordValidationStatus): string {
     }
 
     return "Password does not meet the requirements.";
+}
+
+export async function validateUsernameAvailability(username: string): Promise<boolean> {
+    try {
+        const q = query(collection(db, "users"), where("username", "==", username));
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.empty;
+    } catch (error) {
+        console.error("Error checking username availability:", error);
+        throw new Error("Failed to validate username availability");
+    }
 }

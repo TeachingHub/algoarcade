@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/firebase/config";
 import { useAuth } from "@/context/AuthContext";
 import styles from "@/styles/components/forms/LoginForm.module.css";
 import Button from "@/components/shared/Button";
 import Input from "@/components/shared/Input";
 import Divider from "../shared/Divider";
+import { loginUser } from "@/services/authService";
 
 export default function LoginForm() {
     const [email, setEmail] = useState("");
@@ -25,7 +24,7 @@ export default function LoginForm() {
         e.preventDefault();
         setError("");
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            await loginUser(email, password);
             navigate("/");
         } catch (err: any) {
             setError("Failed to login. Please check your credentials.");

@@ -1,10 +1,9 @@
 import Layout from "../layouts/Layout";
 import { useAuth } from "../context/AuthContext";
 import Button from "@/components/shared/Button";
-import { auth } from "@/firebase/config";
-import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router";
 import styles from "@/styles/pages/Profile.module.css";
+import { logoutUser } from "@/services/authService";
 
 export default function ProfilePage() {
     const { user } = useAuth();
@@ -12,7 +11,7 @@ export default function ProfilePage() {
 
     const handleLogout = async () => {
         try {
-            await signOut(auth);
+            await logoutUser();
             navigate("/");
         } catch (error) {
             console.error("Error signing out:", error);

@@ -57,7 +57,7 @@
 
 .options {
     display: flex;
-    justify-content: center; /* Changed to center since we might not have "forgot password" here */
+    justify-content: center;
     align-items: center;
     flex-wrap: wrap;
     gap: var(--space-md);
