@@ -1,4 +1,4 @@
-import styles from "@/styles/components/shared/Modal.module.css"; // Necesitarás crear este CSS
+import styles from "@/styles/components/shared/Modal.module.css";
 import Button from "./Button";
 
 interface ModalProps {

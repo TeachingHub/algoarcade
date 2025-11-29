@@ -26,6 +26,7 @@ export const registerUser = async (email:string, password:string, username:strin
             photoURL: defaultAvatar 
         });  
 
+        // TODO: Extract this to a separate service
         // Create user in Firestore
         await setDoc(doc(db, "users", user.uid), {
             username,
