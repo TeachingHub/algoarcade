@@ -1,6 +1,6 @@
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, type User } from "firebase/auth";
+import { createUserWithEmailAndPassword, EmailAuthProvider, reauthenticateWithCredential, signInWithEmailAndPassword, signOut, updateProfile, type User } from "firebase/auth";
 import { auth, db } from "@/firebase/config";
-import { doc, setDoc } from "firebase/firestore";
+import { deleteDoc, doc, setDoc } from "firebase/firestore";
 
 export const loginUser = async (email: string, password: string) => {
     return await signInWithEmailAndPassword(auth, email, password);
@@ -48,3 +48,20 @@ export const registerUser = async (email:string, password:string, username:strin
         throw error; // throw error to be handled by the component
     }
 }
+
+export const deleteUserAccount = async (password: string) => {
+    const user = auth.currentUser;
+    if (!user || !user.email) throw new Error("No user logged in");
+
+    // Get user credentials
+    const credential = EmailAuthProvider.credential(user.email, password);
+
+    // Re-authenticate (This refreshes the token and allows sensitive operations)
+    await reauthenticateWithCredential(user, credential);
+
+    // Delete user data from Firestore
+    await deleteDoc(doc(db, "users", user.uid));
+    
+    // Delete user from Auth
+    await user.delete();
+};

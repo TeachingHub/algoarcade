@@ -3,11 +3,15 @@ import { useAuth } from "../context/AuthContext";
 import Button from "@/components/shared/Button";
 import { useNavigate } from "react-router";
 import styles from "@/styles/pages/Profile.module.css";
-import { logoutUser } from "@/services/authService";
+import { deleteUserAccount, logoutUser } from "@/services/authService";
 import Divider from "@/components/shared/Divider";
+import Modal from "@/components/shared/Modal";
+import { useState } from "react";
 
 export default function ProfilePage() {
     const { user, userProfile } = useAuth();
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [confirmPassword, setConfirmPassword] = useState("");
     const navigate = useNavigate();
 
     const handleLogout = async () => {
@@ -17,6 +21,26 @@ export default function ProfilePage() {
         } catch (error) {
             console.error("Error signing out:", error);
         }
+    };
+
+    const handleDeleteAccount = async () => {
+        if (!user) return;
+        try {
+            await deleteUserAccount(confirmPassword);
+            navigate("/"); 
+        } catch (error: any) {
+            console.error("Error deleting account:", error);
+            if (error.code === 'auth/wrong-password') {
+                alert("Incorrect password.");
+            } else {
+                alert("Failed to delete account: " + error.message);
+            }
+        }
+    };
+
+    const closeDeleteModal = () => {
+        setIsDeleteModalOpen(false);
+        setConfirmPassword("");
     };
 
     return (
@@ -43,7 +67,7 @@ export default function ProfilePage() {
                             <Button
                                 style={["secondary"]}
                                 label="DELETE ACCOUNT"
-                                onClick={() => console.log("Delete account clicked")}
+                                onClick={() => setIsDeleteModalOpen(true)}
                             />
                         </div>
                     </div>
@@ -76,6 +100,24 @@ export default function ProfilePage() {
                     onClick={handleLogout}
                 />
             </div>
+            
+            <Modal
+                isOpen={isDeleteModalOpen}
+                title="Delete Account"
+                message="Are you sure you want to delete your account? This action cannot be undone."
+                confirmLabel="Delete"
+                cancelLabel="Cancel"
+                onConfirm={handleDeleteAccount}
+                onCancel={() => closeDeleteModal()}
+                isDestructive
+            >
+                <input
+                    type="password"
+                    placeholder="Confirm Password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+            </Modal>
         </Layout>
     );
 }
