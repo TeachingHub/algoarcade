@@ -56,13 +56,10 @@
 }
 .error {
     color: var(--destructive);
-    background-color: rgba(239, 68, 68, 0.1);
     padding: 0.75rem;
-    border-radius: 4px;
     margin-bottom: 1.5rem;
     font-size: 0.9rem;
     width: 100%;
-    border: 1px solid rgba(239, 68, 68, 0.2);
     text-align: center;
 }
 

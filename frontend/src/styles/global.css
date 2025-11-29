@@ -53,6 +53,8 @@
   --chart-3: #e068d8; /* magenta */
   --chart-4: #59b842; /* green */
   --chart-5: #de3e2d; /* orange */
+
+  --white: #fff;
   
   /* Pixel-perfect corners */
   --radius: 0rem;

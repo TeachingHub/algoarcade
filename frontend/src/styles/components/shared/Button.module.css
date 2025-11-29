@@ -62,6 +62,16 @@
 }
 
 .danger {
+    background-color: transparent;
+    color: var(--destructive); 
+    border: 2px solid var(--destructive);
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+.danger:hover {
     background-color: var(--destructive);
-    color: var(--destructive-foreground);   
+    color: var(--white);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(var(--destructive), 0.3);
 }
