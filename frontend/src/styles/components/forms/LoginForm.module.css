@@ -98,7 +98,6 @@
     align-items: center;
     gap: var(--space-md);
     padding-top: var(--space-lg);
-    border-top: 2px solid var(--border);
 }
 
 .signupText {

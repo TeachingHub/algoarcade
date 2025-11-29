@@ -8,6 +8,7 @@ import styles from "@/styles/components/forms/RegisterForm.module.css";
 import Button from "@/components/shared/Button";
 import Input from "@/components/shared/Input";
 import { validatePassword } from "@/services/validationService";
+import Divider from "../shared/Divider";
 
 export default function RegisterForm() {
     const [username, setUsername] = useState("");
@@ -120,7 +121,7 @@ export default function RegisterForm() {
 
                     <Button style={["primary"]} label="CREATE ACCOUNT" type="submit" />
                 </form>
-
+                <Divider size="xlarge" thickness="thin" />
                 <div className={styles.footer}>
                     <p className={styles.loginText}>Already have an account?</p>
                     <Button style={["link"]} label="LOGIN" to="/login" />

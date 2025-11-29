@@ -6,6 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import styles from "@/styles/components/forms/LoginForm.module.css";
 import Button from "@/components/shared/Button";
 import Input from "@/components/shared/Input";
+import Divider from "../shared/Divider";
 
 export default function LoginForm() {
     const [email, setEmail] = useState("");
@@ -81,7 +82,7 @@ export default function LoginForm() {
 
                     <Button style={["primary"]} label="LOGIN" type="submit" />
                 </form>
-
+                <Divider size="xlarge" thickness="thin" />
                 <div className={styles.footer}>
                     <p className={styles.signupText}>Don't have an account?</p>
                     <Button style={["link"]} label="CREATE ACCOUNT" to="/register" />
