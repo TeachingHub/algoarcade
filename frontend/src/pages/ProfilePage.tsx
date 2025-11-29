@@ -7,11 +7,13 @@ import { deleteUserAccount, logoutUser } from "@/services/authService";
 import Divider from "@/components/shared/Divider";
 import Modal from "@/components/shared/Modal";
 import { useState } from "react";
+import Input from "@/components/shared/Input";
 
 export default function ProfilePage() {
     const { user, userProfile } = useAuth();
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [deleteError, setDeleteError] = useState<string | null>(null);
     const navigate = useNavigate();
 
     const handleLogout = async () => {
@@ -27,13 +29,15 @@ export default function ProfilePage() {
         if (!user) return;
         try {
             await deleteUserAccount(confirmPassword);
-            navigate("/"); 
+            navigate("/");
         } catch (error: any) {
             console.error("Error deleting account:", error);
-            if (error.code === 'auth/wrong-password') {
-                alert("Incorrect password.");
+            if (error.code === 'auth/invalid-credential') {
+                setDeleteError("Incorrect password.");
+            } else if (error.code === 'auth/missing-password') {
+                setDeleteError("Please enter your password to confirm.");
             } else {
-                alert("Failed to delete account: " + error.message);
+                setDeleteError("Failed to delete account: " + error.message);
             }
         }
     };
@@ -41,6 +45,7 @@ export default function ProfilePage() {
     const closeDeleteModal = () => {
         setIsDeleteModalOpen(false);
         setConfirmPassword("");
+        setDeleteError(null);
     };
 
     return (
@@ -100,7 +105,7 @@ export default function ProfilePage() {
                     onClick={handleLogout}
                 />
             </div>
-            
+
             <Modal
                 isOpen={isDeleteModalOpen}
                 title="Delete Account"
@@ -110,13 +115,16 @@ export default function ProfilePage() {
                 onConfirm={handleDeleteAccount}
                 onCancel={() => closeDeleteModal()}
                 isDestructive
+                error={deleteError}
             >
-                <input
+
+                <Input
                     type="password"
                     placeholder="Confirm Password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                 />
+
             </Modal>
         </Layout>
     );

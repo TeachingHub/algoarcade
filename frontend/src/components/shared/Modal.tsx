@@ -11,6 +11,7 @@ interface ModalProps {
     onCancel: () => void;
     isDestructive?: boolean;
     children?: React.ReactNode;
+    error?: string | null;
 }
 
 export default function ConfirmationModal({
@@ -22,7 +23,8 @@ export default function ConfirmationModal({
     onConfirm,
     onCancel,
     isDestructive = false,
-    children
+    children,
+    error
 }: ModalProps) {
     if (!isOpen) return null;
 
@@ -31,7 +33,10 @@ export default function ConfirmationModal({
             <div className={styles.modal}>
                 <h2 className={styles.title}>{title}</h2>
                 <p className={styles.message}>{message}</p>
-                {children}
+                {error ? <div className={styles.error}>{error}</div> : null}
+                <div className={styles.inputContainer}>
+                    {children}
+                </div>
                 <div className={styles.actions}>
                     <Button 
                         style={["secondary"]} 
