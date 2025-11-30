@@ -1,6 +1,6 @@
 import { createUserWithEmailAndPassword, EmailAuthProvider, reauthenticateWithCredential, signInWithEmailAndPassword, signOut, updateProfile, type User } from "firebase/auth";
-import { auth, db } from "@/firebase/config";
-import { deleteDoc, doc, setDoc } from "firebase/firestore";
+import { auth } from "@/firebase/config";
+import { createUserDocument, deleteUserDocument } from "./userService";
 
 export const loginUser = async (email: string, password: string) => {
     return await signInWithEmailAndPassword(auth, email, password);
@@ -26,15 +26,8 @@ export const registerUser = async (email:string, password:string, username:strin
             photoURL: defaultAvatar 
         });  
 
-        // TODO: Extract this to a separate service
         // Create user in Firestore
-        await setDoc(doc(db, "users", user.uid), {
-            username,
-            email,
-            role: "USER",
-            profilePic: defaultAvatar,
-            createdAt: new Date()
-        });
+        await createUserDocument(user);    
 
         return user;
     }
@@ -61,7 +54,7 @@ export const deleteUserAccount = async (password: string) => {
     await reauthenticateWithCredential(user, credential);
 
     // Delete user data from Firestore
-    await deleteDoc(doc(db, "users", user.uid));
+    await deleteUserDocument(user);
     
     // Delete user from Auth
     await user.delete();
