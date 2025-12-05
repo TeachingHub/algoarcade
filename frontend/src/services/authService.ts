@@ -1,6 +1,6 @@
 import { createUserWithEmailAndPassword, EmailAuthProvider, reauthenticateWithCredential, signInWithEmailAndPassword, signOut, updateProfile, type User } from "firebase/auth";
 import { auth } from "@/firebase/config";
-import { createUserDocument, deleteUserDocument } from "./userService";
+import { createUserDocument, deleteUserDocument, updateUserDocument } from "./userService";
 
 export const loginUser = async (email: string, password: string) => {
     return await signInWithEmailAndPassword(auth, email, password);
@@ -58,4 +58,25 @@ export const deleteUserAccount = async (password: string) => {
     
     // Delete user from Auth
     await user.delete();
+};
+
+
+export const updateUserProfile = async (user: User, data: { username?: string;  }) => {
+    try {
+
+        // Update profile in Firebase Auth
+        await updateProfile(user, {
+            displayName: data.username
+        });
+        
+        // Update document in Firestore
+        await updateUserDocument(user.uid, {
+            username: data.username,
+        });
+
+        return user;
+    } catch (error) {
+        console.error("Error updating profile:", error);
+        throw error;
+    }
 };

@@ -1,5 +1,5 @@
-import { deleteDoc, setDoc } from "firebase/firestore";
-import { db } from "../firebase/config";
+import { deleteDoc, setDoc, updateDoc } from "firebase/firestore";
+import { db } from "@/firebase/config";
 import type { User } from "firebase/auth";
 import { doc } from "firebase/firestore";
 
@@ -24,5 +24,15 @@ export async function deleteUserDocument(user: User) {
         await deleteDoc(doc(db, "users", user.uid));
     } catch (error) {
         console.error("Error deleting document:", error);
+    }
+}
+
+export async function updateUserDocument(uid: string, data: { username?: string }) {
+    try {
+        const userRef = doc(db, "users", uid);
+        await updateDoc(userRef, data);
+    } catch (error) {
+        console.error("Error updating document:", error);
+        throw error;
     }
 }

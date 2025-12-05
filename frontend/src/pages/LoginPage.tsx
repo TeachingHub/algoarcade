@@ -1,10 +1,88 @@
-import LoginForm from "@/components/forms/LoginForm";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
+import { useAuth } from "@/context/AuthContext";
+import { loginUser } from "@/services/authService";
 import Layout from "@/layouts/Layout";
+import FormWrapper from "@/components/forms/FormWrapper";
+import Input from "@/components/shared/Input";
+import Button from "@/components/shared/Button";
+import styles from "@/styles/components/forms/Form.module.css";
 
 export default function LoginPage() {
-    return(
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const navigate = useNavigate();
+    const { user } = useAuth();
+
+    useEffect(() => {
+        if (user) {
+            navigate("/profile");
+        }
+    }, [user, navigate]);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError("");
+        try {
+            await loginUser(email, password);
+            navigate("/");
+        } catch (err: any) {
+            setError("Failed to login. Please check your credentials.");
+            console.error(err);
+        }
+    };
+
+    return (
         <Layout>
-            <LoginForm/>        
+            <FormWrapper
+                title="LOGIN"
+                subtitle={<>Access your algorithm<br />training center</>}
+                onSubmit={handleSubmit}
+                error={error}
+                footer={
+                    <>
+                        <p className={styles.footerText}>Don't have an account?</p>
+                        <Button style={["link"]} label="CREATE ACCOUNT" to="/register" />
+                    </>
+                }
+            >
+                <div className={styles.inputGroup}>
+                    <label className={styles.label}>EMAIL ADDRESS</label>
+                    <Input
+                        type="email"
+                        placeholder="player@algoarcade.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
+                </div>
+
+                <div className={styles.inputGroup}>
+                    <label className={styles.label}>PASSWORD</label>
+                    <Input
+                        type="password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                </div>
+
+                <div className={styles.options}>
+                    <div className={styles.checkboxGroup}>
+                        <input type="checkbox" id="remember" className={styles.checkbox} />
+                        <label htmlFor="remember" className={styles.checkboxLabel}>
+                            Remember me
+                        </label>
+                    </div>
+                    <a href="#" className={styles.forgotLink}>
+                        Forgot Password?
+                    </a>
+                </div>
+
+                <Button style={["primary"]} label="LOGIN" type="submit" />
+            </FormWrapper>
         </Layout>
-    )
+    );
 }

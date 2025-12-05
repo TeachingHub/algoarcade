@@ -1,4 +1,4 @@
-.registerContainer {
+.container {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -6,7 +6,7 @@
     width: 100%;
 }
 
-.registerBox {
+.box {
     background-color: var(--card);
     border: 3px solid var(--border);
     padding: var(--space-xxxl);
@@ -27,6 +27,7 @@
     color: var(--primary);
     margin-bottom: var(--space-md);
     letter-spacing: 2px;
+    text-transform: uppercase;
 }
 
 .subtitle {
@@ -53,14 +54,44 @@
     font-size: var(--font-size-xs);
     font-weight: var(--font-weight-bold);
     letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
 .options {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
     gap: var(--space-md);
+}
+
+.checkboxGroup {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.checkbox {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--primary);
+}
+
+.checkboxLabel {
+    color: var(--muted-foreground);
+    font-size: var(--font-size-xxs);
+    cursor: pointer;
+}
+
+.forgotLink {
+    color: var(--primary);
+    font-size: var(--font-size-xxs);
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+}
+
+.forgotLink:hover {
+    opacity: 0.8;
 }
 
 .footer {
@@ -71,14 +102,21 @@
     padding-top: var(--space-lg);
 }
 
-.loginText {
+.footerText {
     color: var(--muted-foreground);
     font-size: var(--font-size-xs);
     margin: 0;
 }
 
+.error {
+    color: var(--destructive);
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: var(--font-size-sm);
+}
+
 @media (max-width: 600px) {
-    .registerBox {
+    .box {
         padding: var(--space-xl);
         margin: var(--space-md);
     }
