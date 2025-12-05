@@ -10,16 +10,17 @@ interface GameCardProps {
     thumbnail?: string;
 }
 
-export default function GameCard({ 
-    title, 
-    description, 
-    difficulty, 
-    tags, 
-    onClick 
+export default function GameCard({
+    title,
+    description,
+    difficulty,
+    tags,
+    onClick,
+    thumbnail
 }: GameCardProps) {
-    
+
     const getDifficultyColor = (diff: string) => {
-        switch(diff) {
+        switch (diff) {
             case 'EASY': return styles.easy;
             case 'MEDIUM': return styles.medium;
             case 'HARD': return styles.hard;
@@ -30,9 +31,13 @@ export default function GameCard({
     return (
         <div className={styles.card} onClick={onClick}>
             <div className={styles.imagePlaceholder}>
-                <span className={styles.icon}>🎮</span>
+                {thumbnail ? (
+                    <img src={thumbnail} alt={title} className={styles.thumbnailImage} />
+                ) : (
+                    <span className={styles.icon}>🎮</span>
+                )}
             </div>
-            
+
             <div className={styles.content}>
                 <div className={styles.header}>
                     <div className={styles.tags}>
@@ -49,10 +54,10 @@ export default function GameCard({
                 <p className={styles.description}>{description}</p>
 
                 <div className={styles.footer}>
-                    <Button 
-                        style={["primary", "fullWidth"]} 
-                        label="PLAY NOW" 
-                        onClick={onClick} 
+                    <Button
+                        style={["primary", "fullWidth"]}
+                        label="PLAY NOW"
+                        onClick={onClick}
                     />
                 </div>
             </div>

@@ -26,16 +26,11 @@
     position: relative;
 }
 
-.imagePlaceholder::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(to bottom,
-            transparent 0px,
-            transparent 2px,
-            rgba(0, 0, 0, 0.3) 2px,
-            rgba(0, 0, 0, 0.3) 4px);
-    pointer-events: none;
+.thumbnailImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 .icon {
@@ -86,15 +81,18 @@
 }
 
 .easy {
-    color: var(--chart-4); /* Green */
+    color: var(--chart-4);
+    /* Green */
 }
 
 .medium {
-    color: var(--chart-1); /* Yellow */
+    color: var(--chart-1);
+    /* Yellow */
 }
 
 .hard {
-    color: var(--destructive); /* Red */
+    color: var(--destructive);
+    /* Red */
 }
 
 .title {
