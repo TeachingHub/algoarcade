@@ -14,7 +14,7 @@ export default function Header() {
                 <div className={styles.navigation}>
                     <div className={styles.navLinks}>
                         <Button style={["link"]} label="HOME" to="/" />
-                        <Button style={["link"]} label="GAMES" />
+                        <Button style={["link"]} label="GAMES" to="/games" />
                         <Button style={["link"]} label="BLOG" />
                     </div>
                     {user ? (

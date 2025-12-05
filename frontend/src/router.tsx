@@ -5,6 +5,8 @@ import RegisterPage from "./pages/RegisterPage";
 import ProfilePage from "./pages/ProfilePage";
 import { useAuth } from "./context/AuthContext";
 import EditProfilePage from "./pages/EditProfilePage";
+import Games from "./pages/games/Games";
+import TSP from "./pages/games/TSP";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -28,6 +30,8 @@ export default function Router() {
         <Route index element={<Index />}></Route>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/games" element={<Games />} />
+        <Route path="/games/tsp" element={<TSP />} />
         <Route
           path="/profile"
           element={

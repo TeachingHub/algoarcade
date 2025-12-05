@@ -1,6 +1,6 @@
 import styles from "@styles/components/shared/Button.module.css";
 
-type ButtonStyle = "primary" | "secondary" | "tertiary" | "link" | "danger";
+type ButtonStyle = "primary" | "secondary" | "tertiary" | "link" | "danger" | "fullWidth";
 
 interface ButtonProps {
     style: ButtonStyle[];
