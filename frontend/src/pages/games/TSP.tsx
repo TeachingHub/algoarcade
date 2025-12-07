@@ -252,9 +252,11 @@ export default function TSP() {
                 setState(prev => ({ ...prev, isRunning: false }));
                 setAnimationId(null);
 
-                // Calculate improvement percentage
-                const improvement = ((userDistance - currentDist) / userDistance * 100).toFixed(1);
-                setGameResult(`Your route: ${formatDistance(userDistance)}. AI optimized: ${formatDistance(currentDist)} (-${improvement}%)`);
+                if (currentDist < userDistance - 1) {
+                    setGameResult(`YOU LOSE! 🤖\nAlgorithm found a better path (${formatDistance(currentDist)})`);
+                } else {
+                    setGameResult("YOU WIN! 🏆\nYour path was optimal!");
+                }
             }
         };
 
@@ -524,7 +526,7 @@ export default function TSP() {
                                 <div className={styles.customGenRow}>
                                     <input
                                         type="number"
-                                        min="3"
+                                        min="5"
                                         max="50"
                                         value={customPointCount}
                                         onChange={(e) => setCustomPointCount(Math.min(50, Math.max(3, parseInt(e.target.value) || 3)))}

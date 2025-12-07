@@ -123,16 +123,21 @@
 
 .instructionOverlay {
     position: absolute;
-    top: var(--space-md);
+    bottom: var(--space-md);
     left: 50%;
     transform: translateX(-50%);
-    background-color: rgba(0, 8, 43, 0.8);
-    padding: var(--space-sm) var(--space-md);
+    background-color: rgba(0, 8, 43, 0.6);
+    padding: var(--space-xs) var(--space-sm);
     border-radius: var(--radius-full);
-    font-size: var(--font-size-xs);
-    color: var(--white);
+    font-size: 10px;
+    color: var(--muted-foreground);
     pointer-events: none;
-    border: 1px solid var(--border);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: opacity 0.3s;
+}
+
+.canvasArea:hover .instructionOverlay {
+    opacity: 0.2;
 }
 
 .radioGroup {
