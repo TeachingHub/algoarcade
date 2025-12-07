@@ -529,7 +529,7 @@ export default function TSP() {
                                         min="5"
                                         max="50"
                                         value={customPointCount}
-                                        onChange={(e) => setCustomPointCount(Math.min(50, Math.max(3, parseInt(e.target.value) || 3)))}
+                                        onChange={(e) => setCustomPointCount(Math.min(50, Math.max(5, parseInt(e.target.value) || 5)))}
                                         className={styles.numberInput}
                                     />
                                     <Button
