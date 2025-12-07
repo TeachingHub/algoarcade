@@ -74,6 +74,7 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    position: relative;
 }
 
 .sidebar {
@@ -109,7 +110,137 @@
     gap: 5px;
 }
 
-.placeholder {
+.notification {
+    background-color: rgba(253, 213, 5, 0.1);
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    padding: var(--space-md);
+    border-radius: var(--radius-sm);
+    text-align: center;
+    font-size: var(--font-size-xs);
+    margin-bottom: var(--space-md);
+}
+
+.instructionOverlay {
+    position: absolute;
+    top: var(--space-md);
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 8, 43, 0.8);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-xs);
+    color: var(--white);
+    pointer-events: none;
+    border: 1px solid var(--border);
+}
+
+.radioGroup {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.radioLabel {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: var(--font-size-xs);
     color: var(--muted-foreground);
-    letter-spacing: 2px;
+    cursor: pointer;
+}
+
+.radioLabel input {
+    accent-color: var(--primary);
+}
+
+/* New Styles for Scenario Selector */
+.scenarioSelector {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.selectInput {
+    background: var(--background);
+    border: 1px solid var(--border);
+    color: var(--foreground);
+    padding: var(--space-sm);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: var(--font-size-xs);
+    width: 100%;
+    cursor: pointer;
+}
+
+.selectInput:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.numberInput {
+    background: var(--background);
+    border: 1px solid var(--border);
+    color: var(--foreground);
+    padding: var(--space-sm);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: var(--font-size-xs);
+    width: 60px;
+}
+
+.customGenRow {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: center;
+}
+
+.slider {
+    width: 100%;
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+/* Context Block Styling */
+.contextBlock {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--primary);
+    padding: var(--space-md);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--space-lg);
+}
+
+.contextTitle {
+    margin: 0 0 var(--space-xs) 0;
+    color: var(--primary);
+    font-size: var(--font-size-sm);
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.contextDescription {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-size: var(--font-size-xs);
+    line-height: 1.5;
+}
+
+.resultOverlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.9);
+    padding: var(--space-lg);
+    border-radius: var(--radius-md);
+    color: var(--white);
+    font-size: var(--font-size-lg);
+    font-weight: bold;
+    border: 2px solid var(--primary);
+    text-align: center;
+    white-space: pre-line;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    z-index: 10;
 }
