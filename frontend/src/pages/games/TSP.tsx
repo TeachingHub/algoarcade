@@ -241,8 +241,7 @@ export default function TSP() {
 
             setState(prev => ({
                 ...prev,
-                bestPath: route,
-                bestDistance: currentDist
+                bestPath: route
             }));
 
             if (result.improved) {
