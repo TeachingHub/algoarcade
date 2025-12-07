@@ -2,7 +2,7 @@
     max-width: 1400px;
     margin: 0 auto;
     padding: var(--space-lg);
-    height: calc(100vh - 80px);
+    min-height: calc(100vh - 80px);
     display: flex;
     flex-direction: column;
     gap: var(--space-lg);
@@ -16,11 +16,29 @@
     border-bottom: 1px solid var(--border);
 }
 
+.headerLeft {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.titleRow {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
 .title {
     font-size: var(--font-size-xxl);
     color: var(--primary);
-    margin: 0 0 var(--space-xs) 0;
+    margin: 0;
     letter-spacing: 2px;
+}
+
+.instructions {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-size: var(--font-size-sm);
 }
 
 .badges {
@@ -63,7 +81,6 @@
     grid-template-columns: 1fr 300px;
     gap: var(--space-lg);
     flex-grow: 1;
-    min-height: 0;
 }
 
 .canvasArea {
@@ -228,6 +245,45 @@
 .contextDescription {
     margin: 0;
     color: var(--muted-foreground);
+    font-size: var(--font-size-xs);
+    line-height: 1.5;
+}
+
+.mainColumn {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.instructionsBlock {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: var(--space-lg);
+    border-radius: var(--radius-md);
+}
+
+.instructionsBlock h3 {
+    color: var(--primary);
+    font-size: var(--font-size-sm);
+    margin: 0 0 var(--space-md) 0;
+    letter-spacing: 1px;
+}
+
+.instructionGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-lg);
+}
+
+.instructionItem h4 {
+    color: var(--foreground);
+    margin: 0 0 var(--space-xs) 0;
+    font-size: var(--font-size-sm);
+}
+
+.instructionItem p {
+    color: var(--muted-foreground);
+    margin: 0;
     font-size: var(--font-size-xs);
     line-height: 1.5;
 }

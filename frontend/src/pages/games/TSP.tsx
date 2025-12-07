@@ -259,7 +259,7 @@ export default function TSP() {
             }
         };
 
-        const timeoutId = setTimeout(improve, 500); // Small delay before starting
+        const timeoutId = setTimeout(improve, 500);
         setAnimationId(timeoutId);
     };
 
@@ -342,7 +342,10 @@ export default function TSP() {
 
         if (pattern === 'random') {
             points = generateRandomPoints(count || 8, canvasSize.width, canvasSize.height);
-            setScenarioInfo(null);
+            setScenarioInfo({
+                name: "Random Path",
+                description: "Chaos theory in action! Can you find order in this randomness?"
+            });
             setBgElements([]);
         } else {
             points = getPredefinedPoints(pattern, canvasSize.width, canvasSize.height);
@@ -400,24 +403,44 @@ export default function TSP() {
                 )}
 
                 <div className={styles.content}>
-                    <div className={styles.canvasArea}>
-                        <canvas
-                            ref={canvasRef}
-                            width={canvasSize.width}
-                            height={canvasSize.height}
-                            onClick={handleCanvasClick}
-                            style={{ cursor: algorithm === 'manual' ? 'crosshair' : 'default' }}
-                        />
-                        {algorithm === 'manual' && manualPath.length < state.points.length && !gameResult && (
-                            <div className={styles.instructionOverlay}>
-                                Click points to build path: {manualPath.length}/{state.points.length}
+                    <div className={styles.mainColumn}>
+                        <div className={styles.canvasArea}>
+                            <canvas
+                                ref={canvasRef}
+                                width={canvasSize.width}
+                                height={canvasSize.height}
+                                onClick={handleCanvasClick}
+                                style={{ cursor: algorithm === 'manual' ? 'crosshair' : 'default' }}
+                            />
+                            {algorithm === 'manual' && manualPath.length < state.points.length && !gameResult && (
+                                <div className={styles.instructionOverlay}>
+                                    Click points to build path: {manualPath.length}/{state.points.length}
+                                </div>
+                            )}
+                            {gameResult && (
+                                <div className={styles.resultOverlay}>
+                                    {gameResult}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className={styles.instructionsBlock}>
+                            <h3>HOW TO PLAY</h3>
+                            <div className={styles.instructionGrid}>
+                                <div className={styles.instructionItem}>
+                                    <h4>1. Choose a Mode</h4>
+                                    <p>Select a scenario from the dropdown or generate a random instance.</p>
+                                </div>
+                                <div className={styles.instructionItem}>
+                                    <h4>2. Connect the Dots</h4>
+                                    <p>In <strong>Manual Mode</strong>, click points to form a path. Try to find the shortest route without crossing lines!</p>
+                                </div>
+                                <div className={styles.instructionItem}>
+                                    <h4>3. Beat the AI</h4>
+                                    <p>Submit your path and see if the <strong>2-opt algorithm</strong> can improve it. If it can't, you win!</p>
+                                </div>
                             </div>
-                        )}
-                        {gameResult && (
-                            <div className={styles.resultOverlay}>
-                                {gameResult}
-                            </div>
-                        )}
+                        </div>
                     </div>
 
                     <div className={styles.sidebar}>
@@ -494,34 +517,41 @@ export default function TSP() {
                         </div>
 
                         <div className={styles.controlPanel}>
-                            <h3>GENERATE</h3>
-                            <div className={styles.scenarioSelector}>
-                                <select
-                                    className={styles.selectInput}
-                                    onChange={(e) => {
-                                        if (e.target.value) generatePoints(e.target.value);
-                                    }}
-                                    defaultValue=""
-                                >
-                                    <option value="" disabled>Select Scenario...</option>
+                            <h3>START TRAINING!</h3>
 
-                                    <optgroup label="Challenges (Randomized)">
-                                        <option value="supermarket">🛒 Supermarket Run</option>
-                                        <option value="grid">🍕 Pizza Delivery</option>
-                                        <option value="islands">🏝️ Island Hopping</option>
-                                        <option value="corners">🔳 Four Corners</option>
-                                    </optgroup>
+                            <div className={styles.setting}>
+                                <span className={styles.statLabel} style={{ marginBottom: '5px' }}>CHOOSE A MODE</span>
+                                <div className={styles.scenarioSelector}>
+                                    <select
+                                        className={styles.selectInput}
+                                        onChange={(e) => {
+                                            if (e.target.value) generatePoints(e.target.value);
+                                        }}
+                                        defaultValue=""
+                                    >
+                                        <option value="" disabled>Select Scenario...</option>
 
-                                    <optgroup label="Pattern Recognition">
-                                        <option value="star">⭐ Hidden Shapes</option>
-                                        <option value="constellation">✨ Broken Constellation</option>
-                                    </optgroup>
+                                        <optgroup label="Challenges (Randomized)">
+                                            <option value="supermarket">🛒 Supermarket Run</option>
+                                            <option value="grid">🍕 Pizza Delivery</option>
+                                            <option value="islands">🏝️ Island Hopping</option>
+                                            <option value="corners">🔳 Four Corners</option>
+                                        </optgroup>
 
-                                    <optgroup label="Real World">
-                                        <option value="europe">🌍 Europe Map</option>
-                                    </optgroup>
-                                </select>
+                                        <optgroup label="Pattern Recognition">
+                                            <option value="star">⭐ Hidden Shapes</option>
+                                            <option value="constellation">✨ Broken Constellation</option>
+                                        </optgroup>
 
+                                        <optgroup label="Real World">
+                                            <option value="europe">🌍 Europe Map</option>
+                                        </optgroup>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className={styles.setting} style={{ marginTop: '15px' }}>
+                                <span className={styles.statLabel} style={{ marginBottom: '5px' }}>GENERATE RANDOM INSTANCE</span>
                                 <div className={styles.customGenRow}>
                                     <input
                                         type="number"
@@ -533,7 +563,7 @@ export default function TSP() {
                                     />
                                     <Button
                                         style={["secondary", "fullWidth"]}
-                                        label="GENERATE RANDOM"
+                                        label="Go!"
                                         onClick={() => generatePoints('random', customPointCount)}
                                     />
                                 </div>
