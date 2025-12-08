@@ -69,7 +69,7 @@ export const getPredefinedPoints = (pattern: string, width: number, height: numb
 
         // Generate 15 points scattered in the "walking paths"
         for (let i = 0; i < 15; i++) {
-            let x, y;
+            let x;
             // Ensure points are NOT inside the shelves (roughly)
             // Aisles at: 20%, 50%, 80% width
             const col = i % 4; // 0: left, 1: mid-left, 2: mid-right, 3: right
@@ -78,7 +78,7 @@ export const getPredefinedPoints = (pattern: string, width: number, height: numb
             else if (col === 2) x = padding + aisleWidth * 2.5 + (Math.random() * 20 - 10);
             else x = padding + aisleWidth * 3.5;
 
-            y = padding + Math.random() * availableHeight;
+            const y = padding + Math.random() * availableHeight;
             points.push({ id: i, x, y });
         }
     } else if (pattern === 'star') {
@@ -231,7 +231,7 @@ export const getScenarioConfig = (pattern: string, width: number, height: number
     const availableHeight = height - 2 * padding;
 
     switch (pattern) {
-        case 'supermarket':
+        case 'supermarket': {
             const aisleWidth = availableWidth / 5;
             const aisleHeight = availableHeight * 0.8;
             return {
@@ -243,6 +243,7 @@ export const getScenarioConfig = (pattern: string, width: number, height: number
                     { type: 'rect', x: padding + aisleWidth * 3.4, y: padding + availableHeight * 0.1, w: aisleWidth * 0.4, h: aisleHeight, color: '#e2e8f0' }
                 ]
             };
+        }
         case 'star':
             return {
                 name: "Connect the Dots",
@@ -275,6 +276,12 @@ export const getScenarioConfig = (pattern: string, width: number, height: number
             return {
                 name: "Four Corners",
                 description: "Visit the center, then do a big loop for the corners.",
+                bgElements: []
+            };
+        case 'europe':
+            return {
+                name: "Europe Map",
+                description: "Visit major European cities efficiently. A classic TSP challenge!",
                 bgElements: []
             };
         default:

@@ -305,3 +305,34 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     z-index: 10;
 }
+
+@media (max-width: 1024px) {
+    .content {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: var(--space-md);
+    }
+
+    .controlPanel {
+        flex: 1;
+        min-width: 300px;
+    }
+}
+
+.canvasArea {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    min-height: 500px;
+    /* Ensure minimum height */
+    width: 100%;
+}
