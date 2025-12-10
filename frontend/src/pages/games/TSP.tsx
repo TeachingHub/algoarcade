@@ -16,6 +16,7 @@ import {
     numberColor
 } from "../../utils/tsp/tsp";
 import { useAuth } from "@/context/AuthContext";
+import { Link } from 'react-router';
 
 export default function TSP() {
     const { user } = useAuth();
@@ -365,17 +366,17 @@ export default function TSP() {
     };
 
     return (
-        <Layout>
+        <Layout noHeader noFooter>
             <div className={styles.gameContainer}>
                 {!user && (
                     <div className={styles.notification}>
-                        ⚠️ Progress not saved. Log in to track your scores!
+                        ⚠️ Progress not saved. Log in to track your scores! <Link to="/login">Log in</Link> or <Link to="/register">Register</Link>
                     </div>
                 )}
 
                 <div className={styles.header}>
                     <div>
-                        <h1 className={styles.title}>TRAVELING SALESPERSON</h1>
+                        <h1 className={styles.title}> <Link to="/Games">{"<"}</Link>TRAVELING SALESPERSON</h1>
                         <div className={styles.badges}>
                             <span className={styles.badge}>HARD</span>
                             <span className={styles.badge}>GRAPH</span>
