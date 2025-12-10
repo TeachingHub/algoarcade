@@ -21,20 +21,20 @@
 }
 
 .primary:hover {
-  transform: translateY(2px);
-  box-shadow: 0px 2px 0px var(--yellow-box-shadow);
+    transform: translateY(2px);
+    box-shadow: 0px 2px 0px var(--yellow-box-shadow);
 }
 
 .secondary {
     background-color: var(--secondary);
-    color: var(--secondary-foreground);
-    border: 2px solid var(--secondary-foreground);
+    color: var(--white);
+    box-shadow: 0px 4px 0px var(--secondary-box-shadow);
 }
 
 .secondary:hover {
     transform: translateY(2px);
-    border: 2px solid transparent;
-    color: var(--accent-foreground);
+    box-shadow: 0px 2px 0px var(--secondary-box-shadow);
+    color: var(--white);
 }
 
 .tertiary {
@@ -62,18 +62,14 @@
 }
 
 .danger {
-    background-color: transparent;
-    color: var(--destructive); 
-    border: 2px solid var(--destructive);
-    font-weight: bold;
-    transition: all 0.2s ease;
+    background-color: var(--destructive);
+    color: var(--white);
+    box-shadow: 0px 4px 0px var(--destructive-box-shadow);
 }
 
 .danger:hover {
-    background-color: var(--destructive);
-    color: var(--white);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(var(--destructive), 0.3);
+    transform: translateY(2px);
+    box-shadow: 0px 2px 0px var(--destructive-box-shadow);
 }
 
 .fullWidth {

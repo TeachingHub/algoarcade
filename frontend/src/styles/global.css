@@ -40,12 +40,15 @@
   /* Destructive red */
   --destructive: #d40924;
   --destructive-foreground: #fff897;
+  --destructive-box-shadow: #b51d1d66;
   
   /* Borders and inputs */
   --border: #003c6c;
   --input: #002246;
   --ring: #fdd505;
   --yellow-box-shadow: #b79801;
+  --secondary-box-shadow: #0b5082;
+  --destructive-box-shadow: #b51d1d66;
   
   /* Chart colors - vibrant arcade palette */
   --chart-1: #fdd505; /* yellow */
@@ -115,22 +118,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 999;
-  background-image:
-    repeating-linear-gradient(
-      to bottom,
-      rgba(255,255,255,0.12) 0px,
-      rgba(255,255,255,0.12) 2px,
-      transparent 2px,
-      transparent 6px
-    );
-  mix-blend-mode: overlay;
-}
 
 
 h1, h2, h3, h4, h5, h6 {
