@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react';
 import type { Point } from "@/types/games/tsp";
-import { pathColor, manualPathColor, numberColor } from "@/utils/tsp/tsp";
+import { pathColor, manualPathColor, numberColor } from "@/utils/tsp";
 
 interface TSPCanvasProps {
     width: number;

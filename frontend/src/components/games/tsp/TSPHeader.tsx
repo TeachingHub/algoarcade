@@ -1,7 +1,7 @@
 import styles from "@/styles/pages/games/TSP.module.css";
 import Button from "@/components/shared/Button";
 import Badge from "@/components/shared/Badge";
-import { formatDistance } from "@/utils/tsp/tsp";
+import { formatDistance } from "@/utils/tsp";
 import type { TSPState } from "@/types/games/tsp";
 
 interface TSPHeaderProps {

@@ -8,7 +8,7 @@ import {
     getPredefinedPoints,
     getScenarioConfig,
     formatDistance
-} from "@/utils/tsp/tsp";
+} from "@/utils/tsp";
 
 export const useTSPGame = (canvasSize: { width: number, height: number }) => {
     const [gameState, setGameState] = useState<TSPState>({
