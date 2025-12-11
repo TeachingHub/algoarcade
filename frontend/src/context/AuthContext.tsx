@@ -1,17 +1,8 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { type User, onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore"; 
-import { auth, db } from "../firebase/config";
-
-
-// User defined in Firestore
-export interface UserProfileData {
-    username: string;
-    email: string;
-    role: "USER" | "ADMIN"; 
-    profilePic: string;
-    createdAt: any;
-}
+import { auth } from "../firebase/config";
+import type { UserProfileData } from "@/types/user/user";
+import { getUserDocument } from "../services/userService";
 
 interface AuthContextType {
     user: User | null; 
@@ -35,25 +26,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
             setUser(currentUser);
-
+            
             if (currentUser) {
-                // fetch user profile from Firestore
-                try {
-                    const docRef = doc(db, "users", currentUser.uid);
-                    const docSnap = await getDoc(docRef);
-                    
-                    if (docSnap.exists()) {
-                        setUserProfile(docSnap.data() as UserProfileData);
-                    } else {
-                            console.error("User document not found in Firestore");
-                        setUserProfile(null);
-                    }
-                } catch (error) {
-                    console.error("Error fetching user profile:", error);
-                    setUserProfile(null);
-                }
+                setUserProfile(await getUserDocument(currentUser));
             } else {
-                // If no user (logout), clear the profile
                 setUserProfile(null);
             }
             

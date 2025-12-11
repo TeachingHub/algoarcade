@@ -1,7 +1,8 @@
-import { deleteDoc, setDoc, updateDoc } from "firebase/firestore";
+import { deleteDoc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase/config";
 import type { User } from "firebase/auth";
 import { doc } from "firebase/firestore";
+import type { UserProfileData } from "@/types/user/user";
 
 
 
@@ -16,6 +17,23 @@ export async function createUserDocument(user: User) {
         });
     } catch (error) {
         console.error("Error writing document:", error);
+    }
+}
+
+export async function getUserDocument(user: User) {
+    try {
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+            return docSnap.data() as UserProfileData;
+        } else {
+            console.error("User document not found in Firestore");
+            return null;
+        }
+    } catch (error) {
+        console.error("Error fetching user profile:", error);
+        return null;
     }
 }
 
