@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useAuth } from "@/context/AuthContext";
-import { registerUser } from "@/services/authService";
 import { validatePassword, validateUsernameAvailability } from "@/services/validationService";
 import Layout from "@/layouts/Layout";
 import FormWrapper from "@/components/forms/FormWrapper";
@@ -15,13 +14,11 @@ export default function RegisterPage() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, register } = useAuth();
 
-    useEffect(() => {
-        if (user) {
-            navigate("/profile");
-        }
-    }, [user, navigate]);
+    if (user) {
+        navigate("/profile");
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -43,8 +40,8 @@ export default function RegisterPage() {
             }
 
             // Register user
-            await registerUser(email, password, username);
-            navigate("/");
+            await register(email, password, username);
+            navigate("/profile");
 
         } catch (err: any) {
             console.error(err);

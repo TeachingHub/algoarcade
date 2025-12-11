@@ -13,20 +13,18 @@ export default function LoginPage() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, login } = useAuth();
 
-    useEffect(() => {
-        if (user) {
-            navigate("/profile");
-        }
-    }, [user, navigate]);
+    if (user) {
+        navigate("/");
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
         try {
-            await loginUser(email, password);
-            navigate("/");
+            await login(email, password);
+            navigate("/profile");
         } catch (err: any) {
             setError("Failed to login. Please check your credentials.");
             console.error(err);
