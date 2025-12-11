@@ -17,6 +17,7 @@ import {
 } from "../../utils/tsp/tsp";
 import { useAuth } from "@/context/AuthContext";
 import { Link } from 'react-router';
+import Badge from '@/components/shared/Badge';
 
 export default function TSP() {
     const { user } = useAuth();
@@ -370,16 +371,19 @@ export default function TSP() {
             <div className={styles.gameContainer}>
                 {!user && (
                     <div className={styles.notification}>
-                        ⚠️ Progress not saved. Log in to track your scores! <Link to="/login">Log in</Link> or <Link to="/register">Register</Link>
+                        ⚠️ Progress not saved. Log in to track your scores! <Button style={["link"]} to="/login">Log in</Button> or <Button style={["link"]} to="/register">Register</Button>
                     </div>
                 )}
 
                 <div className={styles.header}>
-                    <div>
-                        <h1 className={styles.title}> <Link to="/Games">{"<"}</Link>TRAVELING SALESPERSON</h1>
+                    <div className={styles.headerLeft}>
+                        <div className={styles.headerLeftText}>
+                            <Button style={["link"]} to="/games" >{"<"}</Button>
+                            <h1 className={styles.title}> TRAVELING SALESPERSON</h1>
+                        </div>
                         <div className={styles.badges}>
-                            <span className={styles.badge}>HARD</span>
-                            <span className={styles.badge}>GRAPH</span>
+                            <Badge style={["secondary"]} label="HARD" />
+                            <Badge style={["secondary"]} label="GRAPH" />
                         </div>
                     </div>
                     <div className={styles.stats}>

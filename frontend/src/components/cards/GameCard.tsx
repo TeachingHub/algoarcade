@@ -1,5 +1,6 @@
 import styles from "@/styles/components/cards/GameCard.module.css";
 import Button from "@/components/shared/Button";
+import Badge from "../shared/Badge";
 
 interface GameCardProps {
     title: string;
@@ -42,12 +43,10 @@ export default function GameCard({
                 <div className={styles.header}>
                     <div className={styles.tags}>
                         {tags.map(tag => (
-                            <span key={tag} className={styles.tag}>{tag}</span>
+                            <Badge style={["secondary"]} key={tag} label={tag} />
                         ))}
                     </div>
-                    <span className={`${styles.difficulty} ${getDifficultyColor(difficulty)}`}>
-                        {difficulty}
-                    </span>
+                    <Badge style={["danger"]} label={difficulty} />
                 </div>
 
                 <h3 className={styles.title}>{title}</h3>
