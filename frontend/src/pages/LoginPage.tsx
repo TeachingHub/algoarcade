@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useAuth } from "@/context/AuthContext";
-import { loginUser } from "@/services/authService";
 import Layout from "@/layouts/Layout";
 import FormWrapper from "@/components/forms/FormWrapper";
 import Input from "@/components/shared/Input";

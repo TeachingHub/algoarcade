@@ -8,9 +8,10 @@ import Divider from "@/components/shared/Divider";
 import Modal from "@/components/shared/Modal";
 import { useState } from "react";
 import Input from "@/components/shared/Input";
+import Loader from "@/components/shared/Loader";
 
 export default function ProfilePage() {
-    const { user, userProfile } = useAuth();
+    const { user, userProfile, loading } = useAuth();
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [confirmPassword, setConfirmPassword] = useState("");
     const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -47,6 +48,10 @@ export default function ProfilePage() {
         setConfirmPassword("");
         setDeleteError(null);
     };
+
+    if (loading) {
+        return <Loader />;
+    }
 
     return (
         <Layout>

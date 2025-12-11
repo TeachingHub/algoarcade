@@ -1,0 +1,87 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+}
+
+.fullScreen {
+    position: fixed;
+    inset: 0;
+    background-color: var(--background);
+    z-index: 9999;
+}
+
+.spinner {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    animation: rotate 2s steps(4) infinite;
+}
+
+.pixel {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    background-color: var(--primary);
+    box-shadow: 4px 4px 0px var(--yellow-box-shadow);
+}
+
+.pixel:nth-child(1) {
+    top: 0;
+    left: 0;
+    background-color: var(--primary);
+}
+
+.pixel:nth-child(2) {
+    top: 0;
+    right: 0;
+    background-color: var(--secondary);
+    box-shadow: 4px 4px 0px var(--secondary-box-shadow);
+}
+
+.pixel:nth-child(3) {
+    bottom: 0;
+    right: 0;
+    background-color: var(--primary);
+}
+
+.pixel:nth-child(4) {
+    bottom: 0;
+    left: 0;
+    background-color: var(--secondary);
+    box-shadow: 4px 4px 0px var(--secondary-box-shadow);
+}
+
+.text {
+    font-family: 'Press Start 2P', monospace;
+    color: var(--primary);
+    font-size: var(--font-size-sm);
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    animation: pulse 1.5s steps(2) infinite;
+    text-shadow: 2px 2px 0px black;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.8;
+        transform: scale(0.95);
+    }
+}
