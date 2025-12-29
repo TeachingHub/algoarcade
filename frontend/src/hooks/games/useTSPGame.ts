@@ -106,6 +106,14 @@ export const useTSPGame = (canvasSize: { width: number, height: number }) => {
                 bestDistance: currentDistance
             }));
 
+            const getDelay = (s: number) => {
+                // Non-linear delay:
+                // Speed 100 -> 0ms
+                // Speed 50 -> ~375ms
+                // Speed 1 -> ~1500ms
+                return Math.floor(1500 * Math.pow(1 - (s / 100), 2));
+            };
+
             const improve = () => {
                 const result = twoOptImprovement(gameState.points, currentRoute);
                 currentRoute = result.route;
@@ -118,7 +126,7 @@ export const useTSPGame = (canvasSize: { width: number, height: number }) => {
                 }));
 
                 if (result.improved) {
-                    animationIdRef.current = setTimeout(improve, 101 - gameState.speed);
+                    animationIdRef.current = setTimeout(improve, getDelay(gameState.speed));
                 } else {
                     setGameState(prev => ({ ...prev, isRunning: false }));
                     animationIdRef.current = null;
@@ -126,7 +134,7 @@ export const useTSPGame = (canvasSize: { width: number, height: number }) => {
             };
 
             // Start the recursive timeout loop
-            animationIdRef.current = setTimeout(improve, 101 - gameState.speed);
+            animationIdRef.current = setTimeout(improve, getDelay(gameState.speed));
         }
     }, [algorithm, gameState.points, gameState.isRunning, gameState.speed]);
 
@@ -173,8 +181,11 @@ export const useTSPGame = (canvasSize: { width: number, height: number }) => {
                 bestPath: route
             }));
 
+
+            const getDelay = (s: number) => Math.floor(1500 * Math.pow(1 - (s / 100), 2));
+
             if (result.improved) {
-                animationIdRef.current = setTimeout(improve, 101 - gameState.speed);
+                animationIdRef.current = setTimeout(improve, getDelay(gameState.speed));
             } else {
                 setGameState(prev => ({ ...prev, isRunning: false }));
                 animationIdRef.current = null;
