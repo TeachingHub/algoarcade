@@ -17,7 +17,7 @@ export const generateRandomPoints = (count: number, width: number, height: numbe
 
 export const getPredefinedPoints = (pattern: string, width: number, height: number): Point[] => {
     const points: Point[] = [];
-    const padding = 80; // Increased padding to prevent points from touching edges
+    const padding = 80; // prevent points from touching edges
     const availableWidth = width - 2 * padding;
     const availableHeight = height - 2 * padding;
     const centerX = width / 2;
