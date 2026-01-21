@@ -19,6 +19,7 @@ interface TSPControlsProps {
     onSubmit: () => void;
     onReset: () => void;
     onGenerate: (pattern: string, count?: number) => void;
+    onShare: () => Promise<boolean>;
 }
 
 export default function TSPControls({
@@ -36,8 +37,19 @@ export default function TSPControls({
     onStop,
     onSubmit,
     onReset,
-    onGenerate
+    onGenerate,
+    onShare
 }: TSPControlsProps) {
+
+    const handleShare = async () => {
+        const success = await onShare();
+        if (success) {
+            alert("Game link copied to clipboard! 📋");
+        } else {
+            alert("Failed to share game.");
+        }
+    };
+
     return (
         <>
             <div className={styles.controlPanel}>
@@ -164,6 +176,15 @@ export default function TSPControls({
                         />
                     </div>
                 </div>
+            </div>
+
+            <div className={styles.controlPanel}>
+                <h3>SHARE CHALLENGE</h3>
+                <Button
+                    style={["primary", "fullWidth"]}
+                    label="COPY LINK"
+                    onClick={handleShare}
+                />
             </div>
 
             {algorithm !== 'manual' && (

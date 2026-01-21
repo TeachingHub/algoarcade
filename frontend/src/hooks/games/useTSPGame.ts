@@ -9,6 +9,8 @@ import {
     getScenarioConfig,
     formatDistance
 } from "@/utils/tsp";
+import { useSearchParams } from 'react-router';
+import { getGameInstance, saveGameInstance } from '@/services/games/TSPService';
 
 export const useTSPGame = (canvasSize: { width: number, height: number }) => {
     const [gameState, setGameState] = useState<TSPState>({
@@ -30,7 +32,9 @@ export const useTSPGame = (canvasSize: { width: number, height: number }) => {
     // Use ReturnType<typeof setTimeout> to handle both Node and Browser environments safely
     const animationIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-
+    // Load game instance
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [isLoading, setIsLoading] = useState(false)
 
     const stopAlgorithm = useCallback(() => {
         if (animationIdRef.current) {
@@ -213,16 +217,81 @@ export const useTSPGame = (canvasSize: { width: number, height: number }) => {
         setGameResult(null);
     }, [stopAlgorithm]);
 
+    const shareInstance = useCallback(async (authorName: string) => {
+        if (gameState.points.length === 0) return false;
+
+        try {
+            const id = await saveGameInstance({
+                points: gameState.points,
+                author: authorName
+            });
+
+            setSearchParams(prev => {
+                prev.set('instance', id);
+                return prev;
+            });
+
+            const url = `${window.location.origin}${window.location.pathname}?instance=${id}`;
+            await navigator.clipboard.writeText(url);
+
+            return true;
+        } catch (e) {
+            console.error("Error al compartir:", e);
+            return false;
+        }
+    }, [gameState.points, setSearchParams]);
+
     const setSpeed = useCallback((speed: number) => {
         setGameState(prev => ({ ...prev, speed }));
     }, []);
 
     // Initialize with random points when canvas size is available
+    // useEffect(() => {
+    //     if (canvasSize.width > 0 && canvasSize.height > 0 && gameState.points.length === 0) {
+    //         generateScenario('random');
+    //     }
+    // }, [canvasSize.width, canvasSize.height, gameState.points.length, generateScenario]);
+
     useEffect(() => {
-        if (canvasSize.width > 0 && canvasSize.height > 0 && gameState.points.length === 0) {
-            generateScenario('random');
-        }
-    }, [canvasSize.width, canvasSize.height, gameState.points.length, generateScenario]);
+        const instanceId = searchParams.get('instance');
+
+        if (gameState.points.length > 0) return;
+
+        const initGame = async () => {
+            if (instanceId) {
+                setIsLoading(true);
+                try {
+                    const instance = await getGameInstance(instanceId);
+                    if (instance) {
+                        setGameState(prev => ({
+                            ...prev,
+                            points: instance.points,
+                            bestPath: [],
+                            currentPath: [],
+                            bestDistance: Infinity,
+                            isRunning: false
+                        }));
+                        setScenarioInfo({
+                            name: "Desafío Compartido",
+                            description: `Reto creado por ${instance.author || 'un viajante anónimo'}`
+                        });
+                    } else {
+                        generateScenario('random');
+                    }
+                } catch (e) {
+                    generateScenario('random');
+                } finally {
+                    setIsLoading(false);
+                }
+            } else if (canvasSize.width > 0 && canvasSize.height > 0) {
+                generateScenario('random');
+            }
+        };
+
+        initGame();
+    }, [canvasSize.width, canvasSize.height, searchParams]);
+
+
 
     // Cleanup animation on unmount
     useEffect(() => {
@@ -248,7 +317,8 @@ export const useTSPGame = (canvasSize: { width: number, height: number }) => {
             handlePointClick,
             submitManualPath,
             clearAll,
-            setSpeed
+            setSpeed,
+            shareInstance
         }
     };
 };

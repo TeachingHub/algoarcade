@@ -117,6 +117,7 @@ export default function TSP() {
                             onSubmit={actions.submitManualPath}
                             onReset={actions.clearAll}
                             onGenerate={actions.generateScenario}
+                            onShare={() => actions.shareInstance(user?.displayName || "")}
                         />
                     </div>
                 </div>
