@@ -12,3 +12,8 @@ export interface TSPState {
     isRunning: boolean;
     speed: number;
 }
+
+export interface TSPInstance {
+    points: Point[];
+    author: string; 
+}
