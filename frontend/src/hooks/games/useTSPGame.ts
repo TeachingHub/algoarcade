@@ -310,6 +310,7 @@ export const useTSPGame = (canvasSize: { width: number, height: number }) => {
         bgElements,
         customPointCount,
         setCustomPointCount,
+        isLoading,
         actions: {
             generateScenario,
             runAlgorithm,
