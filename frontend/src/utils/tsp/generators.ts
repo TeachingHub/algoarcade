@@ -7,8 +7,8 @@ export const generateRandomPoints = (count: number, width: number, height: numbe
     for (let i = 0; i < count; i++) {
         points.push({
             id: i,
-            x: padding + Math.random() * (width - 2 * padding),
-            y: padding + Math.random() * (height - 2 * padding)
+            x: Math.round(padding + Math.random() * (width - 2 * padding)),
+            y: Math.round(padding + Math.random() * (height - 2 * padding))
         });
     }
 
@@ -34,7 +34,7 @@ export const getPredefinedPoints = (pattern: string, width: number, height: numb
             else x = padding + aisleWidth * 3.5;
 
             const y = padding + Math.random() * availableHeight;
-            points.push({ id: i, x, y });
+            points.push({ id: i, x: Math.round(x), y: Math.round(y) });
         }
     } else if (pattern === 'star') {
         const outerRadius = Math.min(availableWidth, availableHeight) / 2.5;
@@ -46,15 +46,15 @@ export const getPredefinedPoints = (pattern: string, width: number, height: numb
             const angle = (i / (spikes * 2)) * 2 * Math.PI - Math.PI / 2;
             points.push({
                 id: i,
-                x: centerX + r * Math.cos(angle),
-                y: centerY + r * Math.sin(angle)
+                x: Math.round(centerX + r * Math.cos(angle)),
+                y: Math.round(centerY + r * Math.sin(angle))
             });
         }
         for (let i = 0; i < 5; i++) {
             points.push({
                 id: 10 + i,
-                x: padding + Math.random() * availableWidth,
-                y: padding + Math.random() * availableHeight
+                x: Math.round(padding + Math.random() * availableWidth),
+                y: Math.round(padding + Math.random() * availableHeight)
             });
         }
     } else if (pattern === 'grid') {
@@ -66,8 +66,8 @@ export const getPredefinedPoints = (pattern: string, width: number, height: numb
                 if (Math.random() > 0.2 || id === 0 || id === 15) {
                     points.push({
                         id: id++,
-                        x: padding + col * stepX + (Math.random() * 20 - 10),
-                        y: padding + row * stepY + (Math.random() * 20 - 10)
+                        x: Math.round(padding + col * stepX + (Math.random() * 20 - 10)),
+                        y: Math.round(padding + row * stepY + (Math.random() * 20 - 10))
                     });
                 }
             }
@@ -83,8 +83,8 @@ export const getPredefinedPoints = (pattern: string, width: number, height: numb
             for (let i = 0; i < 4; i++) {
                 points.push({
                     id: id++,
-                    x: center.x + (Math.random() * 60 - 30),
-                    y: center.y + (Math.random() * 60 - 30)
+                    x: Math.round(center.x + (Math.random() * 60 - 30)),
+                    y: Math.round(center.y + (Math.random() * 60 - 30))
                 });
             }
         });
@@ -114,8 +114,8 @@ export const getPredefinedPoints = (pattern: string, width: number, height: numb
         cities.forEach((city, index) => {
             points.push({
                 id: index,
-                x: citiesPadding + city.x * citiesAvailWidth,
-                y: citiesPadding + city.y * citiesAvailHeight
+                x: Math.round(citiesPadding + city.x * citiesAvailWidth),
+                y: Math.round(citiesPadding + city.y * citiesAvailHeight)
             });
         });
     } else if (pattern === 'constellation') {
@@ -127,23 +127,23 @@ export const getPredefinedPoints = (pattern: string, width: number, height: numb
         stars.forEach((s, i) => {
             points.push({
                 id: i,
-                x: padding + s.x * scale * 0.8,
-                y: padding + s.y * scale * 0.8
+                x: Math.round(padding + s.x * scale * 0.8),
+                y: Math.round(padding + s.y * scale * 0.8)
             });
         });
         for (let i = 0; i < 5; i++) {
             points.push({
                 id: 7 + i,
-                x: padding + Math.random() * availableWidth,
-                y: padding + Math.random() * availableHeight
+                x: Math.round(padding + Math.random() * availableWidth),
+                y: Math.round(padding + Math.random() * availableHeight)
             });
         }
     } else if (pattern === 'corners') {
         for (let i = 0; i < 11; i++) {
             points.push({
                 id: i,
-                x: centerX + (Math.random() * 100 - 50),
-                y: centerY + (Math.random() * 100 - 50)
+                x: Math.round(centerX + (Math.random() * 100 - 50)),
+                y: Math.round(centerY + (Math.random() * 100 - 50))
             });
         }
         points.push({ id: 11, x: padding, y: padding });
