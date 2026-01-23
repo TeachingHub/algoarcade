@@ -27,7 +27,6 @@ export default function TSP() {
         manualPath,
         gameResult,
         scenarioInfo,
-        bgElements,
         customPointCount,
         setCustomPointCount,
         actions
@@ -78,7 +77,6 @@ export default function TSP() {
                                 points={gameState.points}
                                 bestPath={gameState.bestPath}
                                 manualPath={manualPath}
-                                bgElements={bgElements}
                                 algorithm={algorithm}
                                 onPointClick={actions.handlePointClick}
                                 gameResult={gameResult}

@@ -8,7 +8,6 @@ interface TSPCanvasProps {
     points: Point[];
     bestPath: number[];
     manualPath: number[];
-    bgElements: any[];
     algorithm: string;
     onPointClick: (id: number) => void;
     gameResult: string | null;
@@ -20,7 +19,6 @@ export default function TSPCanvas({
     points,
     bestPath,
     manualPath,
-    bgElements,
     algorithm,
     onPointClick,
 }: TSPCanvasProps) {
@@ -34,18 +32,6 @@ export default function TSPCanvas({
 
         // Clear canvas
         ctx.clearRect(0, 0, width, height);
-
-        // 1. Draw Background Elements
-        bgElements.forEach(el => {
-            ctx.fillStyle = el.color;
-            ctx.beginPath();
-            if (el.type === 'rect') {
-                ctx.fillRect(el.x, el.y, el.w, el.h);
-            } else if (el.type === 'circle') {
-                ctx.arc(el.x, el.y, el.r, 0, 2 * Math.PI);
-                ctx.fill();
-            }
-        });
 
         // Loop closure for drawing paths
         const drawPathLine = (pathIndices: number[], color: string, isDashed: boolean) => {
@@ -73,12 +59,12 @@ export default function TSPCanvas({
             ctx.stroke();
         };
 
-        // 2. Draw Best Path (Algorithm Result)
+        // Draw Best Path (Algorithm Result)
         if (bestPath.length > 1) {
             drawPathLine(bestPath, pathColor, false);
         }
 
-        // 3. Draw Manual Path
+        // Draw Manual Path
         if (manualPath.length > 1 && algorithm === 'manual') {
             drawPathLine(manualPath, manualPathColor, true);
         }
@@ -115,7 +101,7 @@ export default function TSPCanvas({
 
     useEffect(() => {
         draw();
-    }, [width, height, points, bestPath, manualPath, bgElements, algorithm]);
+    }, [width, height, points, bestPath, manualPath, algorithm]);
 
     const handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
         // Simple hit detection

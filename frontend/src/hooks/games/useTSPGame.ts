@@ -26,7 +26,6 @@ export const useTSPGame = (canvasSize: { width: number, height: number }) => {
     const [manualPath, setManualPath] = useState<number[]>([]);
     const [gameResult, setGameResult] = useState<string | null>(null);
     const [scenarioInfo, setScenarioInfo] = useState<{ name: string, description: string } | null>(null);
-    const [bgElements, setBgElements] = useState<any[]>([]);
     const [customPointCount, setCustomPointCount] = useState<number>(8);
 
     // Use ReturnType<typeof setTimeout> to handle both Node and Browser environments safely
@@ -51,7 +50,6 @@ export const useTSPGame = (canvasSize: { width: number, height: number }) => {
 
         let points: Point[] = [];
         let newScenarioInfo = null;
-        let newBgElements: any[] = [];
 
         if (pattern === 'random') {
             const numPoints = count || customPointCount;
@@ -67,13 +65,11 @@ export const useTSPGame = (canvasSize: { width: number, height: number }) => {
             const w = canvasSize.width || 800;
             const h = canvasSize.height || 500;
             points = getPredefinedPoints(pattern, w, h);
-            const config = getScenarioConfig(pattern, w, h);
+            const config = getScenarioConfig(pattern);
             newScenarioInfo = { name: config.name, description: config.description };
-            newBgElements = config.bgElements;
         }
 
         setScenarioInfo(newScenarioInfo);
-        setBgElements(newBgElements);
         setGameState(prev => ({
             ...prev,
             points,
@@ -307,7 +303,6 @@ export const useTSPGame = (canvasSize: { width: number, height: number }) => {
         manualPath,
         gameResult,
         scenarioInfo,
-        bgElements,
         customPointCount,
         setCustomPointCount,
         isLoading,
