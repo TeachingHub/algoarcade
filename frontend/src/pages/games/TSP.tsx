@@ -12,6 +12,7 @@ import TSPInstructions from "@/components/games/tsp/TSPInstructions";
 
 // Hook
 import { useTSPGame } from "@/hooks/games/useTSPGame";
+import { TriangleAlertIcon } from 'lucide-react';
 
 export default function TSP() {
     const { user } = useAuth();
@@ -55,7 +56,7 @@ export default function TSP() {
             <div className={styles.gameContainer}>
                 {!user && (
                     <div className={styles.notification}>
-                        ⚠️ Progress not saved. Log in to track your scores! <Button style={["link"]} to="/login">Log in</Button> or <Button style={["link"]} to="/register">Register</Button>
+                        <TriangleAlertIcon size={20} /> Progress not saved. Log in to track your scores! <Button style={["link"]} to="/login">Log in</Button> or <Button style={["link"]} to="/register">Register</Button>
                     </div>
                 )}
 
