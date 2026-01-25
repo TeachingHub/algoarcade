@@ -1,6 +1,6 @@
 import styles from "@/styles/components/cards/GameCard.module.css";
 import Button from "@/components/shared/Button";
-import Badge from "../shared/Badge";
+import Badge, {type BadgeStyle } from "../shared/Badge";
 
 interface GameCardProps {
     title: string;
@@ -20,12 +20,12 @@ export default function GameCard({
     thumbnail
 }: GameCardProps) {
 
-    const getDifficultyColor = (diff: string) => {
+    const getDifficultyColor = (diff: string) : BadgeStyle => {
         switch (diff) {
-            case 'EASY': return styles.easy;
-            case 'MEDIUM': return styles.medium;
-            case 'HARD': return styles.hard;
-            default: return '';
+            case 'EASY': return "primary";
+            case 'MEDIUM': return "secondary";
+            case 'HARD': return "danger";
+            default: return "primary";
         }
     };
 
@@ -46,7 +46,7 @@ export default function GameCard({
                             <Badge style={["secondary"]} key={tag} label={tag} />
                         ))}
                     </div>
-                    <Badge style={["danger"]} label={difficulty} />
+                    <Badge style={[getDifficultyColor(difficulty)]} label={difficulty} />
                 </div>
 
                 <h3 className={styles.title}>{title}</h3>

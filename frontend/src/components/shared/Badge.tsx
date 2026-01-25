@@ -1,6 +1,6 @@
 import styles from "@styles/components/shared/Badge.module.css";
 
-type BadgeStyle = "primary" | "secondary" | "danger";
+export type BadgeStyle = "primary" | "secondary" | "danger";
 
 interface BadgeProps {
     style?: BadgeStyle[];
