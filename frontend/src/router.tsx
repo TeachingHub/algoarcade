@@ -7,6 +7,7 @@ import { useAuth } from "./context/AuthContext";
 import EditProfilePage from "./pages/EditProfilePage";
 import Games from "./pages/games/Games";
 import TSP from "./pages/games/TSP";
+import NotFound from "./pages/NotFound";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -46,7 +47,7 @@ export default function Router() {
           </ProtectedRoute>
         } />
         <Route path="*" element={<Navigate to="/404" replace />} />
-        {/* <Route path="/404" element={<NotFound />} /> */}
+        <Route path="/404" element={<NotFound />} />
       </Routes>
 
     </BrowserRouter>

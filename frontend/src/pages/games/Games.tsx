@@ -13,8 +13,18 @@ export default function Games() {
             description: 'Find the shortest possible route that visits each city exactly once and returns to the origin city. A classic NP-hard problem.',
             path: '/games/tsp',
             difficulty: 'HARD' as const,
-            tags: ['Graph', 'Optimization', 'NP-Hard']
+            tags: ['Graph', 'Optimization', 'NP-Hard'],
+            thumbnail: '/banners/tsp-banner.jpg'
         },
+        {
+            id: 'pathfinding A*',
+            title: 'Pathfinding A*',
+            description: 'Find the shortest path between two points in a grid using the A* algorithm.',
+            path: '/games/pathfinding',
+            difficulty: 'MEDIUM' as const,
+            tags: ['Graph', 'Pathfinding', 'Search'],
+            thumbnail: '/banners/pathfinder-banner.png'
+        }
     ];
 
     return (
@@ -34,7 +44,7 @@ export default function Games() {
                             difficulty={game.difficulty}
                             tags={game.tags}
                             onClick={() => navigate(game.path)}
-                            thumbnail="/banners/tsp-banner.jpg"
+                            thumbnail={game.thumbnail}
                         />
                     ))}
                 </div>
