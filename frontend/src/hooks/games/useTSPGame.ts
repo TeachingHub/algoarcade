@@ -232,7 +232,7 @@ export const useTSPGame = (canvasSize: { width: number, height: number }) => {
 
             return true;
         } catch (e) {
-            console.error("Error al compartir:", e);
+            console.error("Error sharing:", e);
             return false;
         }
     }, [gameState.points, setSearchParams]);
@@ -268,8 +268,8 @@ export const useTSPGame = (canvasSize: { width: number, height: number }) => {
                             isRunning: false
                         }));
                         setScenarioInfo({
-                            name: "Desafío Compartido",
-                            description: `Reto creado por ${instance.author || 'un viajante anónimo'}`
+                            name: "Shared Challenge",
+                            description: `Created by ${instance.author || 'an anonymous traveler'}`
                         });
                     } else {
                         generateScenario('random');
