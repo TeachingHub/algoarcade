@@ -115,12 +115,65 @@
     font-size: var(--font-size-sm);
 }
 
+
+
+
+/* Avatar Selector Styles */
+.avatarGrid {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.avatarOption {
+    position: relative;
+    cursor: pointer;
+    border-radius: 0;
+    padding: var(--space-xs);
+    border: var(--space-xs) solid transparent;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatarOption.selected {
+    border-color: var(--primary);
+}
+
+
+.avatarImg {
+    width: 80px;
+    height: 80px;
+    border-radius: 0;
+    object-fit: cover;
+    display: block;
+    image-rendering: pixelated;
+}
+
+.checkIcon {
+    color: var(--background);
+    position: absolute;
+    bottom: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    background: var(--primary);
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--background);
+    box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+}
+
 @media (max-width: 600px) {
     .box {
         padding: var(--space-xl);
         margin: var(--space-md);
     }
-    
+
     .options {
         flex-direction: column;
         align-items: flex-start;

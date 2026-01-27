@@ -59,7 +59,7 @@ export default function ProfilePage() {
                 <div className={styles.header}>
                     <div className={styles.avatarContainer}>
                         <img
-                            src={user?.photoURL || "/avatar.png"}
+                            src={user?.photoURL || "/avatars/avatar1.webp"}
                             alt="Profile"
                             className={styles.avatar}
                         />

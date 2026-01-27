@@ -10,24 +10,24 @@ export const logoutUser = async () => {
     return await signOut(auth);
 };
 
-export const registerUser = async (email:string, password:string, username:string) => {
+export const registerUser = async (email: string, password: string, username: string) => {
     let user: User | null = null;
-    try{
+    try {
         // Create user in Firebase Auth
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         user = userCredential.user;
 
         // Set avatar
-        const defaultAvatar = "/avatar.png";
-        
+        const defaultAvatar = "/avatars/avatar1.webp";
+
         // Update user profile
-        await updateProfile(user, { 
-            displayName: username, 
-            photoURL: defaultAvatar 
-        });  
+        await updateProfile(user, {
+            displayName: username,
+            photoURL: defaultAvatar
+        });
 
         // Create user in Firestore
-        await createUserDocument(user);    
+        await createUserDocument(user);
 
         return user;
     }
@@ -55,24 +55,33 @@ export const deleteUserAccount = async (password: string) => {
 
     // Delete user data from Firestore
     await deleteUserDocument(user);
-    
+
     // Delete user from Auth
     await user.delete();
 };
 
 
-export const updateUserProfile = async (user: User, data: { username?: string;  }) => {
+
+export const updateUserProfile = async (user: User, data: { username?: string; photoURL?: string }) => {
     try {
+        const updates: { displayName?: string; photoURL?: string } = {};
+        const docUpdates: { username?: string; profilePic?: string } = {};
+
+        if (data.username) {
+            updates.displayName = data.username;
+            docUpdates.username = data.username;
+        }
+
+        if (data.photoURL) {
+            updates.photoURL = data.photoURL;
+            docUpdates.profilePic = data.photoURL;
+        }
 
         // Update profile in Firebase Auth
-        await updateProfile(user, {
-            displayName: data.username
-        });
-        
+        await updateProfile(user, updates);
+
         // Update document in Firestore
-        await updateUserDocument(user.uid, {
-            username: data.username,
-        });
+        await updateUserDocument(user.uid, docUpdates);
 
         return user;
     } catch (error) {

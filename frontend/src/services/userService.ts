@@ -24,7 +24,7 @@ export async function getUserDocument(user: User) {
     try {
         const docRef = doc(db, "users", user.uid);
         const docSnap = await getDoc(docRef);
-        
+
         if (docSnap.exists()) {
             return docSnap.data() as UserProfileData;
         } else {
@@ -45,7 +45,8 @@ export async function deleteUserDocument(user: User) {
     }
 }
 
-export async function updateUserDocument(uid: string, data: { username?: string }) {
+
+export async function updateUserDocument(uid: string, data: { username?: string; profilePic?: string }) {
     try {
         const userRef = doc(db, "users", uid);
         await updateDoc(userRef, data);

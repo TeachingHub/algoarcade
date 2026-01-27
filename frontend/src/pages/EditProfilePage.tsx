@@ -1,3 +1,4 @@
+
 import Layout from "@/layouts/Layout";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
@@ -8,12 +9,16 @@ import styles from "@/styles/components/forms/Form.module.css";
 import { updateUserProfile } from "@/services/authService";
 import { validateUsernameAvailability } from "@/services/validationService";
 import FormWrapper from "@/components/forms/FormWrapper";
+import { AVAILABLE_AVATARS } from "@/utils/avatars";
+import Divider from "@/components/shared/Divider";
+import { CheckIcon } from "lucide-react";
 
 export default function EditProfilePage() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
   const [username, setUsername] = useState("");
+  const [selectedAvatar, setSelectedAvatar] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -23,6 +28,7 @@ export default function EditProfilePage() {
       return;
     }
     setUsername(user.displayName || "");
+    setSelectedAvatar(user.photoURL || AVAILABLE_AVATARS[0]);
   }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,7 +46,8 @@ export default function EditProfilePage() {
       }
 
       await updateUserProfile(user, {
-        username
+        username,
+        photoURL: selectedAvatar
       });
       navigate("/profile");
     } catch (err: any) {
@@ -58,8 +65,8 @@ export default function EditProfilePage() {
         onSubmit={handleSubmit}
         error={error}
       >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <div>
+        <div className={styles.form}>
+          <div className={styles.inputGroup}>
             <label className={styles.label}>USERNAME</label>
             <Input
               type="text"
@@ -68,9 +75,37 @@ export default function EditProfilePage() {
               required
             />
           </div>
-        </div>
 
-        <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+        <Divider size="xlarge" thickness="medium" />
+
+          <div className={styles.inputGroup}>
+            <label className={styles.label}>PROFILE PICTURE</label>
+            <div className={styles.avatarGrid}>
+              {AVAILABLE_AVATARS.map((avatar) => (
+                <div
+                  key={avatar}
+                  onClick={() => setSelectedAvatar(avatar)}
+                  className={`${styles.avatarOption} ${selectedAvatar === avatar ? styles.selected : ''}`}
+                >
+                  <img
+                    src={avatar}
+                    alt="Avatar option"
+                    className={styles.avatarImg}
+                  />
+                  {selectedAvatar === avatar && (
+                    <div className={styles.checkIcon}>
+                      <CheckIcon size={20}/>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        
+        <Divider size="xlarge" thickness="medium" />
+
+        <div className={styles.options}>
           <Button
             style={["secondary"]}
             label="CANCEL"
