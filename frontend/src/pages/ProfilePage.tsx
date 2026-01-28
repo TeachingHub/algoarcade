@@ -83,20 +83,20 @@ export default function ProfilePage() {
                     </div>
                 </div>
                 <Divider size="xlarge" thickness="medium" />
-                <div>
+                <div className={styles.statsGrid}>
                     <div className={styles.infoItem}>
                         <span className={styles.label}>ID:</span>
                         <span className={styles.value}>{user?.uid}</span>
                     </div>
-                    <div className={styles.infoItem} style={{ marginTop: '0.5rem' }}>
+                    <div className={styles.infoItem}>
                         <span className={styles.label}>EMAIL:</span>
                         <span className={styles.value}>{user?.email}</span>
                     </div>
-                    <div className={styles.infoItem} style={{ marginTop: '0.5rem' }}>
+                    <div className={styles.infoItem}>
                         <span className={styles.label}>ROLE:</span>
                         <span className={styles.value}>{userProfile?.role}</span>
                     </div>
-                    <div className={styles.infoItem} style={{ marginTop: '0.5rem' }}>
+                    <div className={styles.infoItem}>
                         <span className={styles.label}>MEMBER SINCE:</span>
                         <span className={styles.value}>
                             {userProfile?.createdAt?.toDate().toLocaleDateString()}
