@@ -4,7 +4,7 @@ import styles from "@/styles/pages/NotFound.module.css";
 
 export default function NotFound() {
     return (
-        <Layout>
+        <Layout noFooter noHeader>
             <div className={styles.container}>
                 <h1 className={styles.errorCode}>404</h1>
                 <p className={styles.title}>
