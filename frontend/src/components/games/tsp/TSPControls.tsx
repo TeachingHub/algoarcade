@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Button from "@/components/shared/Button";
 import styles from "@/styles/pages/games/TSP.module.css";
 
@@ -41,12 +42,17 @@ export default function TSPControls({
     onShare
 }: TSPControlsProps) {
 
+    const [copyFeedback, setCopyFeedback] = useState<string | null>(null);
+
     const handleShare = async () => {
         const success = await onShare();
         if (success) {
-            alert("Game link copied to clipboard! 📋");
+            setCopyFeedback("Copied!");
+            setTimeout(() => setCopyFeedback(null), 2000);
         } else {
-            alert("Failed to share game.");
+            // Optional: Handle error or just ignore for simplicity
+            setCopyFeedback("Failed");
+            setTimeout(() => setCopyFeedback(null), 2000);
         }
     };
 
@@ -182,7 +188,7 @@ export default function TSPControls({
                 <h3>SHARE CHALLENGE</h3>
                 <Button
                     style={["primary", "fullWidth"]}
-                    label="COPY LINK"
+                    label={copyFeedback || "COPY LINK"}
                     onClick={handleShare}
                 />
             </div>
