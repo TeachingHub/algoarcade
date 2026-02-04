@@ -7,12 +7,14 @@ import Input from "@/components/shared/Input";
 import Button from "@/components/shared/Button";
 import styles from "@/styles/components/forms/Form.module.css";
 
+import Divider from "@/components/shared/Divider";
+
 export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
-    const { user, login } = useAuth();
+    const { user, login, loginWithGoogle } = useAuth();
 
     if (user) {
         navigate("/");
@@ -27,6 +29,16 @@ export default function LoginPage() {
         } catch (err: any) {
             setError("Failed to login. Please check your credentials.");
             console.error(err);
+        }
+    };
+
+    const handleGoogleLogin = async () => {
+        try {
+            await loginWithGoogle();
+            navigate("/profile");
+        } catch (err: any) {
+            console.error(err);
+            setError("Failed to login with Google.");
         }
     };
 
@@ -79,6 +91,15 @@ export default function LoginPage() {
                 </div>
 
                 <Button style={["primary"]} label="LOGIN" type="submit" />
+
+                <Divider size="xlarge">OR</Divider>
+
+                <Button
+                    style={["secondary"]}
+                    label="CONTINUE WITH GOOGLE"
+                    type="button"
+                    onClick={handleGoogleLogin}
+                />
             </FormWrapper>
         </Layout>
     );

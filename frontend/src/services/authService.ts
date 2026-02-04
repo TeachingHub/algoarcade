@@ -1,9 +1,25 @@
-import { createUserWithEmailAndPassword, EmailAuthProvider, reauthenticateWithCredential, signInWithEmailAndPassword, signOut, updateProfile, type User } from "firebase/auth";
+import { createUserWithEmailAndPassword, EmailAuthProvider, GoogleAuthProvider, reauthenticateWithCredential, reauthenticateWithPopup, signInWithEmailAndPassword, signInWithPopup, signOut, updateProfile, type User } from "firebase/auth";
 import { auth } from "@/firebase/config";
-import { createUserDocument, deleteUserDocument, updateUserDocument } from "./userService";
+import { createUserDocument, deleteUserDocument, getUserDocument, updateUserDocument } from "./userService";
 
 export const loginUser = async (email: string, password: string) => {
     return await signInWithEmailAndPassword(auth, email, password);
+};
+
+export const loginWithGoogle = async () => {
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+
+    // Check if user document exists in Firestore
+    const userDoc = await getUserDocument(user);
+
+    // If not, create it
+    if (!userDoc) {
+        await createUserDocument(user);
+    }
+
+    return user;
 };
 
 export const logoutUser = async () => {
@@ -43,15 +59,26 @@ export const registerUser = async (email: string, password: string, username: st
     }
 }
 
-export const deleteUserAccount = async (password: string) => {
+export const deleteUserAccount = async (password?: string) => {
     const user = auth.currentUser;
     if (!user || !user.email) throw new Error("No user logged in");
 
-    // Get user credentials
-    const credential = EmailAuthProvider.credential(user.email, password);
+    // Check if the user is authenticated with Google
+    const isGoogleAuth = user.providerData.some(
+        (provider) => provider.providerId === GoogleAuthProvider.PROVIDER_ID
+    );
 
-    // Re-authenticate (This refreshes the token and allows sensitive operations)
-    await reauthenticateWithCredential(user, credential);
+    if (isGoogleAuth) {
+        // Re-authenticate with Google Popup
+        const provider = new GoogleAuthProvider();
+        await reauthenticateWithPopup(user, provider);
+    } else {
+        // Assume Email/Password auth
+        if (!password) throw new Error("Missing password for re-authentication");
+
+        const credential = EmailAuthProvider.credential(user.email, password);
+        await reauthenticateWithCredential(user, credential);
+    }
 
     // Delete user data from Firestore
     await deleteUserDocument(user);
@@ -59,7 +86,6 @@ export const deleteUserAccount = async (password: string) => {
     // Delete user from Auth
     await user.delete();
 };
-
 
 
 export const updateUserProfile = async (user: User, data: { username?: string; photoURL?: string }) => {

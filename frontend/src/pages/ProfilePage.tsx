@@ -26,6 +26,10 @@ export default function ProfilePage() {
         }
     };
 
+    const isGoogleAuth = user?.providerData.some(
+        (provider) => provider.providerId === "google.com"
+    );
+
     const handleDeleteAccount = async () => {
         if (!user) return;
         try {
@@ -37,6 +41,8 @@ export default function ProfilePage() {
                 setDeleteError("Incorrect password.");
             } else if (error.code === 'auth/missing-password') {
                 setDeleteError("Please enter your password to confirm.");
+            } else if (error.code === 'auth/popup-closed-by-user') {
+                setDeleteError("Re-authentication cancelled.");
             } else {
                 setDeleteError("Failed to delete account: " + error.message);
             }
@@ -114,7 +120,11 @@ export default function ProfilePage() {
             <Modal
                 isOpen={isDeleteModalOpen}
                 title="Delete Account"
-                message="Are you sure you want to delete your account? This action cannot be undone."
+                message={
+                    isGoogleAuth
+                        ? "Are you sure you want to delete your account? You will be asked to sign in with Google again to confirm."
+                        : "Are you sure you want to delete your account? This action cannot be undone."
+                }
                 confirmLabel="Delete"
                 cancelLabel="Cancel"
                 onConfirm={handleDeleteAccount}
@@ -123,12 +133,14 @@ export default function ProfilePage() {
                 error={deleteError}
             >
 
-                <Input
-                    type="password"
-                    placeholder="Confirm Password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                />
+                {!isGoogleAuth && (
+                    <Input
+                        type="password"
+                        placeholder="Confirm Password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                    />
+                )}
 
             </Modal>
         </Layout>

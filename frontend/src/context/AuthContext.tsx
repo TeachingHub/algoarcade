@@ -4,7 +4,7 @@ import { auth } from "../firebase/config";
 import type { UserProfileData } from "@/types/user/user";
 import { getUserDocument } from "../services/userService";
 import { getFromLocalStorage, saveToLocalStorage } from "@/utils/localStorageUtils";
-import { loginUser, registerUser } from "@/services/authService";
+import { loginUser, registerUser, loginWithGoogle as loginWithGoogleService } from "@/services/authService";
 
 interface AuthContextType {
     user: User | null;
@@ -12,6 +12,7 @@ interface AuthContextType {
     loading: boolean;
     login: (email: string, password: string) => Promise<void>;
     register: (email: string, password: string, username: string) => Promise<void>;
+    loginWithGoogle: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -20,6 +21,7 @@ const AuthContext = createContext<AuthContextType>({
     loading: true,
     login: () => Promise.resolve(),
     register: () => Promise.resolve(),
+    loginWithGoogle: () => Promise.resolve(),
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -49,6 +51,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUserProfile(userProfile);
     };
 
+    const loginWithGoogle = async () => {
+        const user = await loginWithGoogleService();
+        const userProfile = await getUserDocument(user);
+        saveToLocalStorage<User>("user", user);
+        saveToLocalStorage<UserProfileData | null>("userProfile", userProfile);
+        setUser(user);
+        setUserProfile(userProfile);
+    };
+
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
             setUser(currentUser);
@@ -66,7 +77,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     return (
-        <AuthContext.Provider value={{ user, userProfile, loading, login, register }}>
+        <AuthContext.Provider value={{ user, userProfile, loading, login, register, loginWithGoogle }}>
             {!loading && children}
         </AuthContext.Provider>
     );
