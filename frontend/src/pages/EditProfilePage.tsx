@@ -76,7 +76,7 @@ export default function EditProfilePage() {
             />
           </div>
 
-        <Divider size="xlarge" thickness="medium" />
+          <Divider size="xlarge" thickness="medium" />
 
           <div className={styles.inputGroup}>
             <label className={styles.label}>PROFILE PICTURE</label>
@@ -94,7 +94,7 @@ export default function EditProfilePage() {
                   />
                   {selectedAvatar === avatar && (
                     <div className={styles.checkIcon}>
-                      <CheckIcon size={20}/>
+                      <CheckIcon size={20} />
                     </div>
                   )}
                 </div>
@@ -102,7 +102,7 @@ export default function EditProfilePage() {
             </div>
           </div>
         </div>
-        
+
         <Divider size="xlarge" thickness="medium" />
 
         <div className={styles.options}>
