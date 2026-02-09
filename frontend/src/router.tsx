@@ -8,6 +8,7 @@ import EditProfilePage from "./pages/EditProfilePage";
 import Games from "./pages/games/Games";
 import TSP from "./pages/games/TSP";
 import NotFound from "./pages/NotFound";
+import Pathfinding from "./pages/games/Pathfinding";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -33,6 +34,7 @@ export default function Router() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/games" element={<Games />} />
         <Route path="/games/tsp" element={<TSP />} />
+        <Route path="/games/pathfinding" element={<Pathfinding />} />
         <Route
           path="/profile"
           element={

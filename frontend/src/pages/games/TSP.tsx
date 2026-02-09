@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react';
 import Layout from "@/layouts/Layout";
 import Button from "@/components/shared/Button";
-import styles from "@/styles/pages/games/TSP.module.css";
+import styles from "@/styles/pages/games/GameLayout.module.css";
 import { useAuth } from "@/context/AuthContext";
+import { formatDistance } from "@/utils/tsp";
 
-// Modular Components
+// Shared Components
+import GameHeader from "@/components/games/shared/GameHeader";
+import GameInstructions from "@/components/games/shared/GameInstructions";
+
+// Game Specific Components
 import TSPCanvas from "@/components/games/tsp/TSPCanvas";
 import TSPControls from "@/components/games/tsp/TSPControls";
-import TSPHeader from "@/components/games/tsp/TSPHeader";
-import TSPInstructions from "@/components/games/tsp/TSPInstructions";
 
 // Hook
 import { useTSPGame } from "@/hooks/games/useTSPGame";
@@ -60,7 +63,14 @@ export default function TSP() {
                     </div>
                 )}
 
-                <TSPHeader gameState={gameState} />
+                <GameHeader
+                    title="TRAVELING SALESPERSON"
+                    badges={["HARD", "GRAPH"]}
+                    stats={[
+                        { label: "BEST", value: gameState.bestDistance === Infinity ? '--' : formatDistance(gameState.bestDistance) },
+                        { label: "POINTS", value: gameState.points.length }
+                    ]}
+                />
 
                 {scenarioInfo && (
                     <div className={styles.contextBlock}>
@@ -96,7 +106,13 @@ export default function TSP() {
                             )}
                         </div>
 
-                        <TSPInstructions />
+                        <GameInstructions
+                            instructions={[
+                                { title: "1. Choose a Mode", description: "Select a scenario from the dropdown or generate a random instance." },
+                                { title: "2. Connect the Dots", description: "In Manual Mode, click points to form a path. Try to find the shortest route without crossing lines!" },
+                                { title: "3. Beat the AI", description: "Submit your path and see if the 2-opt algorithm can improve it. If it can't, you win!" }
+                            ]}
+                        />
                     </div>
 
                     <div className={styles.sidebar}>
