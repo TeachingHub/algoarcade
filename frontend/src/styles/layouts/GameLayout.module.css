@@ -1,0 +1,67 @@
+.gameContainer {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--space-lg);
+    min-height: calc(100vh - 80px);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.content {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: var(--space-lg);
+    flex-grow: 1;
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    overflow-y: auto;
+}
+
+/* Context Block Styling - kept as it's part of GameLayout structure */
+.contextBlock {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--primary);
+    padding: var(--space-md);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--space-lg);
+}
+
+.contextTitle {
+    margin: 0 0 var(--space-xs) 0;
+    color: var(--primary);
+    font-size: var(--font-size-sm);
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.contextDescription {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-size: var(--font-size-xs);
+    line-height: 1.5;
+}
+
+.mainColumn {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+@media (max-width: 1024px) {
+    .content {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: var(--space-md);
+    }
+}

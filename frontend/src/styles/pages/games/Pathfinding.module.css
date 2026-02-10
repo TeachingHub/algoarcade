@@ -1,0 +1,66 @@
+.canvasArea {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    min-height: 500px;
+    width: 100%;
+}
+
+.controlPanel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: var(--space-md);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--space-md);
+}
+
+.controlPanel h3 {
+    font-size: 12px;
+    color: var(--primary);
+    margin: 0 0 var(--space-md) 0;
+    letter-spacing: 1px;
+}
+
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.setting {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.radioLabel {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: var(--font-size-xs);
+    color: var(--muted-foreground);
+    cursor: pointer;
+}
+
+.selectInput {
+    background: var(--background);
+    border: 1px solid var(--border);
+    color: var(--foreground);
+    padding: var(--space-sm);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: var(--font-size-xs);
+    width: 100%;
+    cursor: pointer;
+}
+
+.selectInput:focus {
+    outline: none;
+    border-color: var(--primary);
+}

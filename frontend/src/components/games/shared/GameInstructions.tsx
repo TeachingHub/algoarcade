@@ -1,4 +1,6 @@
-import styles from "@/styles/pages/games/GameLayout.module.css";
+import styles from "@/styles/components/games/shared/GameInstructions.module.css";
+
+
 
 export interface InstructionItem {
     title: string;

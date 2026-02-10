@@ -1,4 +1,6 @@
-import styles from "@/styles/pages/games/GameLayout.module.css";
+import styles from "@/styles/components/games/shared/GameHeader.module.css";
+
+
 import Button from "@/components/shared/Button";
 import Badge from "@/components/shared/Badge";
 

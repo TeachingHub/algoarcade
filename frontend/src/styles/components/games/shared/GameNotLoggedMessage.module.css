@@ -1,0 +1,14 @@
+.notification {
+    background-color: rgba(253, 213, 5, 0.1);
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    padding: var(--space-md);
+    border-radius: var(--radius-sm);
+    text-align: center;
+    font-size: var(--font-size-xs);
+    margin-bottom: var(--space-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+}

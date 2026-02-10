@@ -1,0 +1,32 @@
+.instructionsBlock {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: var(--space-lg);
+    border-radius: var(--radius-md);
+}
+
+.instructionsBlock h3 {
+    color: var(--primary);
+    font-size: var(--font-size-sm);
+    margin: 0 0 var(--space-md) 0;
+    letter-spacing: 1px;
+}
+
+.instructionGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-lg);
+}
+
+.instructionItem h4 {
+    color: var(--foreground);
+    margin: 0 0 var(--space-xs) 0;
+    font-size: var(--font-size-sm);
+}
+
+.instructionItem p {
+    color: var(--muted-foreground);
+    margin: 0;
+    font-size: var(--font-size-xs);
+    line-height: 1.5;
+}

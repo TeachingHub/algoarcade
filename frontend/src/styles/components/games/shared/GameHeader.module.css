@@ -1,0 +1,53 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--border);
+}
+
+.headerLeft {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.headerLeftText {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.title {
+    font-size: var(--font-size-xxl);
+    color: var(--primary);
+    margin: 0;
+    letter-spacing: 2px;
+}
+
+.badges {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.stats {
+    display: flex;
+    gap: var(--space-xl);
+}
+
+.statBox {
+    text-align: right;
+}
+
+.statLabel {
+    display: block;
+    font-size: 10px;
+    color: var(--muted-foreground);
+    font-weight: bold;
+}
+
+.statValue {
+    font-size: var(--font-size-xl);
+    font-family: monospace;
+    font-weight: bold;
+}

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Button from "@/components/shared/Button";
-import styles from "@/styles/pages/games/GameLayout.module.css";
+import styles from "@/styles/components/games/tsp/TSPControls.module.css";
+
 
 interface TSPControlsProps {
     algorithm: 'nearest' | '2opt' | 'manual';
