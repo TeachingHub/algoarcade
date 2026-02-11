@@ -38,50 +38,7 @@
     margin-bottom: 2rem;
 }
 
-.avatarContainer {
-    flex-shrink: 0;
-    width: 180px;
-    height: 180px;
-    position: relative;
-    padding: 6px;
-    background: var(--card);
-    border: 2px solid var(--primary);
-    box-shadow:
-        6px 6px 0px var(--yellow-box-shadow),
-        0 0 20px rgba(253, 213, 5, 0.2);
-    /* Make the avatar container itself a bit interesting */
-    transform: rotate(-2deg);
-    transition: transform 0.3s ease;
-}
 
-.avatarContainer:hover {
-    transform: rotate(0deg) scale(1.02);
-}
-
-.avatar {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    image-rendering: pixelated;
-    background-color: var(--muted);
-    display: block;
-}
-
-/* CRT Overlay on Avatar */
-.avatarContainer::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: repeating-linear-gradient(to bottom,
-            transparent 0%,
-            rgba(0, 0, 0, 0.2) 50%,
-            transparent 100%);
-    background-size: 100% 4px;
-    pointer-events: none;
-}
 
 .userInfo {
     display: flex;

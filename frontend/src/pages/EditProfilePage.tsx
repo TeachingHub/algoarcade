@@ -14,7 +14,7 @@ import Divider from "@/components/shared/Divider";
 import { CheckIcon } from "lucide-react";
 
 export default function EditProfilePage() {
-  const { user } = useAuth();
+  const { user, refreshUserProfile } = useAuth();
   const navigate = useNavigate();
 
   const [username, setUsername] = useState("");
@@ -49,6 +49,7 @@ export default function EditProfilePage() {
         username,
         photoURL: selectedAvatar
       });
+      await refreshUserProfile();
       navigate("/profile");
     } catch (err: any) {
       setError(err.message || "Failed to update profile. Please try again.");

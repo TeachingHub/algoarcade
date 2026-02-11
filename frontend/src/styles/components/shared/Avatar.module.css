@@ -89,7 +89,15 @@
     box-shadow: 8px 8px 0px var(--yellow-box-shadow);
 }
 
+.xxlarge {
+    width: 180px;
+    height: 180px;
+    font-size: 3rem;
+    box-shadow: 6px 6px 0px var(--yellow-box-shadow), 0 0 20px rgba(253, 213, 5, 0.2);
+}
+
 .large:hover,
-.xlarge:hover {
+.xlarge:hover,
+.xxlarge:hover {
     box-shadow: 3px 3px 0px var(--yellow-box-shadow);
 }

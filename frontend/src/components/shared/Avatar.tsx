@@ -5,7 +5,7 @@ interface AvatarProps {
     src?: string | null;
     alt?: string;
     fallback?: string;
-    size?: "small" | "medium" | "large" | "xlarge";
+    size?: "small" | "medium" | "large" | "xlarge" | "xxlarge";
     className?: string;
     onClick?: () => void;
 }

@@ -13,6 +13,7 @@ interface AuthContextType {
     login: (email: string, password: string) => Promise<void>;
     register: (email: string, password: string, username: string) => Promise<void>;
     loginWithGoogle: () => Promise<void>;
+    refreshUserProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -22,6 +23,7 @@ const AuthContext = createContext<AuthContextType>({
     login: () => Promise.resolve(),
     register: () => Promise.resolve(),
     loginWithGoogle: () => Promise.resolve(),
+    refreshUserProfile: () => Promise.resolve(),
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -60,6 +62,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUserProfile(userProfile);
     };
 
+    const refreshUserProfile = async () => {
+        if (user) {
+            const updatedProfile = await getUserDocument(user);
+            saveToLocalStorage<UserProfileData | null>("userProfile", updatedProfile);
+            setUserProfile(updatedProfile);
+        }
+    };
+
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
             setUser(currentUser);
@@ -77,7 +87,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     return (
-        <AuthContext.Provider value={{ user, userProfile, loading, login, register, loginWithGoogle }}>
+        <AuthContext.Provider value={{ user, userProfile, loading, login, register, loginWithGoogle, refreshUserProfile }}>
             {!loading && children}
         </AuthContext.Provider>
     );

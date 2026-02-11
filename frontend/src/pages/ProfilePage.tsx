@@ -1,5 +1,6 @@
 import Layout from "../layouts/Layout";
 import { useAuth } from "../context/AuthContext";
+import Avatar from "@/components/shared/Avatar";
 import Button from "@/components/shared/Button";
 import { useNavigate } from "react-router";
 import styles from "@/styles/pages/Profile.module.css";
@@ -63,13 +64,11 @@ export default function ProfilePage() {
         <Layout>
             <div className={styles.container}>
                 <div className={styles.header}>
-                    <div className={styles.avatarContainer}>
-                        <img
-                            src={user?.photoURL || "/avatars/avatar1.webp"}
-                            alt="Profile"
-                            className={styles.avatar}
-                        />
-                    </div>
+                    <Avatar
+                        src={user?.photoURL}
+                        fallback={user?.displayName || "Player 1"}
+                        size="xxlarge"
+                    />
 
                     <div className={styles.userInfo}>
                         <h1 className={styles.username}>{user?.displayName || "PLAYER 1"}</h1>
