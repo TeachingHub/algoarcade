@@ -248,6 +248,9 @@ export const useTSPGame = (canvasSize: { width: number, height: number }) => {
     //     }
     // }, [canvasSize.width, canvasSize.height, gameState.points.length, generateScenario]);
 
+    // Validate Firestore ID (alphanumeric and exactly 20 chars)
+    const isValidId = (id: string) => /^[a-zA-Z0-9]{20}$/.test(id);
+
     useEffect(() => {
         const instanceId = searchParams.get('instance');
 
@@ -255,6 +258,18 @@ export const useTSPGame = (canvasSize: { width: number, height: number }) => {
 
         const initGame = async () => {
             if (instanceId) {
+                // If invalid format, clean URL
+                if (!isValidId(instanceId)) {
+                    console.warn("Invalid instance ID format");
+                    setSearchParams(prev => {
+                        const newParams = new URLSearchParams(prev);
+                        newParams.delete('instance');
+                        return newParams;
+                    });
+                    generateScenario('random');
+                    return;
+                }
+
                 setIsLoading(true);
                 try {
                     const instance = await getGameInstance(instanceId);
@@ -272,9 +287,23 @@ export const useTSPGame = (canvasSize: { width: number, height: number }) => {
                             description: `Created by ${instance.author || 'an anonymous traveler'}`
                         });
                     } else {
+                        // Not Found: Clean URL
+                        console.warn("Instance not found");
+                        setSearchParams(prev => {
+                            const newParams = new URLSearchParams(prev);
+                            newParams.delete('instance');
+                            return newParams;
+                        });
                         generateScenario('random');
                     }
                 } catch (e) {
+                    // Error: Clean URL
+                    console.error("Error loading instance", e);
+                    setSearchParams(prev => {
+                        const newParams = new URLSearchParams(prev);
+                        newParams.delete('instance');
+                        return newParams;
+                    });
                     generateScenario('random');
                 } finally {
                     setIsLoading(false);
