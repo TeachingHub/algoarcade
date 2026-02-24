@@ -36,7 +36,7 @@
     font-size: var(--font-size-largest);
     font-weight: var(--font-weight-bold);
     color: var(--primary);
-    text-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary), 0 0 40px var(--primary);
+    text-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary);
     margin-bottom: var(--space-md);
     letter-spacing: -2px;
 }
