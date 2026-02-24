@@ -4,8 +4,8 @@ import styles from "@/styles/components/games/tsp/TSPControls.module.css";
 
 
 interface TSPControlsProps {
-    algorithm: 'nearest' | '2opt' | 'manual';
-    setAlgorithm: (algo: 'nearest' | '2opt' | 'manual') => void;
+    algorithm: 'nearest' | '2opt' | 'manual' | 'builder';
+    setAlgorithm: (algo: 'nearest' | '2opt' | 'manual' | 'builder') => void;
     isRunning: boolean;
     pointsCount: number;
     manualPathLength: number;
@@ -92,13 +92,29 @@ export default function TSPControls({
                         />
                         Manual Mode (play!)
                     </label>
+                    <label className={styles.radioLabel}>
+                        <input
+                            type="radio"
+                            value="builder"
+                            checked={algorithm === 'builder'}
+                            onChange={() => setAlgorithm('builder')}
+                            disabled={isRunning}
+                        />
+                        Builder Mode (create!)
+                    </label>
                 </div>
             </div>
 
             <div className={styles.controlPanel}>
                 <h3>CONTROLS</h3>
                 <div className={styles.actions}>
-                    {algorithm !== 'manual' ? (
+                    {algorithm === 'builder' ? (
+                        <Button
+                            style={["primary", "fullWidth"]}
+                            label="CLEAR POINTS"
+                            onClick={onReset}
+                        />
+                    ) : algorithm !== 'manual' ? (
                         <>
                             {!isRunning ? (
                                 <Button
@@ -123,11 +139,14 @@ export default function TSPControls({
                             disabled={manualPathLength !== pointsCount || !!gameResult}
                         />
                     )}
-                    <Button
-                        style={["secondary", "fullWidth"]}
-                        label="RESET PATH"
-                        onClick={onReset}
-                    />
+
+                    {algorithm !== 'builder' && (
+                        <Button
+                            style={["secondary", "fullWidth"]}
+                            label="RESET PATH"
+                            onClick={onReset}
+                        />
+                    )}
                 </div>
             </div>
 
@@ -194,7 +213,7 @@ export default function TSPControls({
                 />
             </div>
 
-            {algorithm !== 'manual' && (
+            {(algorithm !== 'manual' && algorithm !== 'builder') && (
                 <div className={styles.controlPanel}>
                     <h3>SPEED: {speed}%</h3>
                     <input

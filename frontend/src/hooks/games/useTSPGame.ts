@@ -22,7 +22,7 @@ export const useTSPGame = (canvasSize: { width: number, height: number }) => {
         speed: 50
     });
 
-    const [algorithm, setAlgorithm] = useState<'nearest' | '2opt' | 'manual'>('nearest');
+    const [algorithm, setAlgorithmState] = useState<'nearest' | '2opt' | 'manual' | 'builder'>('nearest');
     const [manualPath, setManualPath] = useState<number[]>([]);
     const [gameResult, setGameResult] = useState<string | null>(null);
     const [scenarioInfo, setScenarioInfo] = useState<{ name: string, description: string } | null>(null);
@@ -42,6 +42,44 @@ export const useTSPGame = (canvasSize: { width: number, height: number }) => {
         }
         setGameState(prev => ({ ...prev, isRunning: false }));
     }, []);
+
+    const setAlgorithm = useCallback((algo: 'nearest' | '2opt' | 'manual' | 'builder') => {
+        // If we are leaving builder mode, validate points
+        if (algorithm === 'builder' && algo !== 'builder') {
+            if (gameState.points.length < 5 || gameState.points.length > 50) {
+                // Not a valid graph, don't allow switching or warn.
+                // For better UX, let's just generate a new random scenario of default size
+                // We'll call generateScenario directly inside here or just reset state
+                const numPoints = customPointCount;
+                const w = canvasSize.width || 800;
+                const h = canvasSize.height || 500;
+                const newPoints = generateRandomPoints(numPoints, w, h);
+
+                setGameState(prev => ({
+                    ...prev,
+                    points: newPoints,
+                    bestPath: [],
+                    currentPath: [],
+                    bestDistance: Infinity
+                }));
+                setScenarioInfo({
+                    name: "Random Path",
+                    description: "Auto-generated after invalid builder state."
+                });
+            }
+        }
+
+        setAlgorithmState(algo);
+        if (gameState.isRunning) stopAlgorithm();
+        setManualPath([]);
+        setGameResult(null);
+        setGameState(prev => ({
+            ...prev,
+            bestPath: [],
+            currentPath: [],
+            bestDistance: Infinity
+        }));
+    }, [algorithm, gameState.isRunning, gameState.points.length, stopAlgorithm, canvasSize, customPointCount]);
 
     const generateScenario = useCallback((pattern: string, count?: number) => {
         stopAlgorithm();
@@ -205,13 +243,44 @@ export const useTSPGame = (canvasSize: { width: number, height: number }) => {
         stopAlgorithm();
         setGameState(prev => ({
             ...prev,
+            points: algorithm === 'builder' ? [] : prev.points,
             bestPath: [],
             currentPath: [],
             bestDistance: Infinity
         }));
         setManualPath([]);
         setGameResult(null);
-    }, [stopAlgorithm]);
+    }, [stopAlgorithm, algorithm]);
+
+    const addPoint = useCallback((x: number, y: number) => {
+        if (algorithm !== 'builder' || gameState.isRunning) return;
+
+        setGameState(prev => {
+            // Check if point is too close to existing points (e.g. within 20px)
+            const minDistance = 20;
+            const isTooClose = prev.points.some(p => {
+                const dist = Math.sqrt(Math.pow(p.x - x, 2) + Math.pow(p.y - y, 2));
+                return dist < minDistance;
+            });
+
+            if (isTooClose) return prev;
+
+            const newPoint: Point = {
+                id: prev.points.length > 0 ? Math.max(...prev.points.map(p => p.id)) + 1 : 0,
+                x,
+                y
+            };
+            return {
+                ...prev,
+                points: [...prev.points, newPoint],
+                bestPath: [],
+                currentPath: [],
+                bestDistance: Infinity
+            };
+        });
+        setManualPath([]);
+        setGameResult(null);
+    }, [algorithm, gameState.isRunning]);
 
     const shareInstance = useCallback(async (authorName: string) => {
         if (gameState.points.length === 0) return false;
@@ -340,6 +409,7 @@ export const useTSPGame = (canvasSize: { width: number, height: number }) => {
             runAlgorithm,
             stopAlgorithm,
             handlePointClick,
+            addPoint,
             submitManualPath,
             clearAll,
             setSpeed,

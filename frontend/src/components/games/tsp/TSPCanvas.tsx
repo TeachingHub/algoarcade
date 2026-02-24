@@ -10,6 +10,7 @@ interface TSPCanvasProps {
     manualPath: number[];
     algorithm: string;
     onPointClick: (id: number) => void;
+    onCanvasClick?: (x: number, y: number) => void;
     gameResult: string | null;
 }
 
@@ -21,6 +22,7 @@ export default function TSPCanvas({
     manualPath,
     algorithm,
     onPointClick,
+    onCanvasClick,
 }: TSPCanvasProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -127,6 +129,8 @@ export default function TSPCanvas({
         // Hit threshold (20px radius)
         if (closestDistance < 20 && closestId !== -1) {
             onPointClick(closestId);
+        } else if (algorithm === 'builder' && onCanvasClick) {
+            onCanvasClick(x, y);
         }
     };
 
@@ -137,7 +141,7 @@ export default function TSPCanvas({
             height={height}
             onClick={handleCanvasClick}
             style={{
-                cursor: algorithm === 'manual' ? 'crosshair' : 'default',
+                cursor: algorithm === 'builder' ? 'crosshair' : (algorithm === 'manual' ? 'pointer' : 'default'),
                 display: 'block' // Ensure it behaves well in container
             }}
         />
