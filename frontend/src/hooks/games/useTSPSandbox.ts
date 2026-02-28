@@ -12,7 +12,7 @@ import {
 import { useSearchParams } from 'react-router';
 import { getGameInstance, saveGameInstance } from '@/services/games/TSPService';
 
-export const useTSPGame = (canvasSize: { width: number, height: number }) => {
+export const useTSPSandbox = (canvasSize: { width: number, height: number }) => {
     const [gameState, setGameState] = useState<TSPState>({
         points: [],
         bestPath: [],
