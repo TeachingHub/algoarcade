@@ -1,9 +1,22 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { User } from 'firebase/auth';
 import type { TSPState } from "@/types/games/tsp";
-import { calculateTotalDistance, generateRandomPoints } from "@/utils/tsp";
-import { getDailyChallenge, createDailyChallenge, saveDailyScore, getDailyLeaderboard } from '@/services/games/TSPService';
-import type { TSPLeaderboardEntry } from '@/services/games/TSPService';
+import { calculateTotalDistance } from "@/utils/tsp";
+import { useTSPDailyChallenge } from './tsp/useTSPDailyChallenge';
+import { useTSPLeaderboard } from './tsp/useTSPLeaderboard';
+
+/**
+ * Orchestrator hook for TSP Competitive (Daily Challenge) mode.
+ *
+ * Composes:
+ *  - useTSPDailyChallenge → loads/creates today's challenge
+ *  - useTSPLeaderboard    → leaderboard fetch & score submission
+ *
+ * Owns:
+ *  - Manual path building (click-to-add, simple enough to stay here)
+ *  - Submission flow & game result state
+ *  - hasSubmitted guard (one attempt per day)
+ */
 
 export const useTSPCompetitive = (canvasSize: { width: number, height: number }, user: User | null) => {
     const [gameState, setGameState] = useState<TSPState>({
@@ -16,64 +29,29 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
 
     const [manualPath, setManualPath] = useState<number[]>([]);
     const [gameResult, setGameResult] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
     const [hasSubmitted, setHasSubmitted] = useState(false);
-    const [leaderboard, setLeaderboard] = useState<TSPLeaderboardEntry[]>([]);
 
-    // Get today's date string YYYY-MM-DD
-    const getTodayDateString = () => {
-        const today = new Date();
-        return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-    };
+    // --- Sub-hooks ---
+    const dailyChallenge = useTSPDailyChallenge(canvasSize);
+    const { leaderboard, isSubmitting, fetchLeaderboard, submitScore } = useTSPLeaderboard();
 
-    const loadDailyChallenge = useCallback(async () => {
-        setIsLoading(true);
-        const dateStr = getTodayDateString();
-        try {
-            let instance = await getDailyChallenge(dateStr);
-            if (!instance) {
-                // Generate a consistent random instance for the day (if someone is the first)
-                // For simplicity, we just generate standard random points.
-                // Ideally this would be done on a backend with a cron job, but doing it on first client load works.
-                const w = canvasSize.width > 0 ? canvasSize.width : 800;
-                const h = canvasSize.height > 0 ? canvasSize.height : 500;
-                const newPoints = generateRandomPoints(15, w, h); // e.g., 15 points
-
-                instance = {
-                    points: newPoints,
-                    author: "system"
-                };
-
-                // Try caching it in DB for others
-                await createDailyChallenge(dateStr, instance);
-            }
-
+    // --- Sync daily challenge instance into game state ---
+    useEffect(() => {
+        if (dailyChallenge.instance && gameState.points.length === 0) {
             setGameState(prev => ({
                 ...prev,
-                points: instance!.points,
+                points: dailyChallenge.instance!.points,
                 bestPath: [],
                 currentPath: [],
                 bestDistance: Infinity,
                 isRunning: false
             }));
-
-            // Fetch leaderboard
-            const board = await getDailyLeaderboard(dateStr);
-            setLeaderboard(board);
-
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setIsLoading(false);
+            // Fetch leaderboard once challenge is loaded
+            fetchLeaderboard();
         }
-    }, [canvasSize]);
+    }, [dailyChallenge.instance, gameState.points.length, fetchLeaderboard]);
 
-    // Initialize daily challenge
-    useEffect(() => {
-        if (canvasSize.width > 0 && canvasSize.height > 0 && gameState.points.length === 0) {
-            loadDailyChallenge();
-        }
-    }, [canvasSize.width, canvasSize.height, gameState.points.length, loadDailyChallenge]);
+    // --- Manual path building ---
 
     const handlePointClick = useCallback((pointId: number) => {
         if (hasSubmitted || gameResult) return;
@@ -93,6 +71,8 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
         }
     }, [hasSubmitted, gameResult, manualPath, gameState.points]);
 
+    // --- Submission ---
+
     const submitManualPath = useCallback(async () => {
         if (manualPath.length !== gameState.points.length || hasSubmitted) return;
 
@@ -107,35 +87,17 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
         setHasSubmitted(true);
 
         if (user) {
-            setIsLoading(true);
-            try {
-                const dateStr = getTodayDateString();
-                await saveDailyScore(dateStr, {
-                    userId: user.uid,
-                    displayName: user.displayName || "Anonymous",
-                    photoURL: user.photoURL || "",
-                    distance: distance,
-                    path: manualPath,
-                    timestamp: new Date()
-                });
-                // Refresh leaderboard
-                const board = await getDailyLeaderboard(dateStr);
-                setLeaderboard(board);
-                setGameResult(`Submitted! Your distance: ${Math.round(distance)}`);
-            } catch (e) {
-                console.error(e);
-                setGameResult("Error submitting score");
-            } finally {
-                setIsLoading(false);
-            }
+            const resultMessage = await submitScore(user, distance, manualPath);
+            setGameResult(resultMessage);
         } else {
             setGameResult(`Finished! Distance: ${Math.round(distance)}. Login to save your score!`);
         }
+    }, [manualPath, gameState.points, hasSubmitted, user, submitScore]);
 
-    }, [manualPath, gameState.points, hasSubmitted, user]);
+    // --- Clear path ---
 
     const clearAll = useCallback(() => {
-        if (hasSubmitted) return; // competitive: no undo after submit!
+        if (hasSubmitted) return;
         setGameState(prev => ({
             ...prev,
             bestPath: [],
@@ -144,6 +106,9 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
         }));
         setManualPath([]);
     }, [hasSubmitted]);
+
+    // --- Derived loading state ---
+    const isLoading = dailyChallenge.isLoading || isSubmitting;
 
     return {
         gameState,
@@ -156,7 +121,7 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
             handlePointClick,
             submitManualPath,
             clearAll,
-            reloadLeaderboard: loadDailyChallenge
+            reloadLeaderboard: dailyChallenge.reload
         }
     };
 };
