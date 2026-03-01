@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styles from "@/styles/pages/games/TSP.module.css";
 import GameLayout from "@/layouts/GameLayout";
 import TSPCanvas from "@/components/games/tsp/TSPCanvas";
@@ -10,6 +10,7 @@ import { formatDistance } from "@/utils/tsp";
 export default function TSPCompetitive() {
     // UI State for resizing
     const [canvasSize, setCanvasSize] = useState({ width: 800, height: 500 });
+    const canvasAreaRef = useRef<HTMLDivElement>(null);
 
     const { user } = useAuth();
 
@@ -26,11 +27,10 @@ export default function TSPCompetitive() {
     // Responsive Canvas
     useEffect(() => {
         const handleResize = () => {
-            const container = document.querySelector(`.${styles.canvasArea}`);
-            if (container) {
+            if (canvasAreaRef.current) {
                 setCanvasSize({
-                    width: container.clientWidth,
-                    height: container.clientHeight
+                    width: canvasAreaRef.current.clientWidth,
+                    height: canvasAreaRef.current.clientHeight
                 });
             }
         };
@@ -100,7 +100,7 @@ export default function TSPCompetitive() {
                 </div>
             }
         >
-            <div className={styles.canvasArea}>
+            <div ref={canvasAreaRef} className={styles.canvasArea}>
                 {gameState?.points?.length > 0 ? (
                     <TSPCanvas
                         width={canvasSize.width}

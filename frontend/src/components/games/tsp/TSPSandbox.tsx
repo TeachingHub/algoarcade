@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styles from "@/styles/pages/games/TSP.module.css";
 
 import { useAuth } from "@/context/AuthContext";
@@ -20,6 +20,7 @@ export default function TSPSandbox() {
 
     // UI State for resizing
     const [canvasSize, setCanvasSize] = useState({ width: 800, height: 500 });
+    const canvasAreaRef = useRef<HTMLDivElement>(null);
 
     // Game Logic Hook
     const {
@@ -37,11 +38,10 @@ export default function TSPSandbox() {
     // Responsive Canvas
     useEffect(() => {
         const handleResize = () => {
-            const container = document.querySelector(`.${styles.canvasArea}`);
-            if (container) {
+            if (canvasAreaRef.current) {
                 setCanvasSize({
-                    width: container.clientWidth,
-                    height: container.clientHeight
+                    width: canvasAreaRef.current.clientWidth,
+                    height: canvasAreaRef.current.clientHeight
                 });
             }
         };
@@ -77,7 +77,7 @@ export default function TSPSandbox() {
                     pointsCount={gameState.points.length}
                     manualPathLength={manualPath.length}
                     gameResult={gameResult}
-                    speed={gameState.speed}
+                    speed={gameState.speed ?? 50}
                     setSpeed={actions.setSpeed}
                     customPointCount={customPointCount}
                     setCustomPointCount={setCustomPointCount}
@@ -90,7 +90,7 @@ export default function TSPSandbox() {
                 />
             }
         >
-            <div className={styles.canvasArea}>
+            <div ref={canvasAreaRef} className={styles.canvasArea}>
                 <TSPCanvas
                     width={canvasSize.width}
                     height={canvasSize.height}

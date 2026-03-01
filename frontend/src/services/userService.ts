@@ -7,7 +7,7 @@ import type { UserProfileData } from "@/types/user/user";
 
 
 export async function createUserDocument(user: User) {
-    try {//TODO : check if there could be race conditions and username and profilePic are not null
+    try {
         await setDoc(doc(db, "users", user.uid), {
             username: user.displayName,
             email: user.email,

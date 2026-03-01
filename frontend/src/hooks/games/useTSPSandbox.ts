@@ -30,6 +30,7 @@ export const useTSPSandbox = (canvasSize: { width: number, height: number }) => 
 
     // Use ReturnType<typeof setTimeout> to handle both Node and Browser environments safely
     const animationIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const speedRef = useRef(gameState.speed ?? 50);
 
     // Load game instance
     const [searchParams, setSearchParams] = useSearchParams();
@@ -164,7 +165,7 @@ export const useTSPSandbox = (canvasSize: { width: number, height: number }) => 
                 }));
 
                 if (result.improved) {
-                    animationIdRef.current = setTimeout(improve, getDelay(gameState.speed ?? 50));
+                    animationIdRef.current = setTimeout(improve, getDelay(speedRef.current));
                 } else {
                     setGameState(prev => ({ ...prev, isRunning: false }));
                     animationIdRef.current = null;
@@ -172,7 +173,7 @@ export const useTSPSandbox = (canvasSize: { width: number, height: number }) => 
             };
 
             // Start the recursive timeout loop
-            animationIdRef.current = setTimeout(improve, getDelay(gameState.speed ?? 50));
+            animationIdRef.current = setTimeout(improve, getDelay(speedRef.current));
         }
     }, [algorithm, gameState.points, gameState.isRunning, gameState.speed]);
 
@@ -223,7 +224,7 @@ export const useTSPSandbox = (canvasSize: { width: number, height: number }) => 
             const getDelay = (s: number) => Math.floor(1500 * Math.pow(1 - (s / 100), 2));
 
             if (result.improved) {
-                animationIdRef.current = setTimeout(improve, getDelay(gameState.speed ?? 50));
+                animationIdRef.current = setTimeout(improve, getDelay(speedRef.current));
             } else {
                 setGameState(prev => ({ ...prev, isRunning: false }));
                 animationIdRef.current = null;
@@ -307,15 +308,11 @@ export const useTSPSandbox = (canvasSize: { width: number, height: number }) => 
     }, [gameState.points, setSearchParams]);
 
     const setSpeed = useCallback((speed: number) => {
+        speedRef.current = speed;
         setGameState(prev => ({ ...prev, speed }));
     }, []);
 
-    // Initialize with random points when canvas size is available
-    // useEffect(() => {
-    //     if (canvasSize.width > 0 && canvasSize.height > 0 && gameState.points.length === 0) {
-    //         generateScenario('random');
-    //     }
-    // }, [canvasSize.width, canvasSize.height, gameState.points.length, generateScenario]);
+
 
     // Validate Firestore ID (alphanumeric and exactly 20 chars)
     const isValidId = (id: string) => /^[a-zA-Z0-9]{20}$/.test(id);

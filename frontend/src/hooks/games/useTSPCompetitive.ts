@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
+import type { User } from 'firebase/auth';
 import type { TSPState } from "@/types/games/tsp";
 import { calculateTotalDistance, generateRandomPoints } from "@/utils/tsp";
 import { getDailyChallenge, createDailyChallenge, saveDailyScore, getDailyLeaderboard } from '@/services/games/TSPService';
 import type { TSPLeaderboardEntry } from '@/services/games/TSPService';
 
-export const useTSPCompetitive = (canvasSize: { width: number, height: number }, user: any) => {
+export const useTSPCompetitive = (canvasSize: { width: number, height: number }, user: User | null) => {
     const [gameState, setGameState] = useState<TSPState>({
         points: [],
         bestPath: [],

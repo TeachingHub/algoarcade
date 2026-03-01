@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useAuth } from "@/context/AuthContext";
 import Layout from "@/layouts/Layout";
@@ -16,9 +16,11 @@ export default function LoginPage() {
     const navigate = useNavigate();
     const { user, login, loginWithGoogle } = useAuth();
 
-    if (user) {
-        navigate("/");
-    }
+    useEffect(() => {
+        if (user) {
+            navigate("/");
+        }
+    }, [user, navigate]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

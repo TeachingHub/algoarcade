@@ -11,15 +11,16 @@ export async function validatePassword(password: string): Promise<ValidatePasswo
     try {
 
         const status: PasswordValidationStatus = await validatePasswordFirebase(auth, password);
-        console.log(status);
+
         if (status.isValid) {
             return { valid: true, error: null };
         }
 
         return { valid: false, error: parsePasswordError(status) };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Password validation error:", error);
-        return { valid: false, error: error.message || "An unexpected error occurred during validation." };
+        const message = error instanceof Error ? error.message : "An unexpected error occurred during validation.";
+        return { valid: false, error: message };
     }
 }
 
