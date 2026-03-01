@@ -10,10 +10,10 @@ export interface TSPState {
     currentPath: number[];
     bestDistance: number;
     isRunning: boolean;
-    speed: number;
+    speed?: number;
 }
 
 export interface TSPInstance {
     points: Point[];
-    author: string; 
+    author: string;
 }

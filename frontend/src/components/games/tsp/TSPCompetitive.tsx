@@ -3,13 +3,25 @@ import styles from "@/styles/pages/games/TSP.module.css";
 import GameLayout from "@/layouts/GameLayout";
 import TSPCanvas from "@/components/games/tsp/TSPCanvas";
 import { useTSPCompetitive } from "@/hooks/games/useTSPCompetitive";
+import { useAuth } from "@/context/AuthContext";
+import Button from "@/components/shared/Button";
+import { formatDistance } from "@/utils/tsp";
 
-export default function TSPCompetitive({ onChangeMode }: { onChangeMode: (mode: 'sandbox' | 'competitive') => void }) {
+export default function TSPCompetitive() {
     // UI State for resizing
     const [canvasSize, setCanvasSize] = useState({ width: 800, height: 500 });
 
-    // We'll scaffold this later. For now just use a placeholder
-    const { gameState } = useTSPCompetitive(canvasSize);
+    const { user } = useAuth();
+
+    const {
+        gameState,
+        manualPath,
+        gameResult,
+        isLoading,
+        hasSubmitted,
+        leaderboard,
+        actions
+    } = useTSPCompetitive(canvasSize, user);
 
     // Responsive Canvas
     useEffect(() => {
@@ -42,15 +54,49 @@ export default function TSPCompetitive({ onChangeMode }: { onChangeMode: (mode: 
             ]}
             controls={
                 <div className={styles.competitiveControls}>
-                    <h3>COMPETITIVE CONTROLS</h3>
-                    <p className={styles.loadingText}>Loading Daily Leaderboard soon...</p>
-                    {/* Placeholder for Competitive Controls */}
-                    <button
-                        onClick={() => onChangeMode('sandbox')}
-                        className={styles.returnButton}
-                    >
-                        RETURN TO SANDBOX
-                    </button>
+                    <h3 className={styles.sectionTitle}>DAILY CHALLENGE</h3>
+
+                    <div className={styles.buttonGroup}>
+                        <Button
+                            style={["primary", "fullWidth"]}
+                            label={hasSubmitted ? "ALREADY SUBMITTED" : "SUBMIT SCORE"}
+                            onClick={actions.submitManualPath}
+                            disabled={hasSubmitted || manualPath.length !== (gameState?.points?.length || 0)}
+                        />
+                        <Button
+                            style={["secondary", "fullWidth"]}
+                            label="CLEAR PATH"
+                            onClick={actions.clearAll}
+                            disabled={hasSubmitted || manualPath.length === 0}
+                        />
+                    </div>
+
+                    <h3 className={styles.leaderboardTitle}>LEADERBOARD</h3>
+                    {isLoading && leaderboard.length === 0 ? (
+                        <p className={styles.loadingText}>Loading...</p>
+                    ) : leaderboard.length > 0 ? (
+                        <ul className={styles.leaderboardList}>
+                            {leaderboard.map((entry, idx) => (
+                                <li key={entry.userId} className={`${styles.leaderboardItem} ${entry.userId === user?.uid ? styles.leaderboardItemActive : styles.leaderboardItemInactive}`}>
+                                    <span className={styles.leaderboardRank}>{idx + 1}.</span>
+                                    {entry.photoURL ? (
+                                        <img src={entry.photoURL} alt={entry.displayName} className={styles.leaderboardAvatar} />
+                                    ) : (
+                                        <div className={styles.leaderboardAvatarPlaceholder}>
+                                            {entry.displayName.slice(0, 2).toUpperCase()}
+                                        </div>
+                                    )}
+                                    <div className={styles.leaderboardInfo}>
+                                        <div className={styles.leaderboardName}>{entry.displayName}</div>
+                                        <div className={styles.leaderboardDistance}>{formatDistance(entry.distance)}</div>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p className={styles.emptyLeaderboard}>Be the first to submit a score today!</p>
+                    )}
+
                 </div>
             }
         >
@@ -60,15 +106,27 @@ export default function TSPCompetitive({ onChangeMode }: { onChangeMode: (mode: 
                         width={canvasSize.width}
                         height={canvasSize.height}
                         points={gameState.points}
-                        bestPath={[]}
-                        manualPath={[]}
+                        bestPath={gameState.bestPath}
+                        manualPath={manualPath}
                         algorithm="manual"
-                        onPointClick={() => { }}
+                        onPointClick={actions.handlePointClick}
                         gameResult={null}
                     />
                 ) : (
-                    <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+                    <div className={styles.loadingContainer}>
                         Loading Daily Challenge...
+                    </div>
+                )}
+
+                {/* Overlays */}
+                {!hasSubmitted && manualPath.length < (gameState?.points?.length || 0) && (
+                    <div className={styles.instructionOverlay}>
+                        Connect all points: {manualPath.length}/{(gameState?.points?.length || 0)}
+                    </div>
+                )}
+                {gameResult && (
+                    <div className={styles.resultOverlay}>
+                        {gameResult}
                     </div>
                 )}
             </div>

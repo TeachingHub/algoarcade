@@ -28,7 +28,7 @@ export default function TSPPage() {
             {mode === 'sandbox' ? (
                 <TSPSandbox />
             ) : (
-                <TSPCompetitive onChangeMode={setMode} />
+                <TSPCompetitive />
             )}
         </div>
     );

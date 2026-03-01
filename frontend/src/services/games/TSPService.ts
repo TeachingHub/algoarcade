@@ -1,9 +1,9 @@
 import { db } from "@/firebase/config";
 import type { TSPInstance, Point } from "@/types/games/tsp";
-import { addDoc, serverTimestamp, collection, doc, getDoc } from "firebase/firestore";
-
+import { addDoc, serverTimestamp, collection, doc, getDoc, setDoc, query, orderBy, limit, getDocs } from "firebase/firestore";
 
 const COLLECTION_NAME = "tsp_instances";
+const DAILY_COLLECTION_NAME = "tsp_daily_challenges";
 
 function encodeTSPInstance(instance: TSPInstance): string {
     // 1. Extract author
@@ -80,5 +80,80 @@ export async function getGameInstance(instanceId: string): Promise<TSPInstance |
     } catch (error) {
         console.error("Error fetching game instance:", error)
         throw new Error("Failed to load game instance")
+    }
+}
+
+// --- COMPETITIVE MODE ---
+
+export async function getDailyChallenge(dateString: string): Promise<TSPInstance | null> {
+    try {
+        const docRef = doc(db, DAILY_COLLECTION_NAME, `daily_${dateString}`);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const docData = docSnap.data();
+            if (typeof docData.data === 'string') {
+                return decodeTSPInstance(docData.data);
+            }
+        }
+        return null;
+    } catch (error) {
+        console.error("Error fetching daily challenge:", error);
+        return null;
+    }
+}
+
+export async function createDailyChallenge(dateString: string, instanceData: TSPInstance): Promise<void> {
+    try {
+        const encoded = encodeTSPInstance(instanceData);
+        const docRef = doc(db, DAILY_COLLECTION_NAME, `daily_${dateString}`);
+
+        // We use setDoc to specify the document ID explicitly (the date string)
+        await setDoc(docRef, {
+            data: encoded,
+            createdAt: serverTimestamp()
+        });
+    } catch (error) {
+        console.error("Error creating daily challenge:", error);
+        throw new Error("Failed to create daily challenge");
+    }
+}
+
+export interface TSPLeaderboardEntry {
+    userId: string;
+    displayName: string;
+    photoURL: string;
+    distance: number;
+    path: number[]; // Save the path they submitted just in case
+    timestamp: any;
+}
+
+export async function saveDailyScore(dateString: string, score: TSPLeaderboardEntry): Promise<void> {
+    try {
+        const leaderboardRef = collection(db, "tsp_leaderboards", dateString, "scores");
+        // We can use the user's ID as the doc ID so they only have one score per day
+        await setDoc(doc(leaderboardRef, score.userId), score);
+    } catch (error) {
+        console.error("Error saving daily score:", error);
+        throw new Error("Failed to save daily score");
+    }
+}
+
+export async function getDailyLeaderboard(dateString: string): Promise<TSPLeaderboardEntry[]> {
+    try {
+        const leaderboardRef = collection(db, "tsp_leaderboards", dateString, "scores");
+        // Order by distance ascending (lowest is best), limit to 5
+        const q = query(leaderboardRef, orderBy("distance", "asc"), limit(5));
+
+        const querySnapshot = await getDocs(q);
+        const scores: TSPLeaderboardEntry[] = [];
+        querySnapshot.forEach((doc) => {
+            scores.push(doc.data() as TSPLeaderboardEntry);
+        });
+
+        return scores;
+    } catch (error) {
+        console.error("Error fetching daily leaderboard:", error);
+        return [];
     }
 }

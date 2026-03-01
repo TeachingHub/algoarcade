@@ -164,7 +164,7 @@ export const useTSPSandbox = (canvasSize: { width: number, height: number }) => 
                 }));
 
                 if (result.improved) {
-                    animationIdRef.current = setTimeout(improve, getDelay(gameState.speed));
+                    animationIdRef.current = setTimeout(improve, getDelay(gameState.speed ?? 50));
                 } else {
                     setGameState(prev => ({ ...prev, isRunning: false }));
                     animationIdRef.current = null;
@@ -172,7 +172,7 @@ export const useTSPSandbox = (canvasSize: { width: number, height: number }) => 
             };
 
             // Start the recursive timeout loop
-            animationIdRef.current = setTimeout(improve, getDelay(gameState.speed));
+            animationIdRef.current = setTimeout(improve, getDelay(gameState.speed ?? 50));
         }
     }, [algorithm, gameState.points, gameState.isRunning, gameState.speed]);
 
@@ -223,7 +223,7 @@ export const useTSPSandbox = (canvasSize: { width: number, height: number }) => 
             const getDelay = (s: number) => Math.floor(1500 * Math.pow(1 - (s / 100), 2));
 
             if (result.improved) {
-                animationIdRef.current = setTimeout(improve, getDelay(gameState.speed));
+                animationIdRef.current = setTimeout(improve, getDelay(gameState.speed ?? 50));
             } else {
                 setGameState(prev => ({ ...prev, isRunning: false }));
                 animationIdRef.current = null;
