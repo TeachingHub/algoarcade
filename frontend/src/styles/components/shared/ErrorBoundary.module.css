@@ -1,0 +1,72 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--space-xxl);
+    min-height: 300px;
+    color: var(--foreground);
+}
+
+/* Full-page variant (used at the app root level) */
+.fullPage {
+    min-height: 100vh;
+    background: var(--background);
+}
+
+.icon {
+    font-size: var(--font-size-404);
+    margin-bottom: var(--space-xl);
+    filter: drop-shadow(3px 3px 0px var(--destructive-box-shadow));
+}
+
+.errorCode {
+    font-size: var(--font-size-xxxl);
+    font-weight: var(--font-weight-bold);
+    color: var(--destructive);
+    text-shadow: 3px 3px 0px var(--destructive-box-shadow);
+    margin-bottom: var(--space-lg);
+}
+
+.title {
+    font-size: var(--font-size-lg);
+    color: var(--primary);
+    margin-bottom: var(--space-xl);
+}
+
+.description {
+    max-width: 500px;
+    margin-bottom: var(--space-xl);
+    line-height: 1.8;
+    color: var(--muted-foreground);
+    font-size: var(--font-size-xs);
+}
+
+.details {
+    width: 100%;
+    max-width: 500px;
+    margin-bottom: var(--space-xl);
+    padding: var(--space-lg);
+    background: var(--input);
+    border: 1px solid var(--border);
+    text-align: left;
+    overflow-x: auto;
+}
+
+.detailsText {
+    font-family: 'Courier New', monospace;
+    font-size: var(--font-size-xxs);
+    color: var(--destructive);
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.actions {
+    display: flex;
+    gap: var(--space-lg);
+    flex-wrap: wrap;
+    justify-content: center;
+}

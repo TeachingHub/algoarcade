@@ -9,6 +9,7 @@ import Games from "./pages/games/Games";
 import TSP from "./pages/games/TSP";
 import NotFound from "./pages/NotFound";
 import Pathfinding from "./pages/games/Pathfinding";
+import ErrorBoundary from "./components/shared/ErrorBoundary";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -33,8 +34,16 @@ export default function Router() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/games" element={<Games />} />
-        <Route path="/games/tsp" element={<TSP />} />
-        <Route path="/games/pathfinding" element={<Pathfinding />} />
+        <Route path="/games/tsp" element={
+          <ErrorBoundary>
+            <TSP />
+          </ErrorBoundary>
+        } />
+        <Route path="/games/pathfinding" element={
+          <ErrorBoundary>
+            <Pathfinding />
+          </ErrorBoundary>
+        } />
         <Route
           path="/profile"
           element={

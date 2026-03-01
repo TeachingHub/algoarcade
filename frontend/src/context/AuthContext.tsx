@@ -1,10 +1,11 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { type User, onAuthStateChanged } from "firebase/auth";
-import { auth } from "../firebase/config";
+import { auth, configError } from "../firebase/config";
 import type { UserProfileData } from "@/types/user/user";
 import { getUserDocument } from "../services/userService";
 import { getFromLocalStorage, saveToLocalStorage } from "@/utils/localStorageUtils";
 import { loginUser, registerUser, loginWithGoogle as loginWithGoogleService } from "@/services/authService";
+import ErrorFallback from "@/components/shared/ErrorFallback";
 
 interface AuthContextType {
     user: User | null;
@@ -34,6 +35,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(localStorageUser);
     const [userProfile, setUserProfile] = useState<UserProfileData | null>(localStorageUserProfile);
     const [loading, setLoading] = useState(true);
+    const [authError, setAuthError] = useState<Error | null>(null);
 
     const login = async (email: string, password: string) => {
         const { user } = await loginUser(email, password);
@@ -71,20 +73,53 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-            setUser(currentUser);
-
-            if (currentUser) {
-                setUserProfile(await getUserDocument(currentUser));
-            } else {
-                setUserProfile(null);
-            }
-
+        // Don't try to initialize auth if Firebase config is invalid
+        if (configError) {
+            setAuthError(configError);
             setLoading(false);
-        });
+            return;
+        }
+
+        const unsubscribe = onAuthStateChanged(
+            auth,
+            async (currentUser) => {
+                setUser(currentUser);
+
+                if (currentUser) {
+                    try {
+                        setUserProfile(await getUserDocument(currentUser));
+                    } catch (e) {
+                        console.error("Error fetching user profile:", e);
+                    }
+                } else {
+                    setUserProfile(null);
+                }
+
+                setLoading(false);
+            },
+            (error) => {
+                // Firebase auth failed (bad config, network, etc.)
+                console.error("Firebase auth error:", error);
+                setAuthError(error);
+                setLoading(false);
+            }
+        );
 
         return () => unsubscribe();
     }, []);
+
+    // Show styled error if Firebase auth initialization failed
+    if (authError) {
+        return (
+            <ErrorFallback
+                error={authError}
+                fullPage
+                title="> AUTH_INIT_FAILED_"
+                description="Could not connect to the authentication service. Check your Firebase configuration and network connection."
+                onRetry={() => window.location.reload()}
+            />
+        );
+    }
 
     return (
         <AuthContext.Provider value={{ user, userProfile, loading, login, register, loginWithGoogle, refreshUserProfile }}>
