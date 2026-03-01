@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from "@/styles/pages/games/TSP.module.css";
+import { CircleStar, Bot } from 'lucide-react';
 
 import { useAuth } from "@/context/AuthContext";
 import { formatDistance } from "@/utils/tsp";
@@ -119,7 +120,26 @@ export default function TSPSandbox() {
                 )}
                 {gameResult && (
                     <div className={styles.resultOverlay}>
-                        {gameResult}
+                        <div className={styles.resultIcon}>
+                            {gameResult.won
+                                ? <CircleStar size={32} color="var(--primary)" />
+                                : <Bot size={32} color="var(--destructive)" />
+                            }
+                        </div>
+                        <div className={styles.resultTitle}>
+                            {gameResult.won ? 'YOU WIN!' : 'YOU LOSE!'}
+                        </div>
+                        <div className={styles.resultScores}>
+                            <div className={styles.resultScore}>
+                                <span className={styles.resultScoreLabel}>YOUR PATH</span>
+                                <span className={styles.resultScoreValue}>{formatDistance(gameResult.userDistance)}</span>
+                            </div>
+                            <div className={styles.resultVs}>VS</div>
+                            <div className={styles.resultScore}>
+                                <span className={styles.resultScoreLabel}>ALGORITHM</span>
+                                <span className={styles.resultScoreValue}>{formatDistance(gameResult.algoDistance)}</span>
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>

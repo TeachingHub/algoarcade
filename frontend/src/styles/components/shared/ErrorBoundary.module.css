@@ -16,7 +16,6 @@
 }
 
 .icon {
-    font-size: var(--font-size-404);
     margin-bottom: var(--space-xl);
     filter: drop-shadow(3px 3px 0px var(--destructive-box-shadow));
 }

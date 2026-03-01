@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import type { User } from 'firebase/auth';
+import { serverTimestamp } from 'firebase/firestore';
 import { saveDailyScore, getDailyLeaderboard } from '@/services/games/TSPService';
 import type { TSPLeaderboardEntry } from '@/services/games/TSPService';
 import { getTodayDateString } from './useTSPDailyChallenge';
@@ -39,7 +40,7 @@ export const useTSPLeaderboard = () => {
                 photoURL: user.photoURL || "",
                 distance,
                 path,
-                timestamp: new Date()
+                timestamp: serverTimestamp()
             });
 
             // Refresh leaderboard after submission

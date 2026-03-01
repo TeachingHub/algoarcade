@@ -143,7 +143,7 @@ export async function getDailyLeaderboard(dateString: string): Promise<TSPLeader
     try {
         const leaderboardRef = collection(db, "tsp_leaderboards", dateString, "scores");
         // Order by distance ascending (lowest is best), limit to 5
-        const q = query(leaderboardRef, orderBy("distance", "asc"), limit(5));
+        const q = query(leaderboardRef, orderBy("distance", "asc"), orderBy("timestamp", "asc"), limit(5));
 
         const querySnapshot = await getDocs(q);
         const scores: TSPLeaderboardEntry[] = [];

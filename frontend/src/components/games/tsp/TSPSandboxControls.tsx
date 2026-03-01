@@ -9,7 +9,7 @@ interface TSPControlsProps {
     isRunning: boolean;
     pointsCount: number;
     manualPathLength: number;
-    gameResult: string | null;
+    gameResult: unknown;
     speed: number;
     setSpeed: (speed: number) => void;
     customPointCount: number;

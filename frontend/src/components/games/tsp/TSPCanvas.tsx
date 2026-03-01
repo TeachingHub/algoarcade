@@ -11,7 +11,7 @@ interface TSPCanvasProps {
     algorithm: string;
     onPointClick: (id: number) => void;
     onCanvasClick?: (x: number, y: number) => void;
-    gameResult: string | null;
+    gameResult: unknown;
 }
 
 export default function TSPCanvas({

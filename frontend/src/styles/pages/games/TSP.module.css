@@ -32,20 +32,64 @@
 
 .resultOverlay {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(0, 0, 0, 0.9);
-    padding: var(--space-lg);
-    border-radius: var(--radius-md);
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 8, 43, 0.95), rgba(0, 8, 43, 0.8));
+    padding: var(--space-md) var(--space-lg);
     color: var(--white);
-    font-size: var(--font-size-lg);
-    font-weight: bold;
-    border: 2px solid var(--primary);
     text-align: center;
-    white-space: pre-line;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     z-index: 10;
+    border-top: 2px solid var(--primary);
+    transition: opacity 0.3s ease;
+}
+
+.canvasArea:hover .resultOverlay {
+    opacity: 0.1;
+    pointer-events: none;
+}
+
+.resultIcon {
+    font-size: var(--font-size-xxl);
+    margin-bottom: var(--space-xs);
+}
+
+.resultTitle {
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-bold);
+    color: var(--primary);
+    margin-bottom: var(--space-sm);
+}
+
+.resultScores {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-lg);
+}
+
+.resultScore {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.resultScoreLabel {
+    font-size: var(--font-size-xxs);
+    color: var(--muted-foreground);
+    text-transform: uppercase;
+}
+
+.resultScoreValue {
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-bold);
+    color: var(--foreground);
+}
+
+.resultVs {
+    font-size: var(--font-size-xs);
+    color: var(--destructive);
+    font-weight: var(--font-weight-bold);
 }
 
 .pageWrapper {
@@ -203,4 +247,18 @@
     height: 100%;
     align-items: center;
     justify-content: center;
+}
+
+.loginPrompt {
+    font-size: var(--font-size-xxs);
+    color: var(--muted-foreground);
+    line-height: 1.8;
+    margin-bottom: var(--space-sm);
+    text-align: center;
+}
+
+.leaderboardTime {
+    font-size: 0.75em;
+    color: var(--muted-foreground);
+    opacity: 0.7;
 }

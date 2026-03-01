@@ -58,6 +58,10 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
 
         if (!manualPath.includes(pointId)) {
             const newManualPath = [...manualPath, pointId];
+
+            // Block the final point for non-logged users (can't see distance / submit)
+            if (!user && newManualPath.length === gameState.points.length) return;
+
             setManualPath(newManualPath);
 
             if (newManualPath.length === gameState.points.length) {
@@ -69,7 +73,7 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
                 }));
             }
         }
-    }, [hasSubmitted, gameResult, manualPath, gameState.points]);
+    }, [hasSubmitted, gameResult, manualPath, gameState.points, user]);
 
     // --- Submission ---
 

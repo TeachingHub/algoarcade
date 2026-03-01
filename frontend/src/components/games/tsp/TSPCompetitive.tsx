@@ -7,6 +7,16 @@ import { useAuth } from "@/context/AuthContext";
 import Button from "@/components/shared/Button";
 import { formatDistance } from "@/utils/tsp";
 
+/** Format a Firestore Timestamp or Date to HH:MM */
+function formatTime(timestamp: unknown): string {
+    if (!timestamp) return '';
+    // Firestore timestamps have a toDate() method
+    const date = typeof (timestamp as any)?.toDate === 'function'
+        ? (timestamp as any).toDate()
+        : new Date(timestamp as string | number);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
 export default function TSPCompetitive() {
     // UI State for resizing
     const [canvasSize, setCanvasSize] = useState({ width: 800, height: 500 });
@@ -41,6 +51,8 @@ export default function TSPCompetitive() {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    const isPathComplete = manualPath.length === (gameState?.points?.length || 0);
+
     return (
         <GameLayout
             title="DAILY CHALLENGE: COMPETITIVE"
@@ -56,20 +68,38 @@ export default function TSPCompetitive() {
                 <div className={styles.competitiveControls}>
                     <h3 className={styles.sectionTitle}>DAILY CHALLENGE</h3>
 
-                    <div className={styles.buttonGroup}>
-                        <Button
-                            style={["primary", "fullWidth"]}
-                            label={hasSubmitted ? "ALREADY SUBMITTED" : "SUBMIT SCORE"}
-                            onClick={actions.submitManualPath}
-                            disabled={hasSubmitted || manualPath.length !== (gameState?.points?.length || 0)}
-                        />
-                        <Button
-                            style={["secondary", "fullWidth"]}
-                            label="CLEAR PATH"
-                            onClick={actions.clearAll}
-                            disabled={hasSubmitted || manualPath.length === 0}
-                        />
-                    </div>
+                    {user ? (
+                        <div className={styles.buttonGroup}>
+                            <Button
+                                style={["primary", "fullWidth"]}
+                                label={hasSubmitted ? "ALREADY SUBMITTED" : "SUBMIT SCORE"}
+                                onClick={actions.submitManualPath}
+                                disabled={hasSubmitted || !isPathComplete}
+                            />
+                            <Button
+                                style={["secondary", "fullWidth"]}
+                                label="CLEAR PATH"
+                                onClick={actions.clearAll}
+                                disabled={hasSubmitted || manualPath.length === 0}
+                            />
+                        </div>
+                    ) : (
+                        <div className={styles.buttonGroup}>
+                            <p className={styles.loginPrompt}>
+                                Log in to submit your score and compete on the leaderboard!
+                            </p>
+                            <Button
+                                style={["primary", "fullWidth"]}
+                                label="LOG IN"
+                                to="/login"
+                            />
+                            <Button
+                                style={["secondary", "fullWidth"]}
+                                label="REGISTER"
+                                to="/register"
+                            />
+                        </div>
+                    )}
 
                     <h3 className={styles.leaderboardTitle}>LEADERBOARD</h3>
                     {isLoading && leaderboard.length === 0 ? (
@@ -88,7 +118,12 @@ export default function TSPCompetitive() {
                                     )}
                                     <div className={styles.leaderboardInfo}>
                                         <div className={styles.leaderboardName}>{entry.displayName}</div>
-                                        <div className={styles.leaderboardDistance}>{formatDistance(entry.distance)}</div>
+                                        <div className={styles.leaderboardDistance}>
+                                            {formatDistance(entry.distance)}
+                                            {entry.timestamp && (
+                                                <span className={styles.leaderboardTime}> · {formatTime(entry.timestamp)}</span>
+                                            )}
+                                        </div>
                                     </div>
                                 </li>
                             ))}
@@ -126,7 +161,9 @@ export default function TSPCompetitive() {
                 )}
                 {gameResult && (
                     <div className={styles.resultOverlay}>
-                        {gameResult}
+                        <div className={styles.resultTitle}>
+                            {gameResult}
+                        </div>
                     </div>
                 )}
             </div>

@@ -1,15 +1,41 @@
 import type { Point } from "@/types/games/tsp";
 
+const MIN_POINT_DISTANCE = 30;
+const MAX_PLACEMENT_ATTEMPTS = 100;
+
+/** Checks that a candidate point is at least minDist pixels from all existing points */
+const isFarEnough = (x: number, y: number, existing: Point[], minDist: number): boolean => {
+    return existing.every(p => {
+        const dx = p.x - x;
+        const dy = p.y - y;
+        return dx * dx + dy * dy >= minDist * minDist;
+    });
+};
+
 export const generateRandomPoints = (count: number, width: number, height: number): Point[] => {
     const points: Point[] = [];
     const padding = 50;
 
     for (let i = 0; i < count; i++) {
-        points.push({
-            id: i,
-            x: Math.round(padding + Math.random() * (width - 2 * padding)),
-            y: Math.round(padding + Math.random() * (height - 2 * padding))
-        });
+        let placed = false;
+        for (let attempt = 0; attempt < MAX_PLACEMENT_ATTEMPTS; attempt++) {
+            const x = Math.round(padding + Math.random() * (width - 2 * padding));
+            const y = Math.round(padding + Math.random() * (height - 2 * padding));
+
+            if (isFarEnough(x, y, points, MIN_POINT_DISTANCE)) {
+                points.push({ id: i, x, y });
+                placed = true;
+                break;
+            }
+        }
+        // If we couldn't place after all attempts, force-place (very dense canvas)
+        if (!placed) {
+            points.push({
+                id: i,
+                x: Math.round(padding + Math.random() * (width - 2 * padding)),
+                y: Math.round(padding + Math.random() * (height - 2 * padding))
+            });
+        }
     }
 
     return points;

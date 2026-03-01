@@ -4,7 +4,6 @@ import {
     calculateTotalDistance,
     nearestNeighborTSP,
     twoOptImprovement,
-    formatDistance
 } from "@/utils/tsp";
 import { useTSPAnimation } from './useTSPAnimation';
 
@@ -20,6 +19,12 @@ import { useTSPAnimation } from './useTSPAnimation';
 
 export type AlgorithmMode = 'nearest' | '2opt' | 'manual' | 'builder';
 
+export interface SandboxResult {
+    won: boolean;
+    userDistance: number;
+    algoDistance: number;
+}
+
 export const useTSPAlgorithms = () => {
     const [gameState, setGameState] = useState<TSPState>({
         points: [],
@@ -32,7 +37,7 @@ export const useTSPAlgorithms = () => {
 
     const [algorithm, setAlgorithmState] = useState<AlgorithmMode>('nearest');
     const [manualPath, setManualPath] = useState<number[]>([]);
-    const [gameResult, setGameResult] = useState<string | null>(null);
+    const [gameResult, setGameResult] = useState<SandboxResult | null>(null);
 
     const animation = useTSPAnimation(gameState.speed ?? 50);
 
@@ -185,11 +190,12 @@ export const useTSPAlgorithms = () => {
             } else {
                 setGameState(prev => ({ ...prev, isRunning: false }));
 
-                if (currentDist < userDistance - 1) {
-                    setGameResult(`YOU LOSE! 🤖\nAlgorithm found a better path (${formatDistance(currentDist)})`);
-                } else {
-                    setGameResult("YOU WIN! 🏆\nYour path was optimal!");
-                }
+                const won = currentDist >= userDistance - 1; // -1 for floating point tolerance
+                setGameResult({
+                    won,
+                    userDistance,
+                    algoDistance: currentDist
+                });
             }
         };
 

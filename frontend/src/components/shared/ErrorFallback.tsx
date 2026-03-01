@@ -1,4 +1,5 @@
 import Button from "@/components/shared/Button";
+import { Bug } from 'lucide-react';
 import styles from "@/styles/components/shared/ErrorBoundary.module.css";
 
 interface ErrorFallbackProps {
@@ -29,7 +30,9 @@ export default function ErrorFallback({
 }: ErrorFallbackProps) {
     return (
         <div className={`${styles.container} ${fullPage ? styles.fullPage : ''}`}>
-            <div className={styles.icon}>💀</div>
+            <div className={styles.icon}>
+                <Bug size={64} color="var(--destructive)" />
+            </div>
             <h1 className={styles.errorCode}>CRASH</h1>
             <p className={styles.title}>{title}</p>
 
