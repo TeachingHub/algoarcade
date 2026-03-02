@@ -32,21 +32,49 @@ export function usePathfinding() {
     const speedRef = useRef(state.speed);
     speedRef.current = state.speed;
 
-    // ─── Wall drawing ────────────────────────────────────────────
+    // ─── Cell interaction (wall draw + manual path) ─────────────────
 
     const handleCellInteraction = useCallback((row: number, col: number) => {
         if (state.isRunning) return;
 
         const cell = state.grid[row][col];
 
-        // Can't overwrite start or end
-        if (cell.type === 'start' || cell.type === 'end') return;
-
+        // ── Manual path mode ──
         if (mode === 'manual') {
-            // Manual path mode: build path step by step
-            handleManualStep(row, col);
+            if (state.isSolved) return;
+            if (cell.type === 'wall') return;
+
+            setManualPath(prev => {
+                // If path is empty, must start at start cell
+                if (prev.length === 0) {
+                    if (row !== DEFAULT_START.row || col !== DEFAULT_START.col) return prev;
+                    return [{ row, col }];
+                }
+
+                // Allow going back one step (undo)
+                if (prev.length >= 2) {
+                    const prevStep = prev[prev.length - 2];
+                    if (prevStep.row === row && prevStep.col === col) {
+                        return prev.slice(0, -1);
+                    }
+                }
+
+                // Must be adjacent to last step
+                const last = prev[prev.length - 1];
+                const dr = Math.abs(row - last.row);
+                const dc = Math.abs(col - last.col);
+                if (dr + dc !== 1) return prev;
+
+                // Can't revisit
+                if (prev.some(p => p.row === row && p.col === col)) return prev;
+
+                return [...prev, { row, col }];
+            });
             return;
         }
+
+        // ── Wall / Erase mode — can't overwrite start or end ──
+        if (cell.type === 'start' || cell.type === 'end') return;
 
         setState(prev => {
             const newGrid = prev.grid.map(r => r.map(c => ({ ...c })));
@@ -67,50 +95,7 @@ export function usePathfinding() {
         });
 
         setResultMessage(null);
-    }, [state.isRunning, state.grid, mode]);
-
-    // ─── Manual path solving ─────────────────────────────────────
-
-    const handleManualStep = useCallback((row: number, col: number) => {
-        if (state.isSolved || state.isRunning) return;
-
-        const target = state.grid[row][col];
-        if (target.type === 'wall') return;
-
-        setManualPath(prev => {
-            // If path is empty, must start at start cell
-            if (prev.length === 0) {
-                if (row !== DEFAULT_START.row || col !== DEFAULT_START.col) return prev;
-                return [{ row, col }];
-            }
-
-            // Allow going back one step (undo)
-            if (prev.length >= 2) {
-                const prevStep = prev[prev.length - 2];
-                if (prevStep.row === row && prevStep.col === col) {
-                    return prev.slice(0, -1);
-                }
-            }
-
-            // Must be adjacent to last step
-            const last = prev[prev.length - 1];
-            const dr = Math.abs(row - last.row);
-            const dc = Math.abs(col - last.col);
-            if (dr + dc !== 1) return prev;
-
-            // Can't revisit
-            if (prev.some(p => p.row === row && p.col === col)) return prev;
-
-            const next = [...prev, { row, col }];
-
-            // Check if reached end
-            if (row === DEFAULT_END.row && col === DEFAULT_END.col) {
-                // Will be handled in a separate effect-like check
-            }
-
-            return next;
-        });
-    }, [state.grid, state.isSolved, state.isRunning]);
+    }, [state.isRunning, state.grid, state.isSolved, mode]);
 
     // ─── Submit manual path ──────────────────────────────────────
 

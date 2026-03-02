@@ -142,8 +142,8 @@ export async function saveDailyScore(dateString: string, score: TSPLeaderboardEn
 export async function getDailyLeaderboard(dateString: string): Promise<TSPLeaderboardEntry[]> {
     try {
         const leaderboardRef = collection(db, "tsp_leaderboards", dateString, "scores");
-        // Order by distance ascending (lowest is best), limit to 5
-        const q = query(leaderboardRef, orderBy("distance", "asc"), orderBy("timestamp", "asc"), limit(5));
+        // Single orderBy to avoid requiring a composite index
+        const q = query(leaderboardRef, orderBy("distance", "asc"), limit(10));
 
         const querySnapshot = await getDocs(q);
         const scores: TSPLeaderboardEntry[] = [];
@@ -151,7 +151,19 @@ export async function getDailyLeaderboard(dateString: string): Promise<TSPLeader
             scores.push(doc.data() as TSPLeaderboardEntry);
         });
 
-        return scores;
+        // Client-side tiebreaker: same distance → earlier timestamp wins
+        scores.sort((a, b) => {
+            if (a.distance !== b.distance) return a.distance - b.distance;
+            const getMs = (t: any): number => {
+                if (!t) return Infinity;
+                if (typeof t.toMillis === 'function') return t.toMillis();
+                if (t.seconds) return t.seconds * 1000;
+                return Infinity;
+            };
+            return getMs(a.timestamp) - getMs(b.timestamp);
+        });
+
+        return scores.slice(0, 5);
     } catch (error) {
         console.error("Error fetching daily leaderboard:", error);
         return [];
