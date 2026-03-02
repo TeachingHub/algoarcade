@@ -1,0 +1,101 @@
+.gridContainer {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-sm);
+    user-select: none;
+}
+
+.grid {
+    display: grid;
+    gap: 1px;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.cell {
+    background: rgba(0, 8, 43, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+    min-width: 0;
+    min-height: 0;
+}
+
+.cell:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* ─── Cell Types ──────────────────────────────────────────────── */
+
+.start {
+    background: #22c55e !important;
+    border-color: #22c55e !important;
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+}
+
+.end {
+    background: var(--destructive) !important;
+    border-color: var(--destructive) !important;
+    box-shadow: 0 0 6px var(--destructive);
+}
+
+.wall {
+    background: var(--foreground) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.visited {
+    background: rgba(58, 97, 209, 0.45) !important;
+    border-color: rgba(58, 97, 209, 0.3) !important;
+    animation: visitPop 0.3s ease-out;
+}
+
+.path {
+    background: var(--primary) !important;
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 4px var(--primary);
+    animation: pathGlow 0.4s ease-out;
+}
+
+.manualPath {
+    background: var(--accent-2) !important;
+    border-color: var(--accent-2) !important;
+    opacity: 0.7;
+}
+
+/* ─── Animations ──────────────────────────────────────────────── */
+
+@keyframes visitPop {
+    0% {
+        transform: scale(0.3);
+        background: rgba(106, 76, 219, 0.8);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes pathGlow {
+    0% {
+        transform: scale(0.6);
+        box-shadow: 0 0 12px var(--primary);
+    }
+
+    50% {
+        transform: scale(1.15);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 4px var(--primary);
+    }
+}

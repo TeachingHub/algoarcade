@@ -48,6 +48,15 @@
     cursor: pointer;
 }
 
+.radioLabel input[type="radio"] {
+    accent-color: var(--primary);
+}
+
+.modeDesc {
+    font-size: var(--font-size-xxs);
+    opacity: 0.5;
+}
+
 .selectInput {
     background: var(--background);
     border: 1px solid var(--border);
@@ -63,4 +72,68 @@
 .selectInput:focus {
     outline: none;
     border-color: var(--primary);
+}
+
+.speedSlider {
+    width: 100%;
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+.manualHint {
+    font-size: var(--font-size-xxs);
+    color: var(--muted-foreground);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.manualHint strong {
+    color: var(--foreground);
+}
+
+.manualCount {
+    font-size: var(--font-size-xs);
+    color: var(--primary);
+    margin: 0;
+    font-weight: bold;
+}
+
+.resultOverlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 8, 43, 0.95), rgba(0, 8, 43, 0.8));
+    padding: var(--space-md) var(--space-lg);
+    color: var(--white);
+    text-align: center;
+    z-index: 10;
+    border-top: 2px solid var(--primary);
+    transition: opacity 0.3s ease;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+}
+
+.canvasArea:hover .resultOverlay {
+    opacity: 0.1;
+    pointer-events: none;
+}
+
+.instructionOverlay {
+    position: absolute;
+    bottom: var(--space-md);
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 8, 43, 0.6);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-full);
+    font-size: 10px;
+    color: var(--muted-foreground);
+    pointer-events: none;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: opacity 0.3s;
+}
+
+.canvasArea:hover .instructionOverlay {
+    opacity: 0.2;
 }

@@ -1,49 +1,76 @@
-import { useState } from 'react';
 import styles from "@/styles/pages/games/Pathfinding.module.css";
-
-import Button from "@/components/shared/Button";
 import GameLayout from "@/layouts/GameLayout";
 
+import PathfindingGrid from "@/components/games/pathfinding/PathfindingGrid";
+import PathfindingControls from "@/components/games/pathfinding/PathfindingControls";
+import { usePathfinding } from "@/hooks/games/usePathfinding";
 
 export default function Pathfinding() {
-    // Placeholder state
-    const [stats] = useState([
-        { label: "NODES", value: "0" },
-        { label: "COST", value: "--" }
-    ]);
+    const {
+        state,
+        algorithm,
+        setAlgorithm,
+        mode,
+        setMode,
+        manualPath,
+        resultMessage,
+        actions,
+    } = usePathfinding();
 
     return (
         <GameLayout
             title="PATHFINDING"
             badges={["MEDIUM", "GRID"]}
-            stats={stats}
+            stats={[
+                { label: "VISITED", value: state.visitedCount },
+                { label: "PATH", value: state.pathLength || '--' },
+            ]}
             instructions={[
-                { title: "1. Draw Walls", description: "Click and drag on the grid to create obstacles." },
-                { title: "2. Set Points", description: "Move the Source (Green) and Destination (Red) nodes." },
-                { title: "3. Visualize", description: "Select an algorithm and watch it find the shortest path!" }
+                { title: "1. Build the Board", description: "Draw walls by clicking and dragging, or generate a random maze." },
+                { title: "2. Choose a Method", description: "Select an algorithm to visualize, or switch to Manual mode to solve it yourself." },
+                { title: "3. Find the Path", description: "Watch the algorithm explore (blue) and trace the shortest path (yellow), or draw your own route from start to end!" }
             ]}
             controls={
-                <div className={styles.controlPanel}>
-                    <h3>CONTROLS</h3>
-                    <div className={styles.actions}>
-                        {/* Placeholder controls */}
-                        <div className={styles.setting}>
-                            <label className={styles.radioLabel}>Algorithm</label>
-                            <select className={styles.selectInput}>
-                                <option>Dijkstra</option>
-                                <option>A* Search</option>
-                                <option>BFS</option>
-                                <option>DFS</option>
-                            </select>
-                        </div>
-                        <Button style={["primary"]}>Start</Button>
-                        <Button style={["danger"]}>Clear Board</Button>
-                    </div>
-                </div>
+                <PathfindingControls
+                    algorithm={algorithm}
+                    setAlgorithm={setAlgorithm}
+                    mode={mode}
+                    setMode={setMode}
+                    isRunning={state.isRunning}
+                    isSolved={state.isSolved}
+                    speed={state.speed}
+                    manualPathLength={manualPath.length}
+                    onRun={actions.runAlgorithm}
+                    onStop={actions.stopAlgorithm}
+                    onSubmitManual={actions.submitManualPath}
+                    onClearBoard={actions.clearBoard}
+                    onClearVisualization={actions.clearVisualization}
+                    onGenMaze={actions.genMaze}
+                    onGenRandom={actions.genRandom}
+                    onSetSpeed={actions.setSpeed}
+                />
             }
         >
-            <div className={styles.canvasArea} style={{ minHeight: '500px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ color: 'var(--muted-foreground)' }}>Grid Visualization Component Coming Soon</span>
+            <div className={styles.canvasArea}>
+                <PathfindingGrid
+                    grid={state.grid}
+                    manualPath={manualPath}
+                    isRunning={state.isRunning}
+                    onCellClick={actions.handleCellInteraction}
+                    onCellDrag={actions.handleCellDrag}
+                />
+
+                {mode === 'manual' && manualPath.length === 0 && !state.isSolved && (
+                    <div className={styles.instructionOverlay}>
+                        Click the green start cell to begin your path
+                    </div>
+                )}
+
+                {resultMessage && (
+                    <div className={styles.resultOverlay}>
+                        {resultMessage}
+                    </div>
+                )}
             </div>
         </GameLayout>
     );
