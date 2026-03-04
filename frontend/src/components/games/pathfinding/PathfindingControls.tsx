@@ -6,6 +6,8 @@ import styles from '@/styles/pages/games/Pathfinding.module.css';
 interface PathfindingControlsProps {
     algorithm: AlgorithmType;
     setAlgorithm: (algo: AlgorithmType) => void;
+    comparisonAlgorithm: AlgorithmType;
+    setComparisonAlgorithm: (algo: AlgorithmType) => void;
     mode: InteractionMode;
     setMode: (mode: InteractionMode) => void;
     isRunning: boolean;
@@ -38,6 +40,8 @@ const MODES: { value: InteractionMode; label: string; desc: string }[] = [
 export default function PathfindingControls({
     algorithm,
     setAlgorithm,
+    comparisonAlgorithm,
+    setComparisonAlgorithm,
     mode,
     setMode,
     isRunning,
@@ -75,7 +79,7 @@ export default function PathfindingControls({
                 </div>
             </div>
 
-            {/* ── Algorithm ───────────────────────────────── */}
+            {/* ── Algorithm (visualize mode) ───────────────── */}
             {mode !== 'manual' && (
                 <div className={styles.controlPanel}>
                     <h3>ALGORITHM</h3>
@@ -116,15 +120,30 @@ export default function PathfindingControls({
                 </div>
             )}
 
-            {/* ── Manual Submit ────────────────────────────── */}
+            {/* ── Manual Solve ─────────────────────────────── */}
             {mode === 'manual' && (
                 <div className={styles.controlPanel}>
                     <h3>MANUAL SOLVE</h3>
                     <div className={styles.actions}>
                         <p className={styles.manualHint}>
-                            Click cells from <strong>start</strong> to <strong>end</strong> to draw your path. Click the previous cell to undo.
+                            Click or <strong>drag</strong> cells from <strong>start</strong> to <strong>end</strong> to draw your path. Click the previous cell to undo.
                         </p>
                         <p className={styles.manualCount}>Steps: {manualPathLength}</p>
+
+                        <div className={styles.setting}>
+                            <label className={styles.radioLabel}>Compare against:</label>
+                            <select
+                                className={styles.selectInput}
+                                value={comparisonAlgorithm}
+                                onChange={e => setComparisonAlgorithm(e.target.value as AlgorithmType)}
+                                disabled={isSolved}
+                            >
+                                {ALGORITHMS.map(a => (
+                                    <option key={a.value} value={a.value}>{a.label}</option>
+                                ))}
+                            </select>
+                        </div>
+
                         <Button
                             style={["primary", "fullWidth"]}
                             label="SUBMIT PATH"

@@ -1,17 +1,64 @@
 import { useState, useCallback, useRef } from 'react';
-import type { AlgorithmType, PathfindingState } from '@/types/games/pathfinding';
+import type { AlgorithmType, Cell, PathfindingState } from '@/types/games/pathfinding';
 import {
     createEmptyGrid,
     resetGridForSolve,
     generateMaze,
     generateRandomWalls,
-    getAlgorithm,
-    DEFAULT_START,
-    DEFAULT_END,
-    type SolveStep
+    findStart,
+    findEnd,
+    type SolveStep,
 } from '@/utils/pathfinding';
+import { getAlgorithm, ALGORITHM_LABELS } from '@/utils/pathfinding/algorithms';
 
 export type InteractionMode = 'wall' | 'erase' | 'manual';
+
+export interface PathfindingResult {
+    won: boolean;
+    userSteps: number;
+    algoSteps: number;
+    algoName: string;
+}
+
+// ─── Shared logic: extend manual path ────────────────────────────
+
+function tryExtendManualPath(
+    prev: { row: number; col: number }[],
+    row: number,
+    col: number,
+    grid: Cell[][],
+): { row: number; col: number }[] {
+    // First cell must be the start
+    if (prev.length === 0) {
+        const start = findStart(grid);
+        if (!start || row !== start.row || col !== start.col) return prev;
+        return [{ row, col }];
+    }
+
+    // Undo: click on the second-to-last cell
+    if (prev.length >= 2) {
+        const prevStep = prev[prev.length - 2];
+        if (prevStep.row === row && prevStep.col === col) {
+            return prev.slice(0, -1);
+        }
+    }
+
+    // Must be adjacent to last step
+    const last = prev[prev.length - 1];
+    const dr = Math.abs(row - last.row);
+    const dc = Math.abs(col - last.col);
+    if (dr + dc !== 1) return prev;
+
+    // Can't cross walls
+    if (grid[row][col].type === 'wall') return prev;
+
+    // Can't revisit
+    if (prev.some(p => p.row === row && p.col === col)) return prev;
+
+    return [...prev, { row, col }];
+}
+
+// ─── Hook ────────────────────────────────────────────────────────
 
 export function usePathfinding() {
     const [state, setState] = useState<PathfindingState>({
@@ -24,15 +71,27 @@ export function usePathfinding() {
     });
 
     const [algorithm, setAlgorithm] = useState<AlgorithmType>('astar');
+    const [comparisonAlgorithm, setComparisonAlgorithm] = useState<AlgorithmType>('astar');
     const [mode, setMode] = useState<InteractionMode>('wall');
     const [manualPath, setManualPath] = useState<{ row: number; col: number }[]>([]);
+    const [algoComparisonPath, setAlgoComparisonPath] = useState<{ row: number; col: number }[] | null>(null);
     const [resultMessage, setResultMessage] = useState<string | null>(null);
+    const [gameResult, setGameResult] = useState<PathfindingResult | null>(null);
 
     const animationRef = useRef<number | null>(null);
     const speedRef = useRef(state.speed);
+    const draggingSpecialRef = useRef<'start' | 'end' | null>(null);
     speedRef.current = state.speed;
 
-    // ─── Cell interaction (wall draw + manual path) ─────────────────
+    // ─── Helper to reset transient state ─────────────────────────
+
+    const clearResults = useCallback(() => {
+        setResultMessage(null);
+        setGameResult(null);
+        setAlgoComparisonPath(null);
+    }, []);
+
+    // ─── Cell click ──────────────────────────────────────────────
 
     const handleCellInteraction = useCallback((row: number, col: number) => {
         if (state.isRunning) return;
@@ -43,72 +102,121 @@ export function usePathfinding() {
         if (mode === 'manual') {
             if (state.isSolved) return;
             if (cell.type === 'wall') return;
-
-            setManualPath(prev => {
-                // If path is empty, must start at start cell
-                if (prev.length === 0) {
-                    if (row !== DEFAULT_START.row || col !== DEFAULT_START.col) return prev;
-                    return [{ row, col }];
-                }
-
-                // Allow going back one step (undo)
-                if (prev.length >= 2) {
-                    const prevStep = prev[prev.length - 2];
-                    if (prevStep.row === row && prevStep.col === col) {
-                        return prev.slice(0, -1);
-                    }
-                }
-
-                // Must be adjacent to last step
-                const last = prev[prev.length - 1];
-                const dr = Math.abs(row - last.row);
-                const dc = Math.abs(col - last.col);
-                if (dr + dc !== 1) return prev;
-
-                // Can't revisit
-                if (prev.some(p => p.row === row && p.col === col)) return prev;
-
-                return [...prev, { row, col }];
-            });
+            setManualPath(prev => tryExtendManualPath(prev, row, col, state.grid));
             return;
         }
 
-        // ── Wall / Erase mode — can't overwrite start or end ──
-        if (cell.type === 'start' || cell.type === 'end') return;
+        // ── Start/end: begin drag ──
+        if (cell.type === 'start' || cell.type === 'end') {
+            draggingSpecialRef.current = cell.type;
+            return;
+        }
 
+        // ── Wall / Erase mode ──
         setState(prev => {
             const newGrid = prev.grid.map(r => r.map(c => ({ ...c })));
-
             if (mode === 'wall') {
                 newGrid[row][col].type = newGrid[row][col].type === 'wall' ? 'empty' : 'wall';
             } else if (mode === 'erase') {
                 newGrid[row][col].type = 'empty';
             }
-
-            return {
-                ...prev,
-                grid: newGrid,
-                isSolved: false,
-                visitedCount: 0,
-                pathLength: 0,
-            };
+            return { ...prev, grid: newGrid, isSolved: false, visitedCount: 0, pathLength: 0 };
         });
 
-        setResultMessage(null);
-    }, [state.isRunning, state.grid, state.isSolved, mode]);
+        clearResults();
+    }, [state.isRunning, state.grid, state.isSolved, mode, clearResults]);
 
-    // ─── Submit manual path ──────────────────────────────────────
+    // ─── Cell drag ───────────────────────────────────────────────
+
+    const handleCellDrag = useCallback((row: number, col: number) => {
+        if (state.isRunning) return;
+
+        // ── Dragging start or end ──
+        if (draggingSpecialRef.current) {
+            setState(prev => {
+                const target = prev.grid[row][col].type;
+                if (target === 'wall' || target === 'start' || target === 'end') return prev;
+
+                const newGrid = prev.grid.map(r => r.map(c => ({ ...c })));
+                // Clear old position
+                for (const gridRow of newGrid) {
+                    for (const cell of gridRow) {
+                        if (cell.type === draggingSpecialRef.current) {
+                            cell.type = 'empty';
+                        }
+                    }
+                }
+                // Set new position
+                newGrid[row][col].type = draggingSpecialRef.current!;
+                return { ...prev, grid: newGrid, isSolved: false, visitedCount: 0, pathLength: 0 };
+            });
+            setManualPath([]);
+            clearResults();
+            return;
+        }
+
+        // ── Manual path drag ──
+        if (mode === 'manual') {
+            if (state.isSolved) return;
+            setManualPath(prev => tryExtendManualPath(prev, row, col, state.grid));
+            return;
+        }
+
+        // ── Wall / Erase drag ──
+        const cell = state.grid[row][col];
+        if (cell.type === 'start' || cell.type === 'end') return;
+
+        setState(prev => {
+            const newGrid = prev.grid.map(r => r.map(c => ({ ...c })));
+            newGrid[row][col].type = mode === 'wall' ? 'wall' : 'empty';
+            return { ...prev, grid: newGrid, isSolved: false };
+        });
+
+        clearResults();
+    }, [state.isRunning, state.grid, state.isSolved, mode, clearResults]);
+
+    // ─── Drag end ────────────────────────────────────────────────
+
+    const handleDragEnd = useCallback(() => {
+        draggingSpecialRef.current = null;
+    }, []);
+
+    // ─── Submit manual path (with algorithm comparison) ──────────
 
     const submitManualPath = useCallback(() => {
         if (manualPath.length < 2) return;
 
+        const end = findEnd(state.grid);
+        if (!end) return;
+
         const last = manualPath[manualPath.length - 1];
-        if (last.row !== DEFAULT_END.row || last.col !== DEFAULT_END.col) {
+        if (last.row !== end.row || last.col !== end.col) {
             setResultMessage("Your path must reach the destination!");
             return;
         }
 
-        // Paint the path on the grid
+        // Run selected comparison algorithm silently
+        const algorithmFn = getAlgorithm(comparisonAlgorithm);
+        const generator = algorithmFn(state.grid);
+        let algoPathLength = 0;
+        let algoPath: { row: number; col: number }[] = [];
+        let step = generator.next();
+        while (!step.done) {
+            const s: SolveStep = step.value;
+            if (s.type === 'path') {
+                algoPath = s.cells;
+            }
+            if (s.type === 'done') {
+                algoPathLength = s.pathLength;
+                break;
+            }
+            step = generator.next();
+        }
+
+        const userSteps = manualPath.length;
+        const won = algoPathLength === 0 || userSteps <= algoPathLength;
+
+        // Paint user's path on the grid
         setState(prev => {
             const newGrid = prev.grid.map(r => r.map(c => ({ ...c })));
             for (const p of manualPath) {
@@ -116,27 +224,28 @@ export function usePathfinding() {
                     newGrid[p.row][p.col].type = 'path';
                 }
             }
-            return {
-                ...prev,
-                grid: newGrid,
-                isSolved: true,
-                pathLength: manualPath.length,
-            };
+            return { ...prev, grid: newGrid, isSolved: true, pathLength: userSteps };
         });
 
-        setResultMessage(`Path found! Length: ${manualPath.length} steps`);
-    }, [manualPath]);
+        // Store algo comparison path for overlay rendering
+        setAlgoComparisonPath(algoPath);
 
-    // ─── Run algorithm ───────────────────────────────────────────
+        setGameResult({
+            won,
+            userSteps,
+            algoSteps: algoPathLength,
+            algoName: ALGORITHM_LABELS[comparisonAlgorithm],
+        });
+    }, [manualPath, state.grid, comparisonAlgorithm]);
+
+    // ─── Run algorithm (animated) ────────────────────────────────
 
     const runAlgorithm = useCallback(() => {
         if (state.isRunning) return;
 
-        // Clear previous result
-        setResultMessage(null);
         setManualPath([]);
+        clearResults();
 
-        // Reset grid visualization
         const cleanGrid = resetGridForSolve(state.grid);
         setState(prev => ({
             ...prev,
@@ -149,11 +258,9 @@ export function usePathfinding() {
 
         const algorithmFn = getAlgorithm(algorithm);
         const generator = algorithmFn(cleanGrid);
-
-        // Create a mutable copy of the grid for animation
         const animGrid = cleanGrid.map(r => r.map(c => ({ ...c })));
 
-        const step = () => {
+        const tick = () => {
             const result = generator.next();
             if (result.done) {
                 setState(prev => ({ ...prev, isRunning: false }));
@@ -197,11 +304,11 @@ export function usePathfinding() {
                 return;
             }
 
-            animationRef.current = window.setTimeout(step, Math.max(1, 101 - speedRef.current));
+            animationRef.current = window.setTimeout(tick, Math.max(1, 101 - speedRef.current));
         };
 
-        animationRef.current = window.setTimeout(step, 0);
-    }, [state.grid, state.isRunning, algorithm]);
+        animationRef.current = window.setTimeout(tick, 0);
+    }, [state.grid, state.isRunning, algorithm, clearResults]);
 
     // ─── Stop ────────────────────────────────────────────────────
 
@@ -232,8 +339,8 @@ export function usePathfinding() {
             pathLength: 0,
         }));
         setManualPath([]);
-        setResultMessage(null);
-    }, [stopAlgorithm]);
+        clearResults();
+    }, [stopAlgorithm, clearResults]);
 
     const clearVisualization = useCallback(() => {
         stopAlgorithm();
@@ -245,8 +352,8 @@ export function usePathfinding() {
             pathLength: 0,
         }));
         setManualPath([]);
-        setResultMessage(null);
-    }, [stopAlgorithm]);
+        clearResults();
+    }, [stopAlgorithm, clearResults]);
 
     // ─── Generate ────────────────────────────────────────────────
 
@@ -260,8 +367,8 @@ export function usePathfinding() {
             pathLength: 0,
         }));
         setManualPath([]);
-        setResultMessage(null);
-    }, [stopAlgorithm]);
+        clearResults();
+    }, [stopAlgorithm, clearResults]);
 
     const genRandom = useCallback(() => {
         stopAlgorithm();
@@ -273,42 +380,25 @@ export function usePathfinding() {
             pathLength: 0,
         }));
         setManualPath([]);
-        setResultMessage(null);
-    }, [stopAlgorithm]);
-
-    // ─── Batch draw (drag to draw walls) ─────────────────────────
-
-    const handleCellDrag = useCallback((row: number, col: number) => {
-        if (state.isRunning) return;
-        if (mode === 'manual') return; // No drag in manual mode
-
-        const cell = state.grid[row][col];
-        if (cell.type === 'start' || cell.type === 'end') return;
-
-        setState(prev => {
-            const newGrid = prev.grid.map(r => r.map(c => ({ ...c })));
-            newGrid[row][col].type = mode === 'wall' ? 'wall' : 'empty';
-            return {
-                ...prev,
-                grid: newGrid,
-                isSolved: false,
-            };
-        });
-
-        setResultMessage(null);
-    }, [state.isRunning, state.grid, mode]);
+        clearResults();
+    }, [stopAlgorithm, clearResults]);
 
     return {
         state,
         algorithm,
         setAlgorithm,
+        comparisonAlgorithm,
+        setComparisonAlgorithm,
         mode,
         setMode,
         manualPath,
+        algoComparisonPath,
         resultMessage,
+        gameResult,
         actions: {
             handleCellInteraction,
             handleCellDrag,
+            handleDragEnd,
             runAlgorithm,
             stopAlgorithm,
             submitManualPath,

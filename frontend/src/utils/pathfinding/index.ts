@@ -1,4 +1,4 @@
-import type { Cell, CellType, AlgorithmType } from '@/types/games/pathfinding';
+import type { Cell, CellType } from '@/types/games/pathfinding';
 
 // ─── Grid Constants ──────────────────────────────────────────────
 
@@ -42,11 +42,31 @@ export function resetGridForSolve(grid: Cell[][]): Cell[][] {
     );
 }
 
+// ─── Cell Lookup ─────────────────────────────────────────────────
+
+/** Find the position of a cell with the given type */
+export function findCellOfType(grid: Cell[][], type: CellType): { row: number; col: number } | null {
+    for (let r = 0; r < grid.length; r++) {
+        for (let c = 0; c < grid[r].length; c++) {
+            if (grid[r][c].type === type) return { row: r, col: c };
+        }
+    }
+    return null;
+}
+
+export function findStart(grid: Cell[][]): { row: number; col: number } | null {
+    return findCellOfType(grid, 'start');
+}
+
+export function findEnd(grid: Cell[][]): { row: number; col: number } | null {
+    return findCellOfType(grid, 'end');
+}
+
 // ─── Neighbors ───────────────────────────────────────────────────
 
 const DIRS: [number, number][] = [[-1, 0], [1, 0], [0, -1], [0, 1]];
 
-function getNeighborCoords(row: number, col: number): { row: number; col: number }[] {
+export function getNeighborCoords(row: number, col: number): { row: number; col: number }[] {
     const out: { row: number; col: number }[] = [];
     for (const [dr, dc] of DIRS) {
         const nr = row + dr;
@@ -60,7 +80,7 @@ function getNeighborCoords(row: number, col: number): { row: number; col: number
 
 // ─── Heuristic ───────────────────────────────────────────────────
 
-function manhattan(ar: number, ac: number, br: number, bc: number): number {
+export function manhattan(ar: number, ac: number, br: number, bc: number): number {
     return Math.abs(ar - br) + Math.abs(ac - bc);
 }
 
@@ -73,7 +93,7 @@ export type SolveStep =
 
 // ─── Path Reconstruction ─────────────────────────────────────────
 
-function reconstructPath(grid: Cell[][], endRow: number, endCol: number): { row: number; col: number }[] {
+export function reconstructPath(grid: Cell[][], endRow: number, endCol: number): { row: number; col: number }[] {
     const path: { row: number; col: number }[] = [];
     let cur: { row: number; col: number } | null = { row: endRow, col: endCol };
     while (cur) {
@@ -81,209 +101,6 @@ function reconstructPath(grid: Cell[][], endRow: number, endCol: number): { row:
         cur = grid[cur.row][cur.col].parent;
     }
     return path;
-}
-
-// ─── A* Search ───────────────────────────────────────────────────
-
-export function* astar(gridInput: Cell[][]): Generator<SolveStep> {
-    const grid = resetGridForSolve(gridInput);
-    const startR = DEFAULT_START.row, startC = DEFAULT_START.col;
-    const endR = DEFAULT_END.row, endC = DEFAULT_END.col;
-
-    if (grid[startR][startC].type !== 'start' || grid[endR][endC].type !== 'end') {
-        yield { type: 'done', found: false, visitedCount: 0, pathLength: 0 };
-        return;
-    }
-
-    // Open set as array (sorted by f). For simplicity, not using a heap.
-    const open: { row: number; col: number }[] = [{ row: startR, col: startC }];
-    const closed = new Set<number>();
-    grid[startR][startC].g = 0;
-    grid[startR][startC].h = manhattan(startR, startC, endR, endC);
-    grid[startR][startC].f = grid[startR][startC].h;
-    let visitedCount = 0;
-
-    while (open.length > 0) {
-        open.sort((a, b) => grid[a.row][a.col].f - grid[b.row][b.col].f || grid[a.row][a.col].h - grid[b.row][b.col].h);
-        const cur = open.shift()!;
-        const key = cur.row * COLS + cur.col;
-
-        if (closed.has(key)) continue;
-        closed.add(key);
-
-        const cell = grid[cur.row][cur.col];
-        if (cell.type !== 'start' && cell.type !== 'end') {
-            visitedCount++;
-            yield { type: 'visit', row: cur.row, col: cur.col };
-        }
-
-        if (cur.row === endR && cur.col === endC) {
-            const path = reconstructPath(grid, endR, endC);
-            yield { type: 'path', cells: path };
-            yield { type: 'done', found: true, visitedCount, pathLength: path.length };
-            return;
-        }
-
-        for (const nb of getNeighborCoords(cur.row, cur.col)) {
-            if (closed.has(nb.row * COLS + nb.col)) continue;
-            if (grid[nb.row][nb.col].type === 'wall') continue;
-
-            const tentativeG = cell.g + 1;
-            if (tentativeG < grid[nb.row][nb.col].g) {
-                grid[nb.row][nb.col].g = tentativeG;
-                grid[nb.row][nb.col].h = manhattan(nb.row, nb.col, endR, endC);
-                grid[nb.row][nb.col].f = tentativeG + grid[nb.row][nb.col].h;
-                grid[nb.row][nb.col].parent = { row: cur.row, col: cur.col };
-                open.push(nb);
-            }
-        }
-    }
-
-    yield { type: 'done', found: false, visitedCount, pathLength: 0 };
-}
-
-// ─── Dijkstra ────────────────────────────────────────────────────
-
-export function* dijkstra(gridInput: Cell[][]): Generator<SolveStep> {
-    const grid = resetGridForSolve(gridInput);
-    const startR = DEFAULT_START.row, startC = DEFAULT_START.col;
-    const endR = DEFAULT_END.row, endC = DEFAULT_END.col;
-
-    const open: { row: number; col: number }[] = [{ row: startR, col: startC }];
-    const closed = new Set<number>();
-    grid[startR][startC].g = 0;
-    grid[startR][startC].f = 0;
-    let visitedCount = 0;
-
-    while (open.length > 0) {
-        open.sort((a, b) => grid[a.row][a.col].g - grid[b.row][b.col].g);
-        const cur = open.shift()!;
-        const key = cur.row * COLS + cur.col;
-
-        if (closed.has(key)) continue;
-        closed.add(key);
-
-        const cell = grid[cur.row][cur.col];
-        if (cell.type !== 'start' && cell.type !== 'end') {
-            visitedCount++;
-            yield { type: 'visit', row: cur.row, col: cur.col };
-        }
-
-        if (cur.row === endR && cur.col === endC) {
-            const path = reconstructPath(grid, endR, endC);
-            yield { type: 'path', cells: path };
-            yield { type: 'done', found: true, visitedCount, pathLength: path.length };
-            return;
-        }
-
-        for (const nb of getNeighborCoords(cur.row, cur.col)) {
-            if (closed.has(nb.row * COLS + nb.col)) continue;
-            if (grid[nb.row][nb.col].type === 'wall') continue;
-
-            const tentativeG = cell.g + 1;
-            if (tentativeG < grid[nb.row][nb.col].g) {
-                grid[nb.row][nb.col].g = tentativeG;
-                grid[nb.row][nb.col].f = tentativeG;
-                grid[nb.row][nb.col].parent = { row: cur.row, col: cur.col };
-                open.push(nb);
-            }
-        }
-    }
-
-    yield { type: 'done', found: false, visitedCount, pathLength: 0 };
-}
-
-// ─── BFS ─────────────────────────────────────────────────────────
-
-export function* bfs(gridInput: Cell[][]): Generator<SolveStep> {
-    const grid = resetGridForSolve(gridInput);
-    const startR = DEFAULT_START.row, startC = DEFAULT_START.col;
-    const endR = DEFAULT_END.row, endC = DEFAULT_END.col;
-
-    const queue: { row: number; col: number }[] = [{ row: startR, col: startC }];
-    const visited = new Set<number>([startR * COLS + startC]);
-    let visitedCount = 0;
-
-    while (queue.length > 0) {
-        const cur = queue.shift()!;
-        const cell = grid[cur.row][cur.col];
-
-        if (cell.type !== 'start' && cell.type !== 'end') {
-            visitedCount++;
-            yield { type: 'visit', row: cur.row, col: cur.col };
-        }
-
-        if (cur.row === endR && cur.col === endC) {
-            const path = reconstructPath(grid, endR, endC);
-            yield { type: 'path', cells: path };
-            yield { type: 'done', found: true, visitedCount, pathLength: path.length };
-            return;
-        }
-
-        for (const nb of getNeighborCoords(cur.row, cur.col)) {
-            const key = nb.row * COLS + nb.col;
-            if (visited.has(key)) continue;
-            if (grid[nb.row][nb.col].type === 'wall') continue;
-
-            visited.add(key);
-            grid[nb.row][nb.col].parent = { row: cur.row, col: cur.col };
-            queue.push(nb);
-        }
-    }
-
-    yield { type: 'done', found: false, visitedCount, pathLength: 0 };
-}
-
-// ─── DFS ─────────────────────────────────────────────────────────
-
-export function* dfs(gridInput: Cell[][]): Generator<SolveStep> {
-    const grid = resetGridForSolve(gridInput);
-    const startR = DEFAULT_START.row, startC = DEFAULT_START.col;
-    const endR = DEFAULT_END.row, endC = DEFAULT_END.col;
-
-    const stack: { row: number; col: number }[] = [{ row: startR, col: startC }];
-    const visited = new Set<number>([startR * COLS + startC]);
-    let visitedCount = 0;
-
-    while (stack.length > 0) {
-        const cur = stack.pop()!;
-        const cell = grid[cur.row][cur.col];
-
-        if (cell.type !== 'start' && cell.type !== 'end') {
-            visitedCount++;
-            yield { type: 'visit', row: cur.row, col: cur.col };
-        }
-
-        if (cur.row === endR && cur.col === endC) {
-            const path = reconstructPath(grid, endR, endC);
-            yield { type: 'path', cells: path };
-            yield { type: 'done', found: true, visitedCount, pathLength: path.length };
-            return;
-        }
-
-        for (const nb of getNeighborCoords(cur.row, cur.col)) {
-            const key = nb.row * COLS + nb.col;
-            if (visited.has(key)) continue;
-            if (grid[nb.row][nb.col].type === 'wall') continue;
-
-            visited.add(key);
-            grid[nb.row][nb.col].parent = { row: cur.row, col: cur.col };
-            stack.push(nb);
-        }
-    }
-
-    yield { type: 'done', found: false, visitedCount, pathLength: 0 };
-}
-
-// ─── Algorithm Dispatcher ────────────────────────────────────────
-
-export function getAlgorithm(type: AlgorithmType): (grid: Cell[][]) => Generator<SolveStep> {
-    switch (type) {
-        case 'astar': return astar;
-        case 'dijkstra': return dijkstra;
-        case 'bfs': return bfs;
-        case 'dfs': return dfs;
-    }
 }
 
 // ─── Maze Generation (Recursive Backtracking) ────────────────────
@@ -366,15 +183,16 @@ export function generateRandomWalls(density: number = 0.3): Cell[][] {
 
 /** Quick BFS to verify start can reach end */
 function isSolvable(grid: Cell[][]): boolean {
-    const startR = DEFAULT_START.row, startC = DEFAULT_START.col;
-    const endR = DEFAULT_END.row, endC = DEFAULT_END.col;
+    const s = findStart(grid);
+    const e = findEnd(grid);
+    if (!s || !e) return false;
 
-    const queue = [{ row: startR, col: startC }];
-    const visited = new Set<number>([startR * COLS + startC]);
+    const queue = [{ row: s.row, col: s.col }];
+    const visited = new Set<number>([s.row * COLS + s.col]);
 
     while (queue.length > 0) {
         const cur = queue.shift()!;
-        if (cur.row === endR && cur.col === endC) return true;
+        if (cur.row === e.row && cur.col === e.col) return true;
 
         for (const [dr, dc] of DIRS) {
             const nr = cur.row + dr;
@@ -388,25 +206,4 @@ function isSolvable(grid: Cell[][]): boolean {
     }
 
     return false;
-}
-
-// ─── Manual Path Validation ──────────────────────────────────────
-
-/** Checks that a user-drawn path is continuous, doesn't cross walls, starts at start and ends at end */
-export function isValidManualPath(grid: Cell[][], path: { row: number; col: number }[]): boolean {
-    if (path.length < 2) return false;
-
-    const s = path[0];
-    const e = path[path.length - 1];
-    if (s.row !== DEFAULT_START.row || s.col !== DEFAULT_START.col) return false;
-    if (e.row !== DEFAULT_END.row || e.col !== DEFAULT_END.col) return false;
-
-    for (let i = 1; i < path.length; i++) {
-        const dr = Math.abs(path[i].row - path[i - 1].row);
-        const dc = Math.abs(path[i].col - path[i - 1].col);
-        if (dr + dc !== 1) return false;
-        if (grid[path[i].row][path[i].col].type === 'wall') return false;
-    }
-
-    return true;
 }

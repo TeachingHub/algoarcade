@@ -119,6 +119,48 @@
     pointer-events: none;
 }
 
+.resultIcon {
+    margin-bottom: var(--space-xs);
+}
+
+.resultTitle {
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-bold);
+    color: var(--primary);
+    margin-bottom: var(--space-sm);
+}
+
+.resultScores {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-lg);
+}
+
+.resultScore {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.resultScoreLabel {
+    font-size: var(--font-size-xxs);
+    color: var(--muted-foreground);
+    text-transform: uppercase;
+}
+
+.resultScoreValue {
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-bold);
+    color: var(--foreground);
+}
+
+.resultVs {
+    font-size: var(--font-size-xs);
+    color: var(--destructive);
+    font-weight: var(--font-weight-bold);
+}
+
 .instructionOverlay {
     position: absolute;
     bottom: var(--space-md);
