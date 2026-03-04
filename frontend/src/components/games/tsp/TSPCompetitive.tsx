@@ -6,11 +6,11 @@ import { useTSPCompetitive } from "@/hooks/games/useTSPCompetitive";
 import { useAuth } from "@/context/AuthContext";
 import Button from "@/components/shared/Button";
 import { formatDistance } from "@/utils/tsp";
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 /** Format a Firestore Timestamp or Date to HH:MM */
 function formatTime(timestamp: unknown): string {
     if (!timestamp) return '';
-    // Firestore timestamps have a toDate() method
     const date = typeof (timestamp as any)?.toDate === 'function'
         ? (timestamp as any).toDate()
         : new Date(timestamp as string | number);
@@ -18,7 +18,6 @@ function formatTime(timestamp: unknown): string {
 }
 
 export default function TSPCompetitive() {
-    // UI State for resizing
     const [canvasSize, setCanvasSize] = useState({ width: 800, height: 500 });
     const canvasAreaRef = useRef<HTMLDivElement>(null);
 
@@ -31,6 +30,10 @@ export default function TSPCompetitive() {
         isLoading,
         hasSubmitted,
         leaderboard,
+        isToday,
+        notFound,
+        dateLabel,
+        canGoNext,
         actions
     } = useTSPCompetitive(canvasSize, user);
 
@@ -46,7 +49,7 @@ export default function TSPCompetitive() {
         };
 
         window.addEventListener('resize', handleResize);
-        handleResize(); // Initial measurement
+        handleResize();
 
         return () => window.removeEventListener('resize', handleResize);
     }, []);
@@ -66,13 +69,40 @@ export default function TSPCompetitive() {
             ]}
             controls={
                 <div className={styles.competitiveControls}>
-                    <h3 className={styles.sectionTitle}>DAILY CHALLENGE</h3>
+                    {/* ── Date Navigation ──────────────────────── */}
+                    <div className={styles.dateNav}>
+                        <button
+                            className={styles.dateNavButton}
+                            onClick={actions.goToPrevDay}
+                            aria-label="Previous day"
+                        >
+                            <ChevronLeft size={16} />
+                        </button>
+                        <div className={styles.dateNavCenter}>
+                            <span className={styles.dateNavLabel}>{dateLabel}</span>
+                            <span className={`${styles.dateNavBadge} ${isToday ? styles.dateNavBadgeLive : styles.dateNavBadgePractice}`}>
+                                {isToday ? '● LIVE' : 'PRACTICE'}
+                            </span>
+                        </div>
+                        <button
+                            className={styles.dateNavButton}
+                            onClick={actions.goToNextDay}
+                            disabled={!canGoNext}
+                            aria-label="Next day"
+                        >
+                            <ChevronRight size={16} />
+                        </button>
+                    </div>
+
+                    <h3 className={styles.sectionTitle}>
+                        {isToday ? 'DAILY CHALLENGE' : 'PRACTICE MODE'}
+                    </h3>
 
                     {user ? (
                         <div className={styles.buttonGroup}>
                             <Button
                                 style={["primary", "fullWidth"]}
-                                label={hasSubmitted ? "ALREADY SUBMITTED" : "SUBMIT SCORE"}
+                                label={hasSubmitted ? "ALREADY SUBMITTED" : (isToday ? "SUBMIT SCORE" : "SUBMIT (PRACTICE)")}
                                 onClick={actions.submitManualPath}
                                 disabled={hasSubmitted || !isPathComplete}
                             />
@@ -129,14 +159,20 @@ export default function TSPCompetitive() {
                             ))}
                         </ul>
                     ) : (
-                        <p className={styles.emptyLeaderboard}>Be the first to submit a score today!</p>
+                        <p className={styles.emptyLeaderboard}>
+                            {isToday ? 'Be the first to submit a score today!' : 'No scores for this day.'}
+                        </p>
                     )}
 
                 </div>
             }
         >
             <div ref={canvasAreaRef} className={styles.canvasArea}>
-                {gameState?.points?.length > 0 ? (
+                {notFound ? (
+                    <div className={styles.notFoundMessage}>
+                        No challenge available for this day.
+                    </div>
+                ) : gameState?.points?.length > 0 ? (
                     <TSPCanvas
                         width={canvasSize.width}
                         height={canvasSize.height}
@@ -154,7 +190,7 @@ export default function TSPCompetitive() {
                 )}
 
                 {/* Overlays */}
-                {!hasSubmitted && manualPath.length < (gameState?.points?.length || 0) && (
+                {!hasSubmitted && !notFound && manualPath.length < (gameState?.points?.length || 0) && (
                     <div className={styles.instructionOverlay}>
                         Connect all points: {manualPath.length}/{(gameState?.points?.length || 0)}
                     </div>

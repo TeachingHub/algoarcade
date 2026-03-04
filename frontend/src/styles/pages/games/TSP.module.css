@@ -262,3 +262,82 @@
     color: var(--muted-foreground);
     opacity: 0.7;
 }
+
+/* ─── Date Navigation ─────────────────────────────────────────── */
+
+.dateNav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+    padding: var(--space-sm) 0;
+}
+
+.dateNavButton {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--foreground);
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 14px;
+}
+
+.dateNavButton:hover:not(:disabled) {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--background);
+}
+
+.dateNavButton:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.dateNavCenter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    min-width: 120px;
+}
+
+.dateNavLabel {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    color: var(--foreground);
+}
+
+.dateNavBadge {
+    font-size: 9px;
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 1px;
+    padding: 1px 8px;
+    border-radius: var(--radius-full);
+    text-transform: uppercase;
+}
+
+.dateNavBadgeLive {
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.dateNavBadgePractice {
+    background: rgba(255, 165, 0, 0.12);
+    color: #ffa500;
+    border: 1px solid rgba(255, 165, 0, 0.25);
+}
+
+.notFoundMessage {
+    text-align: center;
+    color: var(--muted-foreground);
+    font-size: var(--font-size-sm);
+    padding: var(--space-xl);
+}

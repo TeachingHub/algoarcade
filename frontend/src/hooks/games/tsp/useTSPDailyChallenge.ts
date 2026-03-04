@@ -6,61 +6,121 @@ import { getDailyChallenge, createDailyChallenge } from '@/services/games/TSPSer
 /**
  * Handles loading (or creating) the daily TSP challenge from Firestore.
  *
- * On mount (when canvas is ready), it:
- *  1. Checks Firestore for today's challenge
- *  2. If none exists, generates one and persists it for other players
- *  3. Exposes the loaded instance and loading state
+ * Supports navigating to past days for practice mode.
+ * Only creates new challenges for today's date.
  */
 
 const DAILY_POINT_COUNT = 15;
 
+/** Returns a date as YYYY-MM-DD */
+export const getDateString = (date: Date): string => {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+};
+
 /** Returns today's date as YYYY-MM-DD */
-export const getTodayDateString = (): string => {
-    const today = new Date();
-    return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+export const getTodayDateString = (): string => getDateString(new Date());
+
+/** Format a date string for display: "4 Mar 2026" */
+export const formatDateLabel = (dateStr: string): string => {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const date = new Date(y, m - 1, d);
+    return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+};
+
+/** Get the previous day's date string */
+const getPrevDay = (dateStr: string): string => {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const date = new Date(y, m - 1, d);
+    date.setDate(date.getDate() - 1);
+    return getDateString(date);
+};
+
+/** Get the next day's date string */
+const getNextDay = (dateStr: string): string => {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const date = new Date(y, m - 1, d);
+    date.setDate(date.getDate() + 1);
+    return getDateString(date);
 };
 
 export const useTSPDailyChallenge = (canvasSize: { width: number; height: number }) => {
+    const [selectedDate, setSelectedDate] = useState(getTodayDateString());
     const [instance, setInstance] = useState<TSPInstance | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [notFound, setNotFound] = useState(false);
 
-    const loadChallenge = useCallback(async () => {
+    const isToday = selectedDate === getTodayDateString();
+
+    const loadChallenge = useCallback(async (dateStr: string) => {
         setIsLoading(true);
-        const dateStr = getTodayDateString();
+        setNotFound(false);
+        setInstance(null);
 
         try {
             let loaded = await getDailyChallenge(dateStr);
 
-            if (!loaded) {
+            if (!loaded && dateStr === getTodayDateString()) {
                 // First player of the day generates the challenge
                 const w = canvasSize.width > 0 ? canvasSize.width : 800;
                 const h = canvasSize.height > 0 ? canvasSize.height : 500;
                 const newPoints = generateRandomPoints(DAILY_POINT_COUNT, w, h);
 
                 loaded = { points: newPoints, author: "system" };
-
-                // Persist for other players
                 await createDailyChallenge(dateStr, loaded);
             }
 
-            setInstance(loaded);
+            if (loaded) {
+                setInstance(loaded);
+            } else {
+                setNotFound(true);
+            }
         } catch (error) {
             console.error("Error loading daily challenge:", error);
+            setNotFound(true);
         } finally {
             setIsLoading(false);
         }
     }, [canvasSize]);
 
-    // Auto-load when canvas is ready and no instance exists yet
+    // Auto-load when canvas is ready or date changes
     useEffect(() => {
-        if (canvasSize.width > 0 && canvasSize.height > 0 && !instance) {
-            loadChallenge();
+        if (canvasSize.width > 0 && canvasSize.height > 0) {
+            loadChallenge(selectedDate);
         }
-    }, [canvasSize.width, canvasSize.height, instance, loadChallenge]);
+    }, [canvasSize.width, canvasSize.height, selectedDate, loadChallenge]);
+
+    // ─── Date navigation ─────────────────────────────────────────
+
+    const goToPrevDay = useCallback(() => {
+        setSelectedDate(prev => getPrevDay(prev));
+    }, []);
+
+    const goToNextDay = useCallback(() => {
+        setSelectedDate(prev => {
+            const next = getNextDay(prev);
+            // Can't go to the future
+            if (next > getTodayDateString()) return prev;
+            return next;
+        });
+    }, []);
+
+    const goToToday = useCallback(() => {
+        setSelectedDate(getTodayDateString());
+    }, []);
+
+    const canGoNext = getNextDay(selectedDate) <= getTodayDateString();
 
     return {
         instance,
         isLoading,
-        reload: loadChallenge,
+        isToday,
+        notFound,
+        selectedDate,
+        canGoNext,
+        dateLabel: formatDateLabel(selectedDate),
+        reload: () => loadChallenge(selectedDate),
+        goToPrevDay,
+        goToNextDay,
+        goToToday,
     };
 };

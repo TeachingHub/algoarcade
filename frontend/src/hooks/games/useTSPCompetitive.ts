@@ -9,13 +9,14 @@ import { useTSPLeaderboard } from './tsp/useTSPLeaderboard';
  * Orchestrator hook for TSP Competitive (Daily Challenge) mode.
  *
  * Composes:
- *  - useTSPDailyChallenge → loads/creates today's challenge
+ *  - useTSPDailyChallenge → loads/creates today's challenge (or past days)
  *  - useTSPLeaderboard    → leaderboard fetch & score submission
  *
  * Owns:
- *  - Manual path building (click-to-add, simple enough to stay here)
+ *  - Manual path building (click-to-add)
  *  - Submission flow & game result state
  *  - hasSubmitted guard (one attempt per day)
+ *  - Practice mode for past challenges
  */
 
 export const useTSPCompetitive = (canvasSize: { width: number, height: number }, user: User | null) => {
@@ -37,7 +38,7 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
 
     // --- Sync daily challenge instance into game state ---
     useEffect(() => {
-        if (dailyChallenge.instance && gameState.points.length === 0) {
+        if (dailyChallenge.instance) {
             setGameState(prev => ({
                 ...prev,
                 points: dailyChallenge.instance!.points,
@@ -46,10 +47,14 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
                 bestDistance: Infinity,
                 isRunning: false
             }));
-            // Fetch leaderboard once challenge is loaded
-            fetchLeaderboard();
+            // Reset play state when navigating dates
+            setManualPath([]);
+            setGameResult(null);
+            setHasSubmitted(false);
+            // Fetch leaderboard for this date
+            fetchLeaderboard(dailyChallenge.selectedDate);
         }
-    }, [dailyChallenge.instance, gameState.points.length, fetchLeaderboard]);
+    }, [dailyChallenge.instance, dailyChallenge.selectedDate, fetchLeaderboard]);
 
     // --- Manual path building ---
 
@@ -59,7 +64,7 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
         if (!manualPath.includes(pointId)) {
             const newManualPath = [...manualPath, pointId];
 
-            // Block the final point for non-logged users (can't see distance / submit)
+            // Block the final point for non-logged users (can't submit)
             if (!user && newManualPath.length === gameState.points.length) return;
 
             setManualPath(newManualPath);
@@ -90,13 +95,19 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
 
         setHasSubmitted(true);
 
+        // Practice mode: past challenges don't save scores
+        if (!dailyChallenge.isToday) {
+            setGameResult(`Practice mode! Distance: ${Math.round(distance)}. This score won't be saved.`);
+            return;
+        }
+
         if (user) {
-            const resultMessage = await submitScore(user, distance, manualPath);
+            const resultMessage = await submitScore(user, distance, manualPath, dailyChallenge.selectedDate);
             setGameResult(resultMessage);
         } else {
             setGameResult(`Finished! Distance: ${Math.round(distance)}. Login to save your score!`);
         }
-    }, [manualPath, gameState.points, hasSubmitted, user, submitScore]);
+    }, [manualPath, gameState.points, hasSubmitted, user, submitScore, dailyChallenge.isToday, dailyChallenge.selectedDate]);
 
     // --- Clear path ---
 
@@ -121,11 +132,20 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
         isLoading,
         hasSubmitted,
         leaderboard,
+        // Date navigation
+        isToday: dailyChallenge.isToday,
+        notFound: dailyChallenge.notFound,
+        selectedDate: dailyChallenge.selectedDate,
+        dateLabel: dailyChallenge.dateLabel,
+        canGoNext: dailyChallenge.canGoNext,
         actions: {
             handlePointClick,
             submitManualPath,
             clearAll,
-            reloadLeaderboard: dailyChallenge.reload
+            reloadLeaderboard: dailyChallenge.reload,
+            goToPrevDay: dailyChallenge.goToPrevDay,
+            goToNextDay: dailyChallenge.goToNextDay,
+            goToToday: dailyChallenge.goToToday,
         }
     };
 };

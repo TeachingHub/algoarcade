@@ -3,21 +3,18 @@ import type { User } from 'firebase/auth';
 import { serverTimestamp } from 'firebase/firestore';
 import { saveDailyScore, getDailyLeaderboard } from '@/services/games/TSPService';
 import type { TSPLeaderboardEntry } from '@/services/games/TSPService';
-import { getTodayDateString } from './useTSPDailyChallenge';
 
 /**
  * Manages the daily leaderboard: fetching scores and submitting new ones.
  *
- * Separated from the game logic so that leaderboard concerns (loading,
- * refreshing, score persistence) don't clutter the gameplay hook.
+ * Accepts a dateString to support viewing past leaderboards.
  */
 
 export const useTSPLeaderboard = () => {
     const [leaderboard, setLeaderboard] = useState<TSPLeaderboardEntry[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const fetchLeaderboard = useCallback(async () => {
-        const dateStr = getTodayDateString();
+    const fetchLeaderboard = useCallback(async (dateStr: string) => {
         const board = await getDailyLeaderboard(dateStr);
         setLeaderboard(board);
     }, []);
@@ -29,11 +26,11 @@ export const useTSPLeaderboard = () => {
     const submitScore = useCallback(async (
         user: User,
         distance: number,
-        path: number[]
+        path: number[],
+        dateStr: string,
     ): Promise<string> => {
         setIsSubmitting(true);
         try {
-            const dateStr = getTodayDateString();
             await saveDailyScore(dateStr, {
                 userId: user.uid,
                 displayName: user.displayName || "Anonymous",
