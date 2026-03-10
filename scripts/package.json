@@ -1,0 +1,12 @@
+{
+    "name": "algoarcade-scripts",
+    "version": "1.0.0",
+    "private": true,
+    "description": "Scheduled scripts for AlgoArcade (daily challenge generation, etc.)",
+    "scripts": {
+        "generate-daily": "node generate-daily-challenge.js"
+    },
+    "dependencies": {
+        "firebase-admin": "^13.6.0"
+    }
+}

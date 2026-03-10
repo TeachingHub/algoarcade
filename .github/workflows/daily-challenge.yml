@@ -1,0 +1,42 @@
+# ───────────────────────────────────────────────────────
+# 🎮 AlgoArcade — Generate Daily TSP Challenge
+# ───────────────────────────────────────────────────────
+# Runs every day at 00:00 UTC to create a new TSP daily
+# challenge in Firestore, independent of user access.
+#
+# Can also be triggered manually from the GitHub UI
+# via the "Run workflow" button.
+# ───────────────────────────────────────────────────────
+
+name: Generate Daily TSP Challenge
+
+on:
+  schedule:
+    # Every day at 00:00 UTC
+    - cron: '0 0 * * *'
+  
+  # Allow manual trigger from GitHub UI
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ./scripts
+
+      - name: Generate daily challenge
+        run: node generate-daily-challenge.js
+        working-directory: ./scripts
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
