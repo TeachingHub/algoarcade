@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Button from "@/components/shared/Button";
 import styles from "@/styles/components/games/tsp/TSPControls.module.css";
+import { Eye, RefreshCw, Gamepad2, Hammer } from "lucide-react";
 
 
 interface TSPControlsProps {
@@ -51,57 +52,35 @@ export default function TSPControls({
             setCopyFeedback("Copied!");
             setTimeout(() => setCopyFeedback(null), 2000);
         } else {
-            // Optional: Handle error or just ignore for simplicity
             setCopyFeedback("Failed");
             setTimeout(() => setCopyFeedback(null), 2000);
         }
     };
 
+    const modes = [
+        { key: 'nearest' as const, icon: <Eye size={18} />, label: 'NEAREST', description: 'Neighbor' },
+        { key: '2opt' as const, icon: <RefreshCw size={18} />, label: '2-OPT', description: 'Optimization' },
+        { key: 'manual' as const, icon: <Gamepad2 size={18} />, label: 'MANUAL', description: 'Play Mode' },
+        { key: 'builder' as const, icon: <Hammer size={18} />, label: 'BUILDER', description: 'Create Mode' },
+    ];
+
     return (
         <>
             <div className={styles.controlPanel}>
-                <h3>ALGORITHM</h3>
-                <div className={styles.radioGroup}>
-                    <label className={styles.radioLabel}>
-                        <input
-                            type="radio"
-                            value="nearest"
-                            checked={algorithm === 'nearest'}
-                            onChange={() => setAlgorithm('nearest')}
+                <h3>MODE</h3>
+                <div className={styles.modeGrid}>
+                    {modes.map((mode) => (
+                        <button
+                            key={mode.key}
+                            className={`${styles.modeButton} ${algorithm === mode.key ? styles.modeButtonActive : ''}`}
+                            onClick={() => setAlgorithm(mode.key)}
                             disabled={isRunning}
-                        />
-                        Nearest Neighbor (view)
-                    </label>
-                    <label className={styles.radioLabel}>
-                        <input
-                            type="radio"
-                            value="2opt"
-                            checked={algorithm === '2opt'}
-                            onChange={() => setAlgorithm('2opt')}
-                            disabled={isRunning}
-                        />
-                        2-opt Optimization (view)
-                    </label>
-                    <label className={styles.radioLabel}>
-                        <input
-                            type="radio"
-                            value="manual"
-                            checked={algorithm === 'manual'}
-                            onChange={() => setAlgorithm('manual')}
-                            disabled={isRunning}
-                        />
-                        Manual Mode (play!)
-                    </label>
-                    <label className={styles.radioLabel}>
-                        <input
-                            type="radio"
-                            value="builder"
-                            checked={algorithm === 'builder'}
-                            onChange={() => setAlgorithm('builder')}
-                            disabled={isRunning}
-                        />
-                        Builder Mode (create!)
-                    </label>
+                        >
+                            {mode.icon}
+                            <span className={styles.modeLabel}>{mode.label}</span>
+                            <span className={styles.modeDescription}>{mode.description}</span>
+                        </button>
+                    ))}
                 </div>
             </div>
 

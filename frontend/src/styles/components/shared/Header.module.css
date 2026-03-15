@@ -20,6 +20,8 @@
             font-size: var(--font-size-sm);
             font-weight: bold;
             color: var(--text-primary);
+            text-decoration: none;
+            cursor: pointer;
         }
 
         .navigation {

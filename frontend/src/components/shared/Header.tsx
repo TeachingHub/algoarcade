@@ -10,9 +10,9 @@ export default function Header() {
     return (
         <header className={styles.header}>
             <div className={styles.content}>
-                <div className={styles.logo}>
+                <Link to="/" className={styles.logo}>
                     <h1>ALGOARCADE</h1>
-                </div>
+                </Link>
                 <div className={styles.navigation}>
                     <div className={styles.navLinks}>
                         <Button style={["link"]} label="HOME" to="/" />
