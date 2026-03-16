@@ -2,6 +2,7 @@ import type { AlgorithmType } from '@/types/games/pathfinding';
 import type { InteractionMode } from '@/hooks/games/usePathfinding';
 import Button from '@/components/shared/Button';
 import styles from '@/styles/pages/games/Pathfinding.module.css';
+import { Pencil, Eraser, Gamepad2 } from 'lucide-react';
 
 interface PathfindingControlsProps {
     algorithm: AlgorithmType;
@@ -31,10 +32,22 @@ const ALGORITHMS: { value: AlgorithmType; label: string }[] = [
     { value: 'dfs', label: 'DFS' },
 ];
 
-const MODES: { value: InteractionMode; label: string; desc: string }[] = [
-    { value: 'wall', label: 'Draw Walls', desc: 'click & drag' },
-    { value: 'erase', label: 'Erase', desc: 'remove walls' },
-    { value: 'manual', label: 'Solve Manually', desc: 'draw path' },
+const modeGroups = [
+    {
+        category: 'BUILD',
+        categoryClass: 'categoryBuild',
+        modes: [
+            { key: 'wall' as const, icon: <Pencil size={18} />, label: 'DRAW WALLS', description: 'Click & drag' },
+            { key: 'erase' as const, icon: <Eraser size={18} />, label: 'ERASE', description: 'Remove walls' },
+        ]
+    },
+    {
+        category: 'PLAY',
+        categoryClass: 'categoryPlay',
+        modes: [
+            { key: 'manual' as const, icon: <Gamepad2 size={18} />, label: 'SOLVE MANUALLY', description: 'Draw your own path' },
+        ]
+    },
 ];
 
 export default function PathfindingControls({
@@ -62,19 +75,25 @@ export default function PathfindingControls({
             {/* ── Mode ────────────────────────────────────── */}
             <div className={styles.controlPanel}>
                 <h3>MODE</h3>
-                <div className={styles.actions}>
-                    {MODES.map(m => (
-                        <label key={m.value} className={styles.radioLabel}>
-                            <input
-                                type="radio"
-                                name="mode"
-                                checked={mode === m.value}
-                                onChange={() => setMode(m.value)}
-                                disabled={isRunning}
-                            />
-                            {m.label}
-                            <span className={styles.modeDesc}>({m.desc})</span>
-                        </label>
+                <div className={styles.modeGroupContainer}>
+                    {modeGroups.map((group) => (
+                        <div key={group.category} className={styles.modeGroup}>
+                            <span className={`${styles.modeCategoryLabel} ${styles[group.categoryClass]}`}>{group.category}</span>
+                            <div className={group.modes.length > 1 ? styles.modeGridRow : ''}>
+                                {group.modes.map((m) => (
+                                    <button
+                                        key={m.key}
+                                        className={`${styles.modeButton} ${mode === m.key ? `${styles.modeButtonActive} ${styles[group.categoryClass]}` : ''}`}
+                                        onClick={() => setMode(m.key)}
+                                        disabled={isRunning}
+                                    >
+                                        {m.icon}
+                                        <span className={styles.modeLabel}>{m.label}</span>
+                                        <span className={styles.modeDescription}>{m.description}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
                     ))}
                 </div>
             </div>
@@ -98,9 +117,7 @@ export default function PathfindingControls({
                         </div>
 
                         <div className={styles.setting}>
-                            <label className={styles.radioLabel}>
-                                Speed: {speed}
-                            </label>
+                            <span className={styles.speedLabel}>Speed: {speed}</span>
                             <input
                                 type="range"
                                 min={1}
@@ -131,7 +148,7 @@ export default function PathfindingControls({
                         <p className={styles.manualCount}>Steps: {manualPathLength}</p>
 
                         <div className={styles.setting}>
-                            <label className={styles.radioLabel}>Compare against:</label>
+                            <span className={styles.speedLabel}>Compare against:</span>
                             <select
                                 className={styles.selectInput}
                                 value={comparisonAlgorithm}

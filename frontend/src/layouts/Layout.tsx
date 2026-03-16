@@ -7,15 +7,16 @@ import type { ReactNode } from "react";
 interface LayoutProps {
     noHeader?: boolean;
     noFooter?: boolean;
+    noPadding?: boolean;
     children: ReactNode;
 }
 
-export default function Layout({ children, noHeader, noFooter }: LayoutProps) {
-    
+export default function Layout({ children, noHeader, noFooter, noPadding }: LayoutProps) {
+
     return (
         <div className={styles.layout}>
             {!noHeader && <Header />}
-            <main className={styles.main}>
+            <main className={`${styles.main} ${noPadding ? styles.mainNoPadding : ''}`}>
                 {children}
             </main>
             {!noFooter && <Footer />}
