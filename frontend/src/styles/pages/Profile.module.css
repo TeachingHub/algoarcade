@@ -184,6 +184,18 @@
     text-transform: uppercase;
 }
 
+.medalGold {
+    color: var(--medal-gold);
+}
+
+.medalSilver {
+    color: var(--medal-silver);
+}
+
+.medalBronze {
+    color: var(--medal-bronze);
+}
+
 @media (max-width: 768px) {
     .container {
         padding: 2rem;

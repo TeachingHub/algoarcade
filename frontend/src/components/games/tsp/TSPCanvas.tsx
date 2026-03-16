@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react';
 import type { Point } from "@/types/games/tsp";
-import { pathColor, manualPathColor, numberColor } from "@/utils/tsp";
+import { getCanvasColors } from "@/utils/tsp";
 
 interface TSPCanvasProps {
     width: number;
@@ -31,6 +31,8 @@ export default function TSPCanvas({
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
+
+        const { pathColor, manualPathColor, numberColor } = getCanvasColors(canvas);
 
         // Clear canvas
         ctx.clearRect(0, 0, width, height);

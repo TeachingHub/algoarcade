@@ -12,10 +12,6 @@ import Input from "@/components/shared/Input";
 import Loader from "@/components/shared/Loader";
 import { CircleStar } from "lucide-react";
 
-function getCSSVar(name: string): string {
-    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
-
 export default function ProfilePage() {
     const { user, userProfile, loading } = useAuth();
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -114,17 +110,17 @@ export default function ProfilePage() {
                     <h2 className={styles.medalsSectionTitle}>TSP MEDALS</h2>
                     <div className={styles.medalsGrid}>
                         <div className={styles.medalCard}>
-                            <CircleStar size={28} color={getCSSVar('--medal-gold')} />
+                            <CircleStar size={28} className={styles.medalGold} />
                             <span className={styles.medalCount}>{userProfile?.tspMedals?.gold ?? 0}</span>
                             <span className={styles.medalLabel}>GOLD</span>
                         </div>
                         <div className={styles.medalCard}>
-                            <CircleStar size={28} color={getCSSVar('--medal-silver')} />
+                            <CircleStar size={28} className={styles.medalSilver} />
                             <span className={styles.medalCount}>{userProfile?.tspMedals?.silver ?? 0}</span>
                             <span className={styles.medalLabel}>SILVER</span>
                         </div>
                         <div className={styles.medalCard}>
-                            <CircleStar size={28} color={getCSSVar('--medal-bronze')} />
+                            <CircleStar size={28} className={styles.medalBronze} />
                             <span className={styles.medalCount}>{userProfile?.tspMedals?.bronze ?? 0}</span>
                             <span className={styles.medalLabel}>BRONZE</span>
                         </div>

@@ -4,10 +4,6 @@ import { useAuth } from '@/context/AuthContext';
 import { CircleStar } from 'lucide-react';
 import styles from '@/styles/components/games/tsp/TSPGlobalLeaderboard.module.css';
 
-function getCSSVar(name: string): string {
-    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
-
 export default function TSPGlobalLeaderboard() {
     const { user } = useAuth();
     const [entries, setEntries] = useState<GlobalLeaderboardEntry[]>([]);
@@ -34,9 +30,9 @@ export default function TSPGlobalLeaderboard() {
                         <tr>
                             <th>#</th>
                             <th>PLAYER</th>
-                            <th><CircleStar size={14} color={getCSSVar('--medal-gold')} /></th>
-                            <th><CircleStar size={14} color={getCSSVar('--medal-silver')} /></th>
-                            <th><CircleStar size={14} color={getCSSVar('--medal-bronze')} /></th>
+                            <th><CircleStar size={14} className={styles.medalGold} /></th>
+                            <th><CircleStar size={14} className={styles.medalSilver} /></th>
+                            <th><CircleStar size={14} className={styles.medalBronze} /></th>
                             <th>TOTAL</th>
                         </tr>
                     </thead>
