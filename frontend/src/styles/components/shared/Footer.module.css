@@ -18,7 +18,6 @@
         padding: 0 var(--space-xl);
         margin-top: var(--space-xxxl);
 
-
         .sections {
             display: flex;
             flex-direction: row;
@@ -34,14 +33,30 @@
             gap: var(--space-xxs);
 
             h3 {
-                font-size: var(--font-size-lg);
+                font-size: var(--font-size-sm);
                 margin-bottom: var(--space-xs);
+                letter-spacing: 1px;
+                color: var(--foreground);
             }
 
             p {
                 font-size: var(--font-size-xs);
                 margin: 0;
+                color: var(--muted-foreground);
+                line-height: 1.6;
             }
+        }
+
+        .footerLink {
+            font-size: var(--font-size-xs);
+            color: var(--muted-foreground);
+            text-decoration: none;
+            transition: color 0.2s;
+            line-height: 1.8;
+        }
+
+        .footerLink:hover {
+            color: var(--primary);
         }
 
         .bottom {
@@ -53,8 +68,8 @@
             p {
                 margin: 0;
                 font-size: var(--font-size-xs);
+                color: var(--muted-foreground);
             }
         }
-
     }
 }
