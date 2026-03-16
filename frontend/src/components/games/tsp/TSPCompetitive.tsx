@@ -58,7 +58,7 @@ export default function TSPCompetitive() {
 
     return (
         <GameLayout
-            title="DAILY CHALLENGE: COMPETITIVE"
+            title="TRAVELING SALESPERSON: DAILY CHALLENGE"
             badges={["RANKED", "GRAPH"]}
             stats={[
                 { label: "POINTS", value: gameState?.points?.length || 0 }

@@ -26,10 +26,32 @@
     margin-bottom: 10px;
 }
 
-.modeGrid {
+/* ─── Mode Selector (Grouped) ──────────────────────────────── */
+
+.modeGroupContainer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.modeGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.modeCategoryLabel {
+    font-size: 9px;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding-left: 2px;
+}
+
+.modeGridRow {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--space-sm);
+    gap: var(--space-xs);
 }
 
 .modeButton {
@@ -37,7 +59,7 @@
     flex-direction: column;
     align-items: center;
     gap: 4px;
-    padding: 12px 8px;
+    padding: 10px 8px;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     background: var(--background);
@@ -59,7 +81,7 @@
 
 .modeButtonActive {
     border-color: var(--primary);
-    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    background: color-mix(in srgb, var(--primary) 8%, transparent);
     color: var(--primary);
 }
 
@@ -72,6 +94,41 @@
 .modeDescription {
     font-size: 9px;
     opacity: 0.7;
+}
+
+/* ─── Category colors ─────────────────────────────────────── */
+
+.categoryVisualize {
+    color: #60a5fa;
+    /* blue */
+}
+
+.categoryVisualize.modeButtonActive {
+    border-color: #60a5fa;
+    background: rgba(96, 165, 250, 0.08);
+    color: #60a5fa;
+}
+
+.categoryPlay {
+    color: #4ade80;
+    /* green */
+}
+
+.categoryPlay.modeButtonActive {
+    border-color: #4ade80;
+    background: rgba(74, 222, 128, 0.08);
+    color: #4ade80;
+}
+
+.categoryCreate {
+    color: #fb923c;
+    /* orange */
+}
+
+.categoryCreate.modeButtonActive {
+    border-color: #fb923c;
+    background: rgba(251, 146, 60, 0.08);
+    color: #fb923c;
 }
 
 .scenarioSelector {
