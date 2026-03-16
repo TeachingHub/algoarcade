@@ -57,29 +57,54 @@ export default function TSPControls({
         }
     };
 
-    const modes = [
-        { key: 'nearest' as const, icon: <Eye size={18} />, label: 'NEAREST', description: 'Neighbor' },
-        { key: '2opt' as const, icon: <RefreshCw size={18} />, label: '2-OPT', description: 'Optimization' },
-        { key: 'manual' as const, icon: <Gamepad2 size={18} />, label: 'MANUAL', description: 'Play Mode' },
-        { key: 'builder' as const, icon: <Hammer size={18} />, label: 'BUILDER', description: 'Create Mode' },
+    const modeGroups = [
+        {
+            category: 'VISUALIZE',
+            categoryClass: styles.categoryVisualize,
+            modes: [
+                { key: 'nearest' as const, icon: <Eye size={18} />, label: 'NEAREST', description: 'Neighbor' },
+                { key: '2opt' as const, icon: <RefreshCw size={18} />, label: '2-OPT', description: 'Optimization' },
+            ]
+        },
+        {
+            category: 'PLAY',
+            categoryClass: styles.categoryPlay,
+            modes: [
+                { key: 'manual' as const, icon: <Gamepad2 size={18} />, label: 'MANUAL', description: 'Solve it yourself' },
+            ]
+        },
+        {
+            category: 'CREATE',
+            categoryClass: styles.categoryCreate,
+            modes: [
+                { key: 'builder' as const, icon: <Hammer size={18} />, label: 'BUILDER', description: 'Place your own points' },
+            ]
+        },
     ];
 
     return (
         <>
             <div className={styles.controlPanel}>
                 <h3>MODE</h3>
-                <div className={styles.modeGrid}>
-                    {modes.map((mode) => (
-                        <button
-                            key={mode.key}
-                            className={`${styles.modeButton} ${algorithm === mode.key ? styles.modeButtonActive : ''}`}
-                            onClick={() => setAlgorithm(mode.key)}
-                            disabled={isRunning}
-                        >
-                            {mode.icon}
-                            <span className={styles.modeLabel}>{mode.label}</span>
-                            <span className={styles.modeDescription}>{mode.description}</span>
-                        </button>
+                <div className={styles.modeGroupContainer}>
+                    {modeGroups.map((group) => (
+                        <div key={group.category} className={styles.modeGroup}>
+                            <span className={`${styles.modeCategoryLabel} ${group.categoryClass}`}>{group.category}</span>
+                            <div className={group.modes.length > 1 ? styles.modeGridRow : ''}>
+                                {group.modes.map((mode) => (
+                                    <button
+                                        key={mode.key}
+                                        className={`${styles.modeButton} ${algorithm === mode.key ? `${styles.modeButtonActive} ${group.categoryClass}` : ''}`}
+                                        onClick={() => setAlgorithm(mode.key)}
+                                        disabled={isRunning}
+                                    >
+                                        {mode.icon}
+                                        <span className={styles.modeLabel}>{mode.label}</span>
+                                        <span className={styles.modeDescription}>{mode.description}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
                     ))}
                 </div>
             </div>
