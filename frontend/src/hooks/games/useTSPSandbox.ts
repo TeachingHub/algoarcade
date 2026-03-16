@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useTSPAlgorithms } from './tsp/useTSPAlgorithms';
 import { useTSPScenarios } from './tsp/useTSPScenarios';
 import { useTSPBuilder } from './tsp/useTSPBuilder';
@@ -22,6 +22,9 @@ export const useTSPSandbox = (canvasSize: { width: number, height: number }) => 
     const scenarios = useTSPScenarios(canvasSize);
     const builder = useTSPBuilder();
 
+    // --- Builder exit warning ---
+    const [pendingModeSwitch, setPendingModeSwitch] = useState<'nearest' | '2opt' | 'manual' | 'builder' | null>(null);
+
     // --- Scenario generation (wraps scenarios + algorithms) ---
 
     const generateScenario = useCallback((pattern: string, count?: number) => {
@@ -35,15 +38,27 @@ export const useTSPSandbox = (canvasSize: { width: number, height: number }) => 
     // --- Algorithm switching (validates builder state before leaving) ---
 
     const setAlgorithm = useCallback((algo: 'nearest' | '2opt' | 'manual' | 'builder') => {
-        // If leaving builder mode with invalid point count, generate fallback
+        // If leaving builder mode with invalid point count, show warning
         if (algorithms.algorithm === 'builder' && algo !== 'builder') {
             if (!builder.isValidBuilderState(algorithms.gameState.points.length)) {
-                const points = scenarios.generateFallback(scenarios.customPointCount);
-                algorithms.setPoints(points);
+                setPendingModeSwitch(algo);
+                return;
             }
         }
         algorithms.setAlgorithm(algo);
-    }, [algorithms, builder, scenarios]);
+    }, [algorithms, builder]);
+
+    const confirmModeSwitch = useCallback(() => {
+        if (!pendingModeSwitch) return;
+        const points = scenarios.generateFallback(scenarios.customPointCount);
+        algorithms.setPoints(points);
+        algorithms.setAlgorithm(pendingModeSwitch);
+        setPendingModeSwitch(null);
+    }, [pendingModeSwitch, algorithms, scenarios]);
+
+    const cancelModeSwitch = useCallback(() => {
+        setPendingModeSwitch(null);
+    }, []);
 
     // --- Builder mode (wraps builder + algorithms) ---
 
@@ -109,6 +124,9 @@ export const useTSPSandbox = (canvasSize: { width: number, height: number }) => 
         customPointCount: scenarios.customPointCount,
         setCustomPointCount: scenarios.setCustomPointCount,
         isLoading,
+        pendingModeSwitch,
+        confirmModeSwitch,
+        cancelModeSwitch,
         actions,
     };
 };

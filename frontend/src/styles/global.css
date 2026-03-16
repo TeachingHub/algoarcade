@@ -58,6 +58,25 @@
   --chart-5: #de3e2d; /* orange */
 
   --white: #fff;
+  --black: #000;
+
+  /* Medal colors */
+  --medal-gold: #fdd505;
+  --medal-silver: #c0c0c0;
+  --medal-bronze: #cd7f32;
+
+  /* Game mode category colors */
+  --mode-visualize: #60a5fa;
+  --mode-play: #4ade80;
+  --mode-create: #fb923c;
+
+  /* Status colors */
+  --success: #22c55e;
+  --warning: #ffa500;
+
+  /* Pathfinding-specific */
+  --pathfinding-visited: #a855f7;
+  --pathfinding-visited-alt: #6a4cdb;
   
   /* Pixel-perfect corners */
   --radius: 0rem;

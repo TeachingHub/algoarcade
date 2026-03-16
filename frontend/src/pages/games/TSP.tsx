@@ -3,7 +3,7 @@ import Layout from '@/layouts/Layout';
 import GameTabs from '@/components/games/shared/GameTabs';
 import TSPSandbox from '@/components/games/tsp/TSPSandbox';
 import TSPCompetitive from '@/components/games/tsp/TSPCompetitive';
-import styles from '@/styles/pages/games/TSP.module.css';
+import TSPGlobalLeaderboard from '@/components/games/tsp/TSPGlobalLeaderboard';
 
 const TSP_TABS = [
     { key: 'sandbox', label: 'SANDBOX' },
@@ -25,11 +25,7 @@ export default function TSPPage() {
 
             {mode === 'sandbox' && <TSPSandbox />}
             {mode === 'competitive' && <TSPCompetitive />}
-            {mode === 'leaderboard' && (
-                <div className={styles.leaderboardPlaceholder}>
-                    <p>Global Leaderboard — Coming soon</p>
-                </div>
-            )}
+            {mode === 'leaderboard' && <TSPGlobalLeaderboard />}
         </Layout>
     );
 }

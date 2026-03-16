@@ -106,25 +106,23 @@
 /* ─── Category colors ─────────────────────────────────────── */
 
 .categoryBuild {
-    color: #60a5fa;
-    /* blue */
+    color: var(--mode-visualize);
 }
 
 .categoryBuild.modeButtonActive {
-    border-color: #60a5fa;
-    background: rgba(96, 165, 250, 0.08);
-    color: #60a5fa;
+    border-color: var(--mode-visualize);
+    background: color-mix(in srgb, var(--mode-visualize) 8%, transparent);
+    color: var(--mode-visualize);
 }
 
 .categoryPlay {
-    color: #4ade80;
-    /* green */
+    color: var(--mode-play);
 }
 
 .categoryPlay.modeButtonActive {
-    border-color: #4ade80;
-    background: rgba(74, 222, 128, 0.08);
-    color: #4ade80;
+    border-color: var(--mode-play);
+    background: color-mix(in srgb, var(--mode-play) 8%, transparent);
+    color: var(--mode-play);
 }
 
 .speedLabel {

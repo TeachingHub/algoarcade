@@ -32,9 +32,9 @@
 /* ─── Cell Types ──────────────────────────────────────────────── */
 
 .start {
-    background: #22c55e !important;
-    border-color: #22c55e !important;
-    box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+    background: var(--success) !important;
+    border-color: var(--success) !important;
+    box-shadow: 0 0 8px color-mix(in srgb, var(--success) 60%, transparent);
     cursor: grab;
 }
 
@@ -80,16 +80,16 @@
 /* ─── Algorithm Comparison Overlay ────────────────────────────── */
 
 .algoPath {
-    background: rgba(168, 85, 247, 0.6) !important;
-    border-color: rgba(168, 85, 247, 0.8) !important;
-    box-shadow: 0 0 4px rgba(168, 85, 247, 0.5);
+    background: color-mix(in srgb, var(--pathfinding-visited) 60%, transparent) !important;
+    border-color: color-mix(in srgb, var(--pathfinding-visited) 80%, transparent) !important;
+    box-shadow: 0 0 4px color-mix(in srgb, var(--pathfinding-visited) 50%, transparent);
     animation: pathGlow 0.4s ease-out;
 }
 
 .pathOverlap {
-    background: linear-gradient(135deg, var(--primary) 50%, rgba(168, 85, 247, 0.7) 50%) !important;
+    background: linear-gradient(135deg, var(--primary) 50%, color-mix(in srgb, var(--pathfinding-visited) 70%, transparent) 50%) !important;
     border-color: var(--primary) !important;
-    box-shadow: 0 0 6px var(--primary), 0 0 4px rgba(168, 85, 247, 0.5);
+    box-shadow: 0 0 6px var(--primary), 0 0 4px color-mix(in srgb, var(--pathfinding-visited) 50%, transparent);
     animation: pathGlow 0.4s ease-out;
 }
 
@@ -98,7 +98,7 @@
 @keyframes visitPop {
     0% {
         transform: scale(0.3);
-        background: rgba(106, 76, 219, 0.8);
+        background: color-mix(in srgb, var(--pathfinding-visited-alt) 80%, transparent);
     }
 
     50% {
