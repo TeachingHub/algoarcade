@@ -4,7 +4,9 @@
     "private": true,
     "description": "Scheduled scripts for AlgoArcade (daily challenge generation, etc.)",
     "scripts": {
-        "generate-daily": "node generate-daily-challenge.js"
+        "generate-daily": "node generate-daily-challenge.js",
+        "award-medals": "node award-daily-medals.js",
+        "cleanup-instances": "node cleanup-shared-instances.js"
     },
     "dependencies": {
         "firebase-admin": "^13.6.0"

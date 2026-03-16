@@ -1,0 +1,38 @@
+# ───────────────────────────────────────────────────────
+# 🧹 AlgoArcade — Cleanup Old Shared TSP Instances
+# ───────────────────────────────────────────────────────
+# Runs daily at 00:10 UTC to delete shared TSP instances
+# older than 7 days from Firestore.
+# ───────────────────────────────────────────────────────
+
+name: Cleanup Shared TSP Instances
+
+on:
+  schedule:
+    # Every day at 00:10 UTC
+    - cron: '10 0 * * *'
+
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ./scripts
+
+      - name: Cleanup old shared instances
+        run: node cleanup-shared-instances.js
+        working-directory: ./scripts
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
