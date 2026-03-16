@@ -10,6 +10,11 @@ import Modal from "@/components/shared/Modal";
 import { useState } from "react";
 import Input from "@/components/shared/Input";
 import Loader from "@/components/shared/Loader";
+import { CircleStar } from "lucide-react";
+
+function getCSSVar(name: string): string {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
 
 export default function ProfilePage() {
     const { user, userProfile, loading } = useAuth();
@@ -90,10 +95,6 @@ export default function ProfilePage() {
                 <Divider size="xlarge" thickness="medium" />
                 <div className={styles.statsGrid}>
                     <div className={styles.infoItem}>
-                        <span className={styles.label}>ID:</span>
-                        <span className={styles.value}>{user?.uid}</span>
-                    </div>
-                    <div className={styles.infoItem}>
                         <span className={styles.label}>EMAIL:</span>
                         <span className={styles.value}>{user?.email}</span>
                     </div>
@@ -106,6 +107,27 @@ export default function ProfilePage() {
                         <span className={styles.value}>
                             {userProfile?.createdAt?.toDate().toLocaleDateString()}
                         </span>
+                    </div>
+                </div>
+                <Divider size="xlarge" thickness="medium" />
+                <div className={styles.medalsSection}>
+                    <h2 className={styles.medalsSectionTitle}>TSP MEDALS</h2>
+                    <div className={styles.medalsGrid}>
+                        <div className={styles.medalCard}>
+                            <CircleStar size={28} color={getCSSVar('--medal-gold')} />
+                            <span className={styles.medalCount}>{userProfile?.tspMedals?.gold ?? 0}</span>
+                            <span className={styles.medalLabel}>GOLD</span>
+                        </div>
+                        <div className={styles.medalCard}>
+                            <CircleStar size={28} color={getCSSVar('--medal-silver')} />
+                            <span className={styles.medalCount}>{userProfile?.tspMedals?.silver ?? 0}</span>
+                            <span className={styles.medalLabel}>SILVER</span>
+                        </div>
+                        <div className={styles.medalCard}>
+                            <CircleStar size={28} color={getCSSVar('--medal-bronze')} />
+                            <span className={styles.medalCount}>{userProfile?.tspMedals?.bronze ?? 0}</span>
+                            <span className={styles.medalLabel}>BRONZE</span>
+                        </div>
                     </div>
                 </div>
                 <Divider size="xlarge" thickness="medium" />
