@@ -12,6 +12,7 @@ import GameLayout from "@/layouts/GameLayout";
 // Game Specific Components
 import TSPCanvas from "@/components/games/tsp/TSPCanvas";
 import TSPSandboxControls from "@/components/games/tsp/TSPSandboxControls";
+import Modal from "@/components/shared/Modal";
 
 // Hook
 import { useTSPSandbox } from "@/hooks/games/useTSPSandbox";
@@ -33,6 +34,9 @@ export default function TSPSandbox() {
         scenarioInfo,
         customPointCount,
         setCustomPointCount,
+        pendingModeSwitch,
+        confirmModeSwitch,
+        cancelModeSwitch,
         actions
     } = useTSPSandbox(canvasSize);
 
@@ -143,6 +147,17 @@ export default function TSPSandbox() {
                     </div>
                 )}
             </div>
+
+            <Modal
+                isOpen={pendingModeSwitch !== null}
+                title="Leave Builder Mode?"
+                message={`You have ${gameState.points.length} point${gameState.points.length !== 1 ? 's' : ''}, but builder mode requires between 5 and 50. Leaving will generate a random instance instead.`}
+                confirmLabel="Leave"
+                cancelLabel="Stay"
+                onConfirm={confirmModeSwitch}
+                onCancel={cancelModeSwitch}
+                isDestructive
+            />
         </GameLayout>
     );
 }
