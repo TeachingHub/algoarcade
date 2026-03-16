@@ -32,22 +32,10 @@ const ALGORITHMS: { value: AlgorithmType; label: string }[] = [
     { value: 'dfs', label: 'DFS' },
 ];
 
-const modeGroups = [
-    {
-        category: 'BUILD',
-        categoryClass: 'categoryBuild',
-        modes: [
-            { key: 'wall' as const, icon: <Pencil size={18} />, label: 'DRAW WALLS', description: 'Click & drag' },
-            { key: 'erase' as const, icon: <Eraser size={18} />, label: 'ERASE', description: 'Remove walls' },
-        ]
-    },
-    {
-        category: 'PLAY',
-        categoryClass: 'categoryPlay',
-        modes: [
-            { key: 'manual' as const, icon: <Gamepad2 size={18} />, label: 'SOLVE MANUALLY', description: 'Draw your own path' },
-        ]
-    },
+const modes = [
+    { key: 'wall' as const, category: 'BUILD', categoryClass: 'categoryBuild', icon: <Pencil size={18} />, label: 'DRAW WALLS', description: 'Click & drag' },
+    { key: 'erase' as const, category: 'BUILD', categoryClass: 'categoryBuild', icon: <Eraser size={18} />, label: 'ERASE', description: 'Remove walls' },
+    { key: 'manual' as const, category: 'PLAY', categoryClass: 'categoryPlay', icon: <Gamepad2 size={18} />, label: 'SOLVE MANUALLY', description: 'Draw path' },
 ];
 
 export default function PathfindingControls({
@@ -75,25 +63,21 @@ export default function PathfindingControls({
             {/* ── Mode ────────────────────────────────────── */}
             <div className={styles.controlPanel}>
                 <h3>MODE</h3>
-                <div className={styles.modeGroupContainer}>
-                    {modeGroups.map((group) => (
-                        <div key={group.category} className={styles.modeGroup}>
-                            <span className={`${styles.modeCategoryLabel} ${styles[group.categoryClass]}`}>{group.category}</span>
-                            <div className={group.modes.length > 1 ? styles.modeGridRow : ''}>
-                                {group.modes.map((m) => (
-                                    <button
-                                        key={m.key}
-                                        className={`${styles.modeButton} ${mode === m.key ? `${styles.modeButtonActive} ${styles[group.categoryClass]}` : ''}`}
-                                        onClick={() => setMode(m.key)}
-                                        disabled={isRunning}
-                                    >
-                                        {m.icon}
-                                        <span className={styles.modeLabel}>{m.label}</span>
-                                        <span className={styles.modeDescription}>{m.description}</span>
-                                    </button>
-                                ))}
+                <div className={styles.modeGrid2x2}>
+                    {modes.map((m) => (
+                        <button
+                            key={m.key}
+                            className={`${styles.modeButton} ${mode === m.key ? `${styles.modeButtonActive} ${styles[m.categoryClass]}` : ''}`}
+                            onClick={() => setMode(m.key)}
+                            disabled={isRunning}
+                        >
+                            <span className={`${styles.modeBadge} ${styles[m.categoryClass]}`}>{m.category}</span>
+                            <div className={styles.modeIconLabel}>
+                                {m.icon}
+                                <span className={styles.modeLabel}>{m.label}</span>
                             </div>
-                        </div>
+                            <span className={styles.modeDescription}>{m.description}</span>
+                        </button>
                     ))}
                 </div>
             </div>

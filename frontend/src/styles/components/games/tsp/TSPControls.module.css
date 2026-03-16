@@ -26,32 +26,26 @@
     margin-bottom: 10px;
 }
 
-/* ─── Mode Selector (Grouped) ──────────────────────────────── */
+/* ─── Mode Selector (Grouped 2x2 grid with badges) ────────── */
 
-.modeGroupContainer {
-    display: flex;
-    flex-direction: column;
+.modeGrid2x2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: var(--space-sm);
 }
 
-.modeGroup {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.modeCategoryLabel {
-    font-size: 9px;
+.modeBadge {
+    font-size: 8px;
     font-weight: bold;
-    letter-spacing: 1.5px;
+    letter-spacing: 1px;
     text-transform: uppercase;
-    padding-left: 2px;
+    margin-bottom: 2px;
 }
 
-.modeGridRow {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-xs);
+.modeIconLabel {
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .modeButton {
