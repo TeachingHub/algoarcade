@@ -1,7 +1,7 @@
 .header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-end;
     padding-bottom: var(--space-md);
     border-bottom: 1px solid var(--border);
 }
@@ -9,10 +9,41 @@
 .headerLeft {
     display: flex;
     flex-direction: column;
-    gap: var(--space-md);
+    gap: var(--space-sm);
 }
 
-.headerLeftText {
+/* ─── Breadcrumbs ─────────────────────────────────────────── */
+
+.breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.breadcrumbLink {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    color: var(--muted-foreground);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.breadcrumbLink:hover {
+    color: var(--primary);
+}
+
+.breadcrumbSeparator {
+    color: var(--muted-foreground);
+    opacity: 0.5;
+}
+
+/* ─── Title Row ───────────────────────────────────────────── */
+
+.titleRow {
     display: flex;
     align-items: center;
     gap: var(--space-md);
@@ -29,6 +60,8 @@
     display: flex;
     gap: var(--space-sm);
 }
+
+/* ─── Stats ───────────────────────────────────────────────── */
 
 .stats {
     display: flex;

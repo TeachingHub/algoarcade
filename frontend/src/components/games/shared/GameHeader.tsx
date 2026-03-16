@@ -1,8 +1,8 @@
 import styles from "@/styles/components/games/shared/GameHeader.module.css";
 
-
-import Button from "@/components/shared/Button";
 import Badge from "@/components/shared/Badge";
+import { Home, ChevronRight } from "lucide-react";
+import { Link } from "react-router";
 
 interface GameStat {
     label: string;
@@ -25,17 +25,26 @@ export default function GameHeader({
     return (
         <div className={styles.header}>
             <div className={styles.headerLeft}>
-                <div className={styles.headerLeftText}>
-                    <Button style={["link"]} to={backLink} >{"<"}</Button>
+                <nav className={styles.breadcrumbs}>
+                    <Link to="/" className={styles.breadcrumbLink}>
+                        <Home size={13} />
+                        <span>HOME</span>
+                    </Link>
+                    <ChevronRight size={12} className={styles.breadcrumbSeparator} />
+                    <Link to={backLink} className={styles.breadcrumbLink}>
+                        GAMES
+                    </Link>
+                </nav>
+                <div className={styles.titleRow}>
                     <h1 className={styles.title}>{title}</h1>
+                    {badges.length > 0 && (
+                        <div className={styles.badges}>
+                            {badges.map((badge, index) => (
+                                <Badge key={index} style={["secondary"]} label={badge} />
+                            ))}
+                        </div>
+                    )}
                 </div>
-                {badges.length > 0 && (
-                    <div className={styles.badges}>
-                        {badges.map((badge, index) => (
-                            <Badge key={index} style={["secondary"]} label={badge} />
-                        ))}
-                    </div>
-                )}
             </div>
             {stats.length > 0 && (
                 <div className={styles.stats}>
