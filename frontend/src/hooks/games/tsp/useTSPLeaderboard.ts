@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import type { User } from 'firebase/auth';
 import { serverTimestamp } from 'firebase/firestore';
-import { saveDailyScore, getDailyLeaderboard } from '@/services/games/TSPService';
+import { saveDailyScore, getDailyLeaderboard, hasUserSubmitted } from '@/services/games/TSPService';
 import type { TSPLeaderboardEntry } from '@/services/games/TSPService';
 
 /**
@@ -17,6 +17,13 @@ export const useTSPLeaderboard = () => {
     const fetchLeaderboard = useCallback(async (dateStr: string) => {
         const board = await getDailyLeaderboard(dateStr);
         setLeaderboard(board);
+    }, []);
+
+    /**
+     * Checks if the user already submitted a score for the given date.
+     */
+    const checkSubmission = useCallback(async (userId: string, dateStr: string): Promise<boolean> => {
+        return hasUserSubmitted(dateStr, userId);
     }, []);
 
     /**
@@ -57,6 +64,7 @@ export const useTSPLeaderboard = () => {
         leaderboard,
         isSubmitting,
         fetchLeaderboard,
+        checkSubmission,
         submitScore,
     };
 };

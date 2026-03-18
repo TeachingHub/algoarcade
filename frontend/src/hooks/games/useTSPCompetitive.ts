@@ -34,7 +34,7 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
 
     // --- Sub-hooks ---
     const dailyChallenge = useTSPDailyChallenge(canvasSize);
-    const { leaderboard, isSubmitting, fetchLeaderboard, submitScore } = useTSPLeaderboard();
+    const { leaderboard, isSubmitting, fetchLeaderboard, checkSubmission, submitScore } = useTSPLeaderboard();
 
     // --- Sync daily challenge instance into game state ---
     useEffect(() => {
@@ -53,8 +53,18 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
             setHasSubmitted(false);
             // Fetch leaderboard for this date
             fetchLeaderboard(dailyChallenge.selectedDate);
+
+            // Check if user already submitted for this date
+            if (user) {
+                checkSubmission(user.uid, dailyChallenge.selectedDate).then(alreadySubmitted => {
+                    if (alreadySubmitted) {
+                        setHasSubmitted(true);
+                        setGameResult('You already submitted your score for this day!');
+                    }
+                });
+            }
         }
-    }, [dailyChallenge.instance, dailyChallenge.selectedDate, fetchLeaderboard]);
+    }, [dailyChallenge.instance, dailyChallenge.selectedDate, fetchLeaderboard, checkSubmission, user]);
 
     // --- Manual path building ---
 

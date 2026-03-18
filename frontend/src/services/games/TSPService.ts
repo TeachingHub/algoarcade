@@ -139,6 +139,17 @@ export async function saveDailyScore(dateString: string, score: TSPLeaderboardEn
     }
 }
 
+export async function hasUserSubmitted(dateString: string, userId: string): Promise<boolean> {
+    try {
+        const scoreRef = doc(db, "tsp_leaderboards", dateString, "scores", userId);
+        const scoreSnap = await getDoc(scoreRef);
+        return scoreSnap.exists();
+    } catch (error) {
+        console.error("Error checking user submission:", error);
+        return false;
+    }
+}
+
 export async function getDailyLeaderboard(dateString: string): Promise<TSPLeaderboardEntry[]> {
     try {
         const leaderboardRef = collection(db, "tsp_leaderboards", dateString, "scores");
