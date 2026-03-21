@@ -101,12 +101,16 @@ export async function getAllPosts(): Promise<BlogPost[]> {
 }
 
 /**
- * Fetch a single blog post by its slug
+ * Fetch a single blog post by its slug (Only if published)
  */
 export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
     try {
         const postsRef = collection(db, COLLECTION_NAME);
-        const q = query(postsRef, where("slug", "==", slug));
+        const q = query(
+            postsRef,
+            where("slug", "==", slug),
+            where("published", "==", true) // Required by Firestore rules for non-admins
+        );
         const snapshot = await getDocs(q);
 
         if (snapshot.empty) return null;
