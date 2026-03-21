@@ -15,6 +15,9 @@ export default function Header() {
                 </Link>
                 <div className={styles.navigation}>
                     <div className={styles.navLinks}>
+                        {userProfile?.role === "ADMIN" && (
+                            <Button style={["link"]} label="ADMIN" to="/admin" />
+                        )}
                         <Button style={["link"]} label="GAMES" to="/games" />
                         <Button style={["link"]} label="BLOG" to="/blog" />
                     </div>

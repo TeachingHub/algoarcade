@@ -21,6 +21,7 @@ export default function Footer() {
                         <h3>Links</h3>
                         <Link to="/" className={styles.footerLink}>Home</Link>
                         <Link to="/games" className={styles.footerLink}>Games</Link>
+                        <Link to="/blog" className={styles.footerLink}>Blog</Link>
                         <Link to="/profile" className={styles.footerLink}>Profile</Link>
                     </div>
                     <div className={styles.section}>
