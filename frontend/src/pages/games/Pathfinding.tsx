@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Layout from "@/layouts/Layout";
 import GameTabs from "@/components/games/shared/GameTabs";
 import GameLayout from "@/layouts/GameLayout";
 import styles from "@/styles/pages/games/Pathfinding.module.css";
-import { CircleStar, Bot } from 'lucide-react';
+import { CircleStar, Bot, TriangleAlert } from 'lucide-react';
 
 import PathfindingGrid from "@/components/games/pathfinding/PathfindingGrid";
 import PathfindingControls from "@/components/games/pathfinding/PathfindingControls";
@@ -15,6 +15,7 @@ const PATHFINDING_TABS = [
 
 export default function Pathfinding() {
     const [activeTab, setActiveTab] = useState('sandbox');
+    const [isMobile, setIsMobile] = useState(false);
     const {
         state,
         algorithm,
@@ -29,6 +30,13 @@ export default function Pathfinding() {
         gameResult,
         actions,
     } = usePathfinding();
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     return (
         <Layout noFooter noPadding>
@@ -76,6 +84,14 @@ export default function Pathfinding() {
                     }
                 >
                     <div className={styles.canvasArea}>
+                        {isMobile && (
+                            <div className={styles.mobileWarning}>
+                                <div className={styles.mobileWarningTitle}><TriangleAlert color="var(--primary)" /> Not Optimized for Mobile</div>
+                                <div className={styles.mobileWarningText}>
+                                    This game is best played on a larger screen (tablet or desktop) for the best experience.
+                                </div>
+                            </div>
+                        )}
                         <PathfindingGrid
                             grid={state.grid}
                             manualPath={manualPath}

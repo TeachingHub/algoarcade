@@ -16,83 +16,63 @@
     border-color: var(--primary);
 }
 
+.card:hover .coverImage {
+    transform: scale(1.03);
+}
+
+/* ── Cover Image ── */
 .imagePlaceholder {
-    height: 160px;
-    background: linear-gradient(135deg, var(--secondary) 0%, var(--background) 100%);
+    height: 180px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--background) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     border-bottom: 4px solid var(--border);
     position: relative;
+    overflow: hidden;
 }
 
-.thumbnailImage {
+.coverImage {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
+    transition: transform 0.3s ease;
 }
 
 .icon {
-    font-size: 4rem;
+    font-size: 3rem;
     filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.5));
     z-index: 1;
 }
 
+/* ── Content ── */
 .content {
     padding: var(--space-xl);
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    gap: var(--space-lg);
+    gap: var(--space-md);
 }
 
-.header {
+.meta {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     gap: var(--space-sm);
+}
+
+.date {
+    font-size: var(--font-size-xxs);
+    color: var(--muted-foreground);
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .tags {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-xs);
-}
-
-.tag {
-    font-size: var(--font-size-xxs);
-    background-color: var(--muted);
-    color: var(--muted-foreground);
-    padding: 6px 8px;
-    border: 2px solid var(--border);
-    text-transform: uppercase;
-    font-weight: bold;
-    letter-spacing: 1px;
-}
-
-.difficulty {
-    font-size: var(--font-size-xxs);
-    font-weight: bold;
-    padding: 6px 8px;
-    border: 2px solid currentColor;
-    text-transform: uppercase;
-    background-color: rgba(0, 0, 0, 0.2);
-}
-
-.easy {
-    color: var(--chart-4);
-    /* Green */
-}
-
-.medium {
-    color: var(--chart-1);
-    /* Yellow */
-}
-
-.hard {
-    color: var(--destructive);
-    /* Red */
 }
 
 .title {
@@ -103,7 +83,7 @@
     text-shadow: 2px 2px 0px var(--background);
 }
 
-.description {
+.excerpt {
     color: var(--muted-foreground);
     font-size: var(--font-size-xs);
     line-height: 1.8;
@@ -113,4 +93,28 @@
 
 .footer {
     margin-top: var(--space-md);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.readMore {
+    font-size: var(--font-size-xxs);
+    color: var(--secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+    transition: color 0.2s ease;
+}
+
+.card:hover .readMore {
+    color: var(--primary);
+}
+
+.readTime {
+    font-size: var(--font-size-xxs);
+    color: var(--muted-foreground);
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
 }

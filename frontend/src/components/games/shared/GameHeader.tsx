@@ -34,6 +34,10 @@ export default function GameHeader({
                     <Link to={backLink} className={styles.breadcrumbLink}>
                         GAMES
                     </Link>
+                    <ChevronRight size={12} className={styles.breadcrumbSeparator} />
+                    <span className={`${styles.breadcrumbLink} ${styles.breadcrumbCurrent}`}>
+                        {title.split(':')[0]}
+                    </span>
                 </nav>
                 <div className={styles.titleRow}>
                     <h1 className={styles.title}>{title}</h1>

@@ -21,7 +21,16 @@ export default function TSPSandbox() {
     const { user } = useAuth();
 
     // UI State for resizing
-    const [canvasSize, setCanvasSize] = useState({ width: 800, height: 500 });
+    const [canvasSize, setCanvasSize] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const w = window.innerWidth;
+            return {
+                width: w < 768 ? Math.max(w - 40, 300) : 800,
+                height: w < 768 ? 300 : 500
+            };
+        }
+        return { width: 800, height: 500 };
+    });
     const canvasAreaRef = useRef<HTMLDivElement>(null);
 
     // Game Logic Hook
@@ -117,7 +126,7 @@ export default function TSPSandbox() {
                 {algorithm === 'builder' && !gameResult && (
                     <div className={styles.instructionOverlay}>
                         <div>Click canvas to add points: {gameState.points.length}</div>
-                        <div style={{ fontSize: '0.8em', marginTop: '4px', opacity: 0.8 }}>
+                        <div className={styles.builderHintNote}>
                             Create between 5 and 50 points, or your instance will be reset.
                         </div>
                     </div>

@@ -33,3 +33,18 @@
     gap: var(--space-xl);
     padding-bottom: var(--space-xxxl);
 }
+
+@media (max-width: 768px) {
+    .container {
+        padding: var(--space-md);
+    }
+    .title {
+        font-size: 1.8rem;
+    }
+    .subtitle {
+        font-size: var(--font-size-md);
+    }
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}

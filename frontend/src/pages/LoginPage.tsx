@@ -9,6 +9,19 @@ import styles from "@/styles/components/forms/Form.module.css";
 
 import Divider from "@/components/shared/Divider";
 
+const getGoogleLoginErrorMessage = (error: any) => {
+    switch (error?.code) {
+        case "auth/unauthorized-domain":
+            return "Este dominio no esta autorizado en Firebase Auth. Anade tu dominio de Vercel en Authentication > Settings > Authorized domains.";
+        case "auth/operation-not-allowed":
+            return "Google Sign-In no esta habilitado en Firebase. Activalo en Authentication > Sign-in method.";
+        case "auth/popup-closed-by-user":
+            return "Inicio de sesion cancelado.";
+        default:
+            return "Failed to login with Google.";
+    }
+};
+
 export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -40,7 +53,7 @@ export default function LoginPage() {
             navigate("/profile");
         } catch (err: any) {
             console.error(err);
-            setError("Failed to login with Google.");
+            setError(getGoogleLoginErrorMessage(err));
         }
     };
 

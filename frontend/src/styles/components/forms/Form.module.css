@@ -57,6 +57,13 @@
     text-transform: uppercase;
 }
 
+.passwordHint {
+    color: var(--muted-foreground);
+    font-size: var(--font-size-xxs);
+    margin: var(--space-xs) 0 0;
+    line-height: 1.4;
+}
+
 .options {
     display: flex;
     justify-content: space-between;

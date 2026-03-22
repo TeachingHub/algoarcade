@@ -1,12 +1,12 @@
-import Layout from "@/layouts/Layout";
 import { useNavigate } from "react-router";
+import Layout from "@/layouts/Layout";
 import GameCard from "@/components/cards/GameCard";
 import styles from "@/styles/pages/games/Games.module.css";
 
 export default function Games() {
     const navigate = useNavigate();
 
-    const games = [
+    const allGames = [
         {
             id: 'tsp',
             title: 'Traveling Salesperson',
@@ -17,7 +17,7 @@ export default function Games() {
             thumbnail: '/banners/tsp-banner.jpg'
         },
         {
-            id: 'pathfinding A*',
+            id: 'pathfinding',
             title: 'Pathfinding A*',
             description: 'Find the shortest path between two points in a grid using the A* algorithm.',
             path: '/games/pathfinding',
@@ -36,7 +36,7 @@ export default function Games() {
                 </div>
 
                 <div className={styles.grid}>
-                    {games.map((game) => (
+                    {allGames.map((game) => (
                         <GameCard
                             key={game.id}
                             title={game.title}

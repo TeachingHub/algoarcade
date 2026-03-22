@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { User } from 'firebase/auth';
 import type { TSPState } from "@/types/games/tsp";
 import { calculateTotalDistance } from "@/utils/tsp";
-import { useTSPDailyChallenge } from './tsp/useTSPDailyChallenge';
+import { useTSPDailyChallenge, normalizeDistance } from './tsp/useTSPDailyChallenge';
 import { useTSPLeaderboard } from './tsp/useTSPLeaderboard';
 
 /**
@@ -34,7 +34,7 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
 
     // --- Sub-hooks ---
     const dailyChallenge = useTSPDailyChallenge(canvasSize);
-    const { leaderboard, isSubmitting, fetchLeaderboard, submitScore } = useTSPLeaderboard();
+    const { leaderboard, isSubmitting, fetchLeaderboard, checkSubmission, submitScore } = useTSPLeaderboard();
 
     // --- Sync daily challenge instance into game state ---
     useEffect(() => {
@@ -53,8 +53,18 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
             setHasSubmitted(false);
             // Fetch leaderboard for this date
             fetchLeaderboard(dailyChallenge.selectedDate);
+
+            // Check if user already submitted for this date
+            if (user) {
+                checkSubmission(user.uid, dailyChallenge.selectedDate).then(alreadySubmitted => {
+                    if (alreadySubmitted) {
+                        setHasSubmitted(true);
+                        setGameResult('You already submitted your score for this day!');
+                    }
+                });
+            }
         }
-    }, [dailyChallenge.instance, dailyChallenge.selectedDate, fetchLeaderboard]);
+    }, [dailyChallenge.instance, dailyChallenge.selectedDate, fetchLeaderboard, checkSubmission, user]);
 
     // --- Manual path building ---
 
@@ -85,7 +95,11 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
     const submitManualPath = useCallback(async () => {
         if (manualPath.length !== gameState.points.length || hasSubmitted) return;
 
-        const distance = calculateTotalDistance(gameState.points, manualPath);
+        let distance = calculateTotalDistance(gameState.points, manualPath);
+        
+        // Normalize distance to standard canvas size (800x500) for fair scoring
+        // This ensures mobile players don't get unfair advantages due to smaller canvas
+        distance = normalizeDistance(distance, canvasSize.width, canvasSize.height);
 
         setGameState(prev => ({
             ...prev,
@@ -107,7 +121,7 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
         } else {
             setGameResult(`Finished! Distance: ${Math.round(distance)}. Login to save your score!`);
         }
-    }, [manualPath, gameState.points, hasSubmitted, user, submitScore, dailyChallenge.isToday, dailyChallenge.selectedDate]);
+    }, [manualPath, gameState.points, hasSubmitted, user, submitScore, dailyChallenge.isToday, dailyChallenge.selectedDate, canvasSize]);
 
     // --- Clear path ---
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Button from "@/components/shared/Button";
+import Modal from "@/components/shared/Modal";
 import styles from "@/styles/components/games/tsp/TSPControls.module.css";
 import { Eye, RefreshCw, Gamepad2, Hammer } from "lucide-react";
 
@@ -22,7 +23,7 @@ interface TSPControlsProps {
     onSubmit: () => void;
     onReset: () => void;
     onGenerate: (pattern: string, count?: number) => void;
-    onShare: () => Promise<boolean>;
+    onShare: () => Promise<string | null>;
 }
 
 export default function TSPControls({
@@ -44,16 +45,25 @@ export default function TSPControls({
     onShare
 }: TSPControlsProps) {
 
-    const [copyFeedback, setCopyFeedback] = useState<string | null>(null);
+    const [shareUrl, setShareUrl] = useState<string | null>(null);
+    const [isSharing, setIsSharing] = useState(false);
+    const [copied, setCopied] = useState(false);
 
-    const handleShare = async () => {
-        const success = await onShare();
-        if (success) {
-            setCopyFeedback("Copied!");
-            setTimeout(() => setCopyFeedback(null), 2000);
-        } else {
-            setCopyFeedback("Failed");
-            setTimeout(() => setCopyFeedback(null), 2000);
+    const handleShareClick = async () => {
+        setIsSharing(true);
+        const url = await onShare();
+        if (url) {
+            setShareUrl(url);
+            setCopied(false);
+        }
+        setIsSharing(false);
+    };
+
+    const handleCopy = async () => {
+        if (shareUrl) {
+            await navigator.clipboard.writeText(shareUrl);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
         }
     };
 
@@ -136,7 +146,7 @@ export default function TSPControls({
                 <h3>START TRAINING!</h3>
 
                 <div className={styles.setting}>
-                    <span className={styles.statLabel} style={{ marginBottom: '5px' }}>CHOOSE A MODE</span>
+                    <span className={`${styles.statLabel} ${styles.sectionLabel}`}>CHOOSE A MODE</span>
                     <div className={styles.scenarioSelector}>
                         <select
                             className={styles.selectInput}
@@ -166,8 +176,8 @@ export default function TSPControls({
                     </div>
                 </div>
 
-                <div className={styles.setting} style={{ marginTop: '15px' }}>
-                    <span className={styles.statLabel} style={{ marginBottom: '5px' }}>GENERATE RANDOM INSTANCE</span>
+                <div className={`${styles.setting} ${styles.settingSpaced}`}>
+                    <span className={`${styles.statLabel} ${styles.sectionLabel}`}>GENERATE RANDOM INSTANCE</span>
                     <div className={styles.customGenRow}>
                         <input
                             type="number"
@@ -178,7 +188,7 @@ export default function TSPControls({
                             className={styles.numberInput}
                         />
                         <Button
-                            style={["secondary", "fullWidth"]}
+                            style={["secondary"]}
                             label="Go!"
                             onClick={() => onGenerate('random', customPointCount)}
                         />
@@ -190,8 +200,9 @@ export default function TSPControls({
                 <h3>SHARE CHALLENGE</h3>
                 <Button
                     style={["primary", "fullWidth"]}
-                    label={copyFeedback || "COPY LINK"}
-                    onClick={handleShare}
+                    label={isSharing ? "GENERATING..." : "SHARE INSTANCE"}
+                    onClick={handleShareClick}
+                    disabled={isSharing || pointsCount === 0}
                 />
             </div>
 
@@ -209,6 +220,20 @@ export default function TSPControls({
                     />
                 </div>
             )}
+            {/* Share Link Modal */}
+            <Modal
+                isOpen={!!shareUrl}
+                title="READY TO SHARE"
+                message="Send this link to challenge your friends to beat the AI on your custom map."
+                confirmLabel={copied ? "COPIED!" : "COPY LINK"}
+                cancelLabel="CLOSE"
+                onConfirm={handleCopy}
+                onCancel={() => setShareUrl(null)}
+            >
+                <div className={styles.shareUrlBox}>
+                    {shareUrl}
+                </div>
+            </Modal>
         </>
     );
 }

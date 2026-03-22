@@ -2,7 +2,7 @@ import type { AlgorithmType } from '@/types/games/pathfinding';
 import type { InteractionMode } from '@/hooks/games/usePathfinding';
 import Button from '@/components/shared/Button';
 import styles from '@/styles/pages/games/Pathfinding.module.css';
-import { Pencil, Eraser, Gamepad2 } from 'lucide-react';
+import { Pencil, Eraser, Gamepad2, Eye } from 'lucide-react';
 
 interface PathfindingControlsProps {
     algorithm: AlgorithmType;
@@ -33,9 +33,10 @@ const ALGORITHMS: { value: AlgorithmType; label: string }[] = [
 ];
 
 const modes = [
+    { key: 'visualize' as const, category: 'WATCH', categoryClass: 'categoryVisualize', icon: <Eye size={18} />, label: 'VISUALIZE', description: 'Watch algorithm' },
+    { key: 'manual' as const, category: 'PLAY', categoryClass: 'categoryPlay', icon: <Gamepad2 size={18} />, label: 'SOLVE MANUALLY', description: 'Draw path' },
     { key: 'wall' as const, category: 'BUILD', categoryClass: 'categoryBuild', icon: <Pencil size={18} />, label: 'DRAW WALLS', description: 'Click & drag' },
     { key: 'erase' as const, category: 'BUILD', categoryClass: 'categoryBuild', icon: <Eraser size={18} />, label: 'ERASE', description: 'Remove walls' },
-    { key: 'manual' as const, category: 'PLAY', categoryClass: 'categoryPlay', icon: <Gamepad2 size={18} />, label: 'SOLVE MANUALLY', description: 'Draw path' },
 ];
 
 export default function PathfindingControls({
@@ -83,7 +84,7 @@ export default function PathfindingControls({
             </div>
 
             {/* ── Algorithm (visualize mode) ───────────────── */}
-            {mode !== 'manual' && (
+            {mode === 'visualize' && (
                 <div className={styles.controlPanel}>
                     <h3>ALGORITHM</h3>
                     <div className={styles.actions}>
@@ -115,7 +116,7 @@ export default function PathfindingControls({
                         {isRunning ? (
                             <Button style={["danger", "fullWidth"]} label="STOP" onClick={onStop} />
                         ) : (
-                            <Button style={["primary", "fullWidth"]} label="VISUALIZE" onClick={onRun} disabled={isSolved} />
+                            <Button style={["primary", "fullWidth"]} label="VISUALIZE" onClick={onRun} />
                         )}
                     </div>
                 </div>
@@ -168,7 +169,7 @@ export default function PathfindingControls({
             <div className={styles.controlPanel}>
                 <h3>CLEAR</h3>
                 <div className={styles.actions}>
-                    <Button style={["danger", "fullWidth"]} label="CLEAR VISUALIZATION" onClick={onClearVisualization} disabled={isRunning} />
+                    <Button style={["danger", "fullWidth"]} label="CLEAR PATH" onClick={onClearVisualization} disabled={isRunning} />
                     <Button style={["danger", "fullWidth"]} label="CLEAR BOARD" onClick={onClearBoard} disabled={isRunning} />
                 </div>
             </div>

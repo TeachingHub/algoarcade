@@ -73,3 +73,25 @@
         }
     }
 }
+
+@media (max-width: 768px) {
+    .footer .content .sections {
+        flex-direction: column;
+        gap: var(--space-xl);
+        align-items: center;
+        text-align: center;
+    }
+    
+    .footer .section h3 {
+        font-size: var(--font-size-xs);
+    }
+    
+    .footer .section p,
+    .footer .footerLink {
+        font-size: 10px;
+    }
+    
+    .footer .bottom p {
+        font-size: 10px;
+    }
+}

@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import { type User, onAuthStateChanged } from "firebase/auth";
 import { auth, configError } from "../firebase/config";
 import type { UserProfileData } from "@/types/user/user";
-import { getUserDocument } from "../services/userService";
+import { createUserDocument, getUserDocument } from "../services/userService";
 import { getFromLocalStorage, saveToLocalStorage } from "@/utils/localStorageUtils";
 import { loginUser, registerUser, loginWithGoogle as loginWithGoogleService } from "@/services/authService";
 import ErrorFallback from "@/components/shared/ErrorFallback";
@@ -57,6 +57,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const loginWithGoogle = async () => {
         const user = await loginWithGoogleService();
+        if (!user) return;
+
         const userProfile = await getUserDocument(user);
         saveToLocalStorage<User>("user", user);
         saveToLocalStorage<UserProfileData | null>("userProfile", userProfile);
@@ -87,7 +89,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
                 if (currentUser) {
                     try {
-                        setUserProfile(await getUserDocument(currentUser));
+                        let profile = await getUserDocument(currentUser);
+
+                        // Redirect-based Google login may reach here before profile is created.
+                        if (!profile) {
+                            await createUserDocument(currentUser);
+                            profile = await getUserDocument(currentUser);
+                        }
+
+                        setUserProfile(profile);
                     } catch (e) {
                         console.error("Error fetching user profile:", e);
                     }

@@ -18,6 +18,9 @@ export const useTSPBuilder = () => {
         y: number,
         currentPoints: Point[]
     ): Point[] | null => {
+        // Check limit
+        if (currentPoints.length >= 50) return null;
+
         // Check if too close to an existing point
         const isTooClose = currentPoints.some(p => {
             const dist = Math.sqrt(Math.pow(p.x - x, 2) + Math.pow(p.y - y, 2));

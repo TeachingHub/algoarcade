@@ -6,7 +6,7 @@ import { ClipboardList, Zap, BarChart, Gamepad2 } from "lucide-react";
 import { useState } from "react";
 
 export default function Index() {
-    const [activeCard, setActiveCard] = useState<number | null>(null);
+    const [activeCard, setActiveCard] = useState<number | null>(0);
 
     const toggleCard = (index: number) => {
         setActiveCard(activeCard === index ? null : index);

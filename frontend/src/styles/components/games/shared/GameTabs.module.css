@@ -54,3 +54,51 @@
     background: var(--accent-1);
     color: var(--bg-dark);
 }
+
+@media (max-width: 768px) {
+    .tabContent {
+        flex-direction: column;
+        padding: var(--space-md);
+        gap: var(--space-sm);
+    }
+    
+    .gameName {
+        border-right: none;
+        padding-right: 0;
+        width: 100%;
+        text-align: center;
+        white-space: normal;
+        margin-bottom: var(--space-xs);
+        font-size: var(--font-size-sm);
+    }
+    
+    .tabGroup {
+        width: 100%;
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-auto-flow: column;
+        gap: 4px;
+        background: rgba(0, 0, 0, 0.4);
+        padding: 4px;
+        border-radius: 6px;
+    }
+    
+    .tabButton {
+        border: none;
+        padding: 8px 4px;
+        font-size: 8px;
+        border-radius: 4px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        white-space: normal;
+        text-align: center;
+    }
+    
+    .tabButtonActive {
+        background: var(--accent-1);
+        color: var(--bg-dark);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+}

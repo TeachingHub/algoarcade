@@ -1,0 +1,149 @@
+.container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: var(--space-xl);
+    min-height: calc(100vh - var(--navbar-height) - var(--footer-min-height));
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-xxl);
+    padding-bottom: var(--space-lg);
+    border-bottom: 2px solid var(--border);
+}
+
+.title {
+    font-size: var(--font-size-xxxl);
+    color: var(--primary);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.badge {
+    background-color: var(--destructive);
+    color: var(--destructive-foreground);
+    padding: var(--space-xs) var(--space-sm);
+    font-size: var(--font-size-xs);
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+/* ── Tabs ── */
+.tabs {
+    display: flex;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xxl);
+    overflow-x: auto;
+    padding-bottom: var(--space-xs);
+}
+
+.tab {
+    padding: var(--space-sm) var(--space-xl);
+    background-color: transparent;
+    border: 2px solid var(--border);
+    color: var(--muted-foreground);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    font-family: inherit;
+    white-space: nowrap;
+}
+
+.tab:hover {
+    border-color: var(--secondary);
+    color: var(--secondary);
+}
+
+.activeTab {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: var(--primary-foreground);
+    font-weight: bold;
+}
+
+/* ── Tab Content Container ── */
+.fixedContentWrapper {
+    width: 100%;
+    min-height: 500px;
+}
+
+.content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+    width: 100%;
+}
+
+/* ── Table Styles for all tabs ── */
+.tableWrapper {
+    width: 100%;
+    overflow-x: auto;
+    background-color: var(--card);
+    border: 4px solid var(--border);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+.table th,
+.table td {
+    padding: var(--space-md) var(--space-lg);
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-size: var(--font-size-xs);
+}
+
+.table th {
+    background-color: var(--muted);
+    color: var(--muted-foreground);
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.table tr:last-child td {
+    border-bottom: none;
+}
+
+.table tr:hover td {
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+.actions {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: center;
+}
+
+.avatarColumn {
+    width: 50px;
+}
+
+.emptyState {
+    padding: var(--space-xxxl) var(--space-xl);
+    text-align: center;
+    color: var(--muted-foreground);
+    font-size: var(--font-size-sm);
+}
+
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-md);
+}
+
+.sectionTitle {
+    font-size: var(--font-size-xl);
+    color: var(--secondary);
+    margin: 0;
+}

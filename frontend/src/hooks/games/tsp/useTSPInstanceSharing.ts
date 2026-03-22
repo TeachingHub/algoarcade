@@ -89,8 +89,8 @@ export const useTSPInstanceSharing = (
     }, [canvasSize.width, canvasSize.height, hasInitialized]);
 
     // Share current instance
-    const shareInstance = useCallback(async (points: Point[], authorName: string): Promise<boolean> => {
-        if (points.length === 0) return false;
+    const shareInstance = useCallback(async (points: Point[], authorName: string): Promise<string | null> => {
+        if (points.length === 0) return null;
 
         try {
             const id = await saveGameInstance({
@@ -103,13 +103,10 @@ export const useTSPInstanceSharing = (
                 return prev;
             });
 
-            const url = `${window.location.origin}${window.location.pathname}?instance=${id}`;
-            await navigator.clipboard.writeText(url);
-
-            return true;
+            return `${window.location.origin}${window.location.pathname}?instance=${id}`;
         } catch (e) {
             console.error("Error sharing:", e);
-            return false;
+            return null;
         }
     }, [setSearchParams]);
 

@@ -13,13 +13,14 @@
     grid-template-columns: 1fr 300px;
     gap: var(--space-lg);
     flex-grow: 1;
+    align-items: start;
 }
 
 .sidebar {
     display: flex;
     flex-direction: column;
     gap: var(--space-md);
-    overflow-y: auto;
+    min-width: 0;
 }
 
 /* Context Block Styling - kept as it's part of GameLayout structure */
@@ -52,6 +53,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-lg);
+    min-width: 0;
 }
 
 @media (max-width: 1024px) {
@@ -63,5 +65,19 @@
         flex-direction: row;
         flex-wrap: wrap;
         gap: var(--space-md);
+    }
+}
+
+@media (max-width: 768px) {
+    .gameContainer {
+        padding: var(--space-sm);
+        gap: var(--space-md);
+    }
+    .sidebar {
+        flex-direction: column;
+        flex-wrap: nowrap;
+    }
+    .contextTitle {
+        font-size: var(--font-size-xs);
     }
 }
