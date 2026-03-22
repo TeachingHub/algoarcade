@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword, EmailAuthProvider, GoogleAuthProvider, reauthenticateWithCredential, reauthenticateWithPopup, signInWithEmailAndPassword, signInWithPopup, signOut, updateProfile, type User } from "firebase/auth";
+import { createUserWithEmailAndPassword, EmailAuthProvider, GoogleAuthProvider, reauthenticateWithCredential, reauthenticateWithPopup, signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, signOut, updateProfile, type User } from "firebase/auth";
 import { auth } from "@/firebase/config";
 import { createUserDocument, deleteUserDocument, getUserDocument, updateUserDocument } from "./userService";
 
@@ -8,18 +8,30 @@ export const loginUser = async (email: string, password: string) => {
 
 export const loginWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
+    provider.setCustomParameters({ prompt: "select_account" });
 
-    // Check if user document exists in Firestore
-    const userDoc = await getUserDocument(user);
+    try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
 
-    // If not, create it
-    if (!userDoc) {
-        await createUserDocument(user);
+        // Check if user document exists in Firestore
+        const userDoc = await getUserDocument(user);
+
+        // If not, create it
+        if (!userDoc) {
+            await createUserDocument(user);
+        }
+
+        return user;
+    } catch (error: any) {
+        // Safari/iOS and strict browser settings may block popups.
+        if (error?.code === "auth/popup-blocked") {
+            await signInWithRedirect(auth, provider);
+            return null;
+        }
+
+        throw error;
     }
-
-    return user;
 };
 
 export const logoutUser = async () => {
