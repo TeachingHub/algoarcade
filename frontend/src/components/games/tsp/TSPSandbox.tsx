@@ -117,7 +117,7 @@ export default function TSPSandbox() {
                 {algorithm === 'builder' && !gameResult && (
                     <div className={styles.instructionOverlay}>
                         <div>Click canvas to add points: {gameState.points.length}</div>
-                        <div style={{ fontSize: '0.8em', marginTop: '4px', opacity: 0.8 }}>
+                        <div className={styles.builderHintNote}>
                             Create between 5 and 50 points, or your instance will be reset.
                         </div>
                     </div>

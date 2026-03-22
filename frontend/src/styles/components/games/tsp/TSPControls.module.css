@@ -4,6 +4,8 @@
     padding: var(--space-md);
     border-radius: var(--radius-sm);
     margin-bottom: var(--space-md);
+    min-width: 0;
+    overflow-x: hidden;
 }
 
 .controlPanel h3 {
@@ -17,6 +19,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-sm);
+    min-width: 0;
 }
 
 .setting {
@@ -30,7 +33,7 @@
 
 .modeGrid2x2 {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-sm);
 }
 
@@ -45,7 +48,10 @@
 .modeIconLabel {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 4px;
+    width: 100%;
+    min-width: 0;
 }
 
 .modeButton {
@@ -61,6 +67,9 @@
     cursor: pointer;
     transition: all 0.2s;
     font-family: inherit;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
 }
 
 .modeButton:hover:not(:disabled) {
@@ -83,11 +92,18 @@
     font-size: 11px;
     font-weight: bold;
     letter-spacing: 1px;
+    text-align: center;
+    line-height: 1.2;
+    white-space: normal;
+    overflow-wrap: anywhere;
 }
 
 .modeDescription {
     font-size: 9px;
     opacity: 0.7;
+    text-align: center;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
 }
 
 /* ─── Category colors ─────────────────────────────────────── */
@@ -159,7 +175,8 @@
 .customGenRow {
     display: flex;
     gap: var(--space-sm);
-    align-items: center;
+    align-items: stretch;
+    min-width: 0;
 }
 
 .slider {
@@ -173,4 +190,24 @@
     font-size: 10px;
     color: var(--muted-foreground);
     font-weight: bold;
+}
+
+.sectionLabel {
+    margin-bottom: 5px;
+}
+
+.settingSpaced {
+    margin-top: 15px;
+}
+
+.shareUrlBox {
+    padding: var(--space-md);
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    word-break: break-all;
+    font-family: monospace;
+    color: var(--primary);
+    margin-top: var(--space-md);
+    user-select: all;
 }

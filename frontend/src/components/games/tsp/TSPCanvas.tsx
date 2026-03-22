@@ -74,9 +74,8 @@ export default function TSPCanvas({
         }
 
         // 4. Draw Points
-        points.forEach((point, index) => {
+        points.forEach((point) => {
             const isInManualPath = manualPath.includes(point.id);
-            const manualIndex = manualPath.indexOf(point.id);
 
             // Point fill
             ctx.fillStyle = isInManualPath ? manualPathColor : pathColor;
@@ -89,17 +88,7 @@ export default function TSPCanvas({
             ctx.lineWidth = 2;
             ctx.stroke();
 
-            // Number Label
-            ctx.fillStyle = numberColor;
-            ctx.font = 'bold 10px "Press Start 2P"';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-
-            if (algorithm === 'manual' && isInManualPath) {
-                ctx.fillText((manualIndex + 1).toString(), point.x, point.y);
-            } else {
-                ctx.fillText(index.toString(), point.x, point.y);
-            }
+            // No number labels in points
         });
     };
 

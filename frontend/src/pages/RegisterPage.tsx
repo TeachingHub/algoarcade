@@ -100,6 +100,9 @@ export default function RegisterPage() {
                         onChange={(e) => setPassword(e.target.value)}
                         required
                     />
+                    <p className={styles.passwordHint}>
+                        Must contain at least 6 characters, one uppercase, one lowercase, one number and one special character.
+                    </p>
                 </div>
 
                 <Button style={["primary"]} label="CREATE ACCOUNT" type="submit" />

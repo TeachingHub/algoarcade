@@ -63,7 +63,7 @@ export default function BlogPostPage() {
             <div className={styles.container}>
                 <button className={styles.backLink} onClick={() => navigate("/blog")}>
                     <ArrowLeft size={14} />
-                    {'<'} BACK TO BLOG
+                    BACK TO BLOG
                 </button>
 
                 {post.coverImage && (

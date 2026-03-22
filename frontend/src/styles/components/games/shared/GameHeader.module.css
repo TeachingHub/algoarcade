@@ -36,6 +36,15 @@
     color: var(--primary);
 }
 
+.breadcrumbCurrent {
+    color: var(--primary);
+    cursor: default;
+}
+
+.breadcrumbCurrent:hover {
+    color: var(--primary);
+}
+
 .breadcrumbSeparator {
     color: var(--muted-foreground);
     opacity: 0.5;

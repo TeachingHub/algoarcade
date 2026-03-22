@@ -146,7 +146,7 @@ export default function TSPControls({
                 <h3>START TRAINING!</h3>
 
                 <div className={styles.setting}>
-                    <span className={styles.statLabel} style={{ marginBottom: '5px' }}>CHOOSE A MODE</span>
+                    <span className={`${styles.statLabel} ${styles.sectionLabel}`}>CHOOSE A MODE</span>
                     <div className={styles.scenarioSelector}>
                         <select
                             className={styles.selectInput}
@@ -176,8 +176,8 @@ export default function TSPControls({
                     </div>
                 </div>
 
-                <div className={styles.setting} style={{ marginTop: '15px' }}>
-                    <span className={styles.statLabel} style={{ marginBottom: '5px' }}>GENERATE RANDOM INSTANCE</span>
+                <div className={`${styles.setting} ${styles.settingSpaced}`}>
+                    <span className={`${styles.statLabel} ${styles.sectionLabel}`}>GENERATE RANDOM INSTANCE</span>
                     <div className={styles.customGenRow}>
                         <input
                             type="number"
@@ -188,7 +188,7 @@ export default function TSPControls({
                             className={styles.numberInput}
                         />
                         <Button
-                            style={["secondary", "fullWidth"]}
+                            style={["secondary"]}
                             label="Go!"
                             onClick={() => onGenerate('random', customPointCount)}
                         />
@@ -230,17 +230,7 @@ export default function TSPControls({
                 onConfirm={handleCopy}
                 onCancel={() => setShareUrl(null)}
             >
-                <div style={{ 
-                    padding: 'var(--space-md)', 
-                    background: 'var(--background)', 
-                    border: '1px solid var(--border)', 
-                    borderRadius: '4px', 
-                    wordBreak: 'break-all', 
-                    fontFamily: 'monospace', 
-                    color: 'var(--primary)',
-                    marginTop: 'var(--space-md)',
-                    userSelect: 'all'
-                }}>
+                <div className={styles.shareUrlBox}>
                     {shareUrl}
                 </div>
             </Modal>

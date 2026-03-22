@@ -30,6 +30,12 @@
     opacity: 0.2;
 }
 
+.builderHintNote {
+    font-size: 0.8em;
+    margin-top: 4px;
+    opacity: 0.8;
+}
+
 .resultOverlay {
     position: absolute;
     bottom: 0;
@@ -45,7 +51,7 @@
 }
 
 .canvasArea:hover .resultOverlay {
-    opacity: 0.1;
+    opacity: 0.25;
     pointer-events: none;
 }
 

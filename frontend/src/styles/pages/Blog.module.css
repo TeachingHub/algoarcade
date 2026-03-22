@@ -2,7 +2,7 @@
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    padding: var(--space-xl);
+    padding: var(--space-sm) var(--space-xl) var(--space-xl);
     min-height: calc(100vh - var(--navbar-height) - var(--footer-min-height));
 }
 

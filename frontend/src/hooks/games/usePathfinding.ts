@@ -11,7 +11,7 @@ import {
 } from '@/utils/pathfinding';
 import { getAlgorithm, ALGORITHM_LABELS } from '@/utils/pathfinding/algorithms';
 
-export type InteractionMode = 'wall' | 'erase' | 'manual';
+export type InteractionMode = 'wall' | 'erase' | 'manual' | 'visualize';
 
 export interface PathfindingResult {
     won: boolean;
@@ -113,6 +113,7 @@ export function usePathfinding() {
         }
 
         // ── Wall / Erase mode ──
+        if (mode === 'visualize') return;
         setState(prev => {
             const newGrid = prev.grid.map(r => r.map(c => ({ ...c })));
             if (mode === 'wall') {
@@ -163,6 +164,7 @@ export function usePathfinding() {
         }
 
         // ── Wall / Erase drag ──
+        if (mode === 'visualize') return;
         const cell = state.grid[row][col];
         if (cell.type === 'start' || cell.type === 'end') return;
 
