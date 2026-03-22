@@ -99,3 +99,29 @@
     width: 100%;
     max-width: 900px;
 }
+
+@media (max-width: 768px) {
+    .container {
+        padding: 100px var(--space-md) var(--space-xl) var(--space-md);
+    }
+    .title {
+        font-size: var(--font-size-xxxl);
+    }
+    .subtitle {
+        font-size: var(--font-size-md);
+        line-height: 1.4;
+    }
+    .heroText {
+        font-size: var(--font-size-sm);
+    }
+    .ctaButtons {
+        flex-direction: column;
+        width: 100%;
+        max-width: 300px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .sectionTitle {
+        font-size: var(--font-size-lg);
+    }
+}

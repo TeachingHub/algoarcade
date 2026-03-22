@@ -18,7 +18,16 @@ function formatTime(timestamp: unknown): string {
 }
 
 export default function TSPCompetitive() {
-    const [canvasSize, setCanvasSize] = useState({ width: 800, height: 500 });
+    const [canvasSize, setCanvasSize] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const w = window.innerWidth;
+            return {
+                width: w < 768 ? Math.max(w - 40, 300) : 800,
+                height: w < 768 ? 300 : 500
+            };
+        }
+        return { width: 800, height: 500 };
+    });
     const canvasAreaRef = useRef<HTMLDivElement>(null);
 
     const { user } = useAuth();

@@ -1,11 +1,14 @@
+import { useState } from "react";
 import styles from "@/styles/components/shared/Header.module.css";
 import Button from "./Button";
 import Avatar from "./Avatar";
 import { useAuth } from "@/context/AuthContext";
 import { Link } from "react-router";
+import { Menu, X } from "lucide-react";
 
 export default function Header() {
     const { user, userProfile } = useAuth();
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     return (
         <header className={styles.header}>
@@ -13,7 +16,15 @@ export default function Header() {
                 <Link to="/" className={styles.logo}>
                     <h1>ALGOARCADE</h1>
                 </Link>
-                <div className={styles.navigation}>
+                
+                <button 
+                    className={styles.menuButton} 
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                >
+                    {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+                </button>
+
+                <div className={`${styles.navigation} ${isMenuOpen ? styles.navigationOpen : ''}`}>
                     <div className={styles.navLinks}>
                         {userProfile?.role === "ADMIN" && (
                             <Button style={["link"]} label="ADMIN" to="/admin" />

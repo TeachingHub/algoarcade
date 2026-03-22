@@ -211,3 +211,13 @@
     margin-top: var(--space-md);
     user-select: all;
 }
+
+@media (max-width: 768px) {
+    .customGenRow {
+        flex-wrap: wrap;
+    }
+    
+    .numberInput {
+        flex: 1;
+    }
+}

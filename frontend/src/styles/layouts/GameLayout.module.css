@@ -67,3 +67,17 @@
         gap: var(--space-md);
     }
 }
+
+@media (max-width: 768px) {
+    .gameContainer {
+        padding: var(--space-sm);
+        gap: var(--space-md);
+    }
+    .sidebar {
+        flex-direction: column;
+        flex-wrap: nowrap;
+    }
+    .contextTitle {
+        font-size: var(--font-size-xs);
+    }
+}

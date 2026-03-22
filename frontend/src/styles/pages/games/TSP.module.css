@@ -323,3 +323,13 @@
     font-size: var(--font-size-sm);
     padding: var(--space-xl);
 }
+
+@media (max-width: 768px) {
+    .canvasArea {
+        min-height: 300px;
+        touch-action: none;
+    }
+    .resultOverlay {
+        padding: var(--space-sm);
+    }
+}

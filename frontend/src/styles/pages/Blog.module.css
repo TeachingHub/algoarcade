@@ -86,3 +86,18 @@
     max-width: 400px;
     line-height: 1.8;
 }
+
+@media (max-width: 768px) {
+    .container {
+        padding: var(--space-sm) var(--space-md) var(--space-xl);
+    }
+    .title {
+        font-size: 1.8rem;
+    }
+    .subtitle {
+        font-size: var(--font-size-md);
+    }
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}

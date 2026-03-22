@@ -278,3 +278,20 @@
 .canvasArea:hover .instructionOverlay {
     opacity: 0.2;
 }
+
+@media (max-width: 768px) {
+    .canvasArea {
+        min-height: 300px;
+        touch-action: none;
+    }
+
+    .resultScores {
+        flex-direction: column;
+        gap: var(--space-xs);
+    }
+    
+    .instructionOverlay {
+        text-align: center;
+        width: 90%;
+    }
+}

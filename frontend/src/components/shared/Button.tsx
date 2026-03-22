@@ -1,4 +1,5 @@
 import styles from "@styles/components/shared/Button.module.css";
+import { Link } from "react-router";
 
 type ButtonStyle = "primary" | "secondary" | "tertiary" | "link" | "danger" | "fullWidth";
 
@@ -35,15 +36,15 @@ export default function Button({
 
     if (to) {
         return (
-            <a
-                href={to}
+            <Link
+                to={to}
                 target={target === "blank" ? "_blank" : "_self"}
                 rel={rel}
                 className={classNames}
                 aria-label={ariaLabel}
             >
                 {label || children}
-            </a>
+            </Link>
         );
     }
 
