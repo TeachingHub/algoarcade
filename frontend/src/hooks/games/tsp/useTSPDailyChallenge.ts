@@ -60,6 +60,24 @@ const scaleToCanvas = (instance: TSPInstance, width: number, height: number): TS
     };
 };
 
+/** Standard canvas dimensions used for fair scoring */
+export const STANDARD_CANVAS = { width: 800, height: 500 } as const;
+
+/**
+ * Normalizes a distance to the standard canvas size.
+ * This ensures fair scoring regardless of the actual canvas size (desktop vs mobile).
+ * Formula: distance * (diagonalStandard / diagonalActual)
+ */
+export const normalizeDistance = (
+    distance: number,
+    actualWidth: number,
+    actualHeight: number
+): number => {
+    const standardDiagonal = Math.sqrt(STANDARD_CANVAS.width ** 2 + STANDARD_CANVAS.height ** 2);
+    const actualDiagonal = Math.sqrt(actualWidth ** 2 + actualHeight ** 2);
+    return distance * (standardDiagonal / actualDiagonal);
+};
+
 export const useTSPDailyChallenge = (canvasSize: { width: number; height: number }) => {
     const [selectedDate, setSelectedDate] = useState(getTodayDateString());
     const [instance, setInstance] = useState<TSPInstance | null>(null);
