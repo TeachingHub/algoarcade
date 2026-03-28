@@ -103,6 +103,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     }
                 } else {
                     setUserProfile(null);
+                    localStorage.removeItem("user");
+                    localStorage.removeItem("userProfile");
                 }
 
                 setLoading(false);

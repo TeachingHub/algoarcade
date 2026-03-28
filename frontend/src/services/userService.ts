@@ -82,16 +82,21 @@ export async function getGlobalLeaderboard(topN: number = 20): Promise<GlobalLea
         snapshot.forEach((docSnap) => {
             const data = docSnap.data() as UserProfileData;
             const medals = data.tspMedals;
-            if (!medals || (medals.gold + medals.silver + medals.bronze === 0)) return;
+            if (!medals) return;
+
+            const gold = medals.gold ?? 0;
+            const silver = medals.silver ?? 0;
+            const bronze = medals.bronze ?? 0;
+            if (gold + silver + bronze === 0) return;
 
             entries.push({
                 uid: docSnap.id,
                 username: data.username || "Anonymous",
                 profilePic: data.profilePic || "",
-                gold: medals.gold,
-                silver: medals.silver,
-                bronze: medals.bronze,
-                totalMedals: medals.gold + medals.silver + medals.bronze,
+                gold,
+                silver,
+                bronze,
+                totalMedals: gold + silver + bronze,
             });
         });
 

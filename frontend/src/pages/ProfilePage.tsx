@@ -101,7 +101,13 @@ export default function ProfilePage() {
                     <div className={styles.infoItem}>
                         <span className={styles.label}>MEMBER SINCE:</span>
                         <span className={styles.value}>
-                            {userProfile?.createdAt?.toDate().toLocaleDateString()}
+                            {(() => {
+                                const d = userProfile?.createdAt;
+                                if (!d) return "Unknown";
+                                if (typeof d.toDate === "function") return d.toDate().toLocaleDateString();
+                                if (d.seconds) return new Date(d.seconds * 1000).toLocaleDateString();
+                                return new Date(d).toLocaleDateString();
+                            })()}
                         </span>
                     </div>
                 </div>
