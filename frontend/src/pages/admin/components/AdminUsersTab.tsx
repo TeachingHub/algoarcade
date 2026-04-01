@@ -93,17 +93,17 @@ export default function AdminUsersTab() {
                                 <td className={styles.avatarColumn}>
                                     <Avatar src={user.profilePic} fallback={user.username || "?"} size="small" />
                                 </td>
-                                <td>
+                                <td data-label="User">
                                     <strong>{user.username}</strong>
                                 </td>
-                                <td>{user.email}</td>
-                                <td>
+                                <td data-label="Email">{user.email}</td>
+                                <td data-label="Role">
                                     <Badge 
                                         label={user.role} 
                                         style={[user.role === "ADMIN" ? "danger" : "secondary"]} 
                                     />
                                 </td>
-                                <td>
+                                <td data-label="">
                                     <div className={styles.actions}>
                                         <Button 
                                             style={["primary"]}

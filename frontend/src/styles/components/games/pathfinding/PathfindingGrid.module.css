@@ -57,8 +57,8 @@
 }
 
 .wall {
-    background: var(--secondary) !important;
-    border-color: color-mix(in srgb, var(--secondary) 80%, white 20%) !important;
+    background: var(--pathfinding-wall) !important;
+    border-color: var(--pathfinding-wall-light) !important;
 }
 
 .visited {

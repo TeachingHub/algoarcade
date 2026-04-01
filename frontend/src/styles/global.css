@@ -77,6 +77,8 @@
   /* Pathfinding-specific */
   --pathfinding-visited: #a855f7;
   --pathfinding-visited-alt: #6a4cdb;
+  --pathfinding-wall: #5c6b7a;
+  --pathfinding-wall-light: #7a8a9a;
   
   /* Pixel-perfect corners */
   --radius: 0rem;

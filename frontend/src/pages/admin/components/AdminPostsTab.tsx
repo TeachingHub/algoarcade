@@ -130,22 +130,22 @@ export default function AdminPostsTab() {
                         ) : (
                             posts.map((post) => (
                                 <tr key={post.id}>
-                                    <td>
+                                    <td data-label="Title">
                                         <strong>{post.title}</strong>
                                     </td>
-                                    <td>
+                                    <td data-label="Slug">
                                         <span style={{ opacity: 0.6 }}>/blog/{post.slug}</span>
                                     </td>
-                                    <td>
+                                    <td data-label="Date">
                                         {post.createdAt?.toDate ? post.createdAt.toDate().toLocaleDateString() : 'N/A'}
                                     </td>
-                                    <td>
+                                    <td data-label="Status">
                                         <Badge 
                                             label={post.published ? "PUBLISHED" : "DRAFT"} 
                                             style={[post.published ? "primary" : "secondary"]} 
                                         />
                                     </td>
-                                    <td>
+                                    <td data-label="">
                                         <div className={styles.actions}>
                                             <Button 
                                                 style={[post.published ? "secondary" : "primary"]}

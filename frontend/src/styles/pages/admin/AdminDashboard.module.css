@@ -114,14 +114,19 @@
     border-bottom: none;
 }
 
-.table tr:hover td {
-    background-color: rgba(255, 255, 255, 0.03);
+.table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.table tbody tr:hover td {
+    background-color: rgba(253, 213, 5, 0.03);
 }
 
 .actions {
     display: flex;
     gap: var(--space-sm);
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .avatarColumn {
@@ -140,10 +145,163 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: var(--space-md);
+    flex-wrap: wrap;
+    gap: var(--space-sm);
 }
 
 .sectionTitle {
     font-size: var(--font-size-xl);
     color: var(--secondary);
     margin: 0;
+}
+
+/* ============================================ */
+/* ── RESPONSIVE: Tablet ────────────────────── */
+/* ============================================ */
+@media (max-width: 1024px) {
+    .container {
+        padding: var(--space-lg);
+    }
+
+    .title {
+        font-size: var(--font-size-xxl);
+    }
+}
+
+/* ============================================ */
+/* ── RESPONSIVE: Mobile ────────────────────── */
+/* ============================================ */
+@media (max-width: 768px) {
+    .container {
+        padding: var(--space-md);
+    }
+
+    /* ── Compact header ── */
+    .header {
+        flex-direction: column;
+        gap: var(--space-sm);
+        align-items: flex-start;
+        margin-bottom: var(--space-lg);
+        padding-bottom: var(--space-md);
+    }
+
+    .title {
+        font-size: var(--font-size-md);
+    }
+
+    .badge {
+        font-size: var(--font-size-xxs);
+        padding: 2px var(--space-xs);
+    }
+
+    /* ── Tabs: full width ── */
+    .tabs {
+        gap: var(--space-xs);
+        margin-bottom: var(--space-lg);
+    }
+
+    .tab {
+        font-size: var(--font-size-xxs);
+        padding: var(--space-sm) var(--space-md);
+        flex: 1;
+        text-align: center;
+    }
+
+    /* ── Reduce min-height ── */
+    .fixedContentWrapper {
+        min-height: auto;
+    }
+
+    /* ── Section header: stack ── */
+    .sectionHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-sm);
+    }
+
+    .sectionTitle {
+        font-size: var(--font-size-sm);
+    }
+
+    /* ──────────────────────────────────────── */
+    /* Transform table → mobile card stack     */
+    /* ──────────────────────────────────────── */
+    .tableWrapper {
+        border: none;
+        background: transparent;
+        overflow-x: visible;
+    }
+
+    .table {
+        min-width: 0;
+        display: block;
+    }
+
+    .table thead {
+        display: none;
+    }
+
+    .table tbody {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-md);
+    }
+
+    .table tbody tr {
+        display: grid;
+        grid-template-columns: 1fr;
+        background-color: var(--card);
+        border: 2px solid var(--border);
+        padding: var(--space-lg);
+        gap: var(--space-sm);
+        transition: border-color 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+        border-color: var(--primary);
+    }
+
+    .table tbody tr:hover td {
+        background-color: transparent;
+    }
+
+    .table tbody tr td {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        padding: 0;
+        border-bottom: none;
+        font-size: var(--font-size-xxs);
+        min-width: 0;
+        word-break: break-word;
+    }
+
+    /* 
+     * Labels via data-label attribute:
+     * <td data-label="Email">user@example.com</td>
+     */
+    .table tbody tr td[data-label]:not([data-label=""])::before {
+        content: attr(data-label) ": ";
+        color: var(--muted-foreground);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        flex-shrink: 0;
+        min-width: 60px;
+        font-size: 8px;
+    }
+
+    .avatarColumn {
+        width: auto;
+        justify-content: center;
+    }
+
+    /* ── Stack action buttons vertically ── */
+    .actions {
+        flex-direction: column;
+        width: 100%;
+        gap: var(--space-xs);
+        margin-top: var(--space-sm);
+        padding-top: var(--space-sm);
+        border-top: 1px solid var(--border);
+    }
 }
