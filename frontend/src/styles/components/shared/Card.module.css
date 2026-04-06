@@ -104,6 +104,7 @@
     transform: translateY(-10px);
     transition: padding 0.4s ease, opacity 0.4s ease, transform 0.4s ease;
     border-top: 1px solid transparent;
+    text-align: left;
 }
 
 .card.expanded .content {

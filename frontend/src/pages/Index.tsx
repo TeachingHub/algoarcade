@@ -19,7 +19,7 @@ export default function Index() {
                     <h1 className={styles.title}>ALGOARCADE</h1>
                     <h2 className={styles.subtitle}>{'>'} LEARN ALGORITHMS PLAYING_</h2>
                     <p className={styles.heroText}>
-                        Master the most important computer science algorithms through interactive retro games. Fun + Learning = Victory.
+                        Master the most important computer science algorithms through interactive retro games. <br/> Fun + Learning = Victory.
                     </p>
                     <div className={styles.ctaButtons}>
                         <Button style={["primary"]} label="PLAY NOW" to="/games" />

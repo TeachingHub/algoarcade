@@ -122,11 +122,11 @@
 /* ── Article Body (Markdown Content) ── */
 /* Keep Press Start 2P but make it readable with generous spacing */
 .articleBody {
-    line-height: 2.4;
+    line-height: 1.8;
     color: var(--muted-foreground);
     font-size: var(--font-size-xs);
-    letter-spacing: 0.5px;
-    word-spacing: 2px;
+    letter-spacing: 0.3px;
+    word-spacing: 1px;
 }
 
 .articleBody h1 {
@@ -153,12 +153,12 @@
 }
 
 .articleBody p {
-    margin: 0 0 var(--space-xxl) 0;
+    margin: 0 0 var(--space-lg) 0;
     color: var(--muted-foreground);
     font-size: var(--font-size-xs);
-    line-height: 2.4;
-    letter-spacing: 0.5px;
-    word-spacing: 2px;
+    line-height: 1.8;
+    letter-spacing: 0.3px;
+    word-spacing: 1px;
 }
 
 .articleBody strong {
@@ -178,12 +178,12 @@
 }
 
 .articleBody li {
-    margin-bottom: var(--space-lg);
-    line-height: 2.4;
+    margin-bottom: var(--space-md);
+    line-height: 1.8;
     color: var(--muted-foreground);
     font-size: var(--font-size-xs);
-    letter-spacing: 0.5px;
-    word-spacing: 2px;
+    letter-spacing: 0.2px;
+    word-spacing: 1px;
 }
 
 .articleBody li::marker {
@@ -302,13 +302,13 @@
     }
     .articleBody {
         font-size: var(--font-size-xxs);
-        line-height: 2.6;
-        letter-spacing: 0.3px;
+        line-height: 2.0;
+        letter-spacing: 0.2px;
     }
     .articleBody p,
     .articleBody li {
         font-size: var(--font-size-xxs);
-        line-height: 2.6;
+        line-height: 2.0;
     }
     .articleBody h1 {
         font-size: var(--font-size-sm);

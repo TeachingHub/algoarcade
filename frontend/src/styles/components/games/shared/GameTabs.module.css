@@ -52,8 +52,9 @@
 
 .tabButtonActive {
     background: var(--accent-1);
-    color: var(--bg-dark);
-}
+    color: var(--primary);
+    border-bottom: 3px solid var(--primary);
+    }
 
 @media (max-width: 768px) {
     .tabContent {
@@ -99,6 +100,6 @@
     .tabButtonActive {
         background: var(--accent-1);
         color: var(--bg-dark);
-        box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        border-bottom: 2px solid var(--primary);
     }
 }
