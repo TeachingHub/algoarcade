@@ -1,12 +1,17 @@
+/* ============================================ */
+/* ── Admin Dashboard — Base (Desktop) ──────── */
+/* ============================================ */
+
 .container {
     max-width: var(--max-width);
     margin: 0 auto;
-    padding: var(--space-xl);
+    padding: var(--space-xl) var(--space-xl) var(--space-xxxl);
     min-height: calc(100vh - var(--navbar-height) - var(--footer-min-height));
     display: flex;
     flex-direction: column;
 }
 
+/* ── Page Header ── */
 .header {
     display: flex;
     align-items: center;
@@ -21,6 +26,7 @@
     color: var(--primary);
     margin: 0;
     line-height: 1.2;
+    text-shadow: 0 0 20px rgba(253, 213, 5, 0.15);
 }
 
 .badge {
@@ -30,21 +36,22 @@
     font-size: var(--font-size-xs);
     font-weight: bold;
     letter-spacing: 2px;
+    flex-shrink: 0;
 }
 
 /* ── Tabs ── */
 .tabs {
     display: flex;
-    gap: var(--space-md);
+    gap: 0;
     margin-bottom: var(--space-xxl);
-    overflow-x: auto;
-    padding-bottom: var(--space-xs);
+    border-bottom: 2px solid var(--border);
 }
 
 .tab {
-    padding: var(--space-sm) var(--space-xl);
+    padding: var(--space-md) var(--space-xxl);
     background-color: transparent;
-    border: 2px solid var(--border);
+    border: none;
+    border-bottom: 3px solid transparent;
     color: var(--muted-foreground);
     font-size: var(--font-size-sm);
     cursor: pointer;
@@ -52,18 +59,19 @@
     text-transform: uppercase;
     font-family: inherit;
     white-space: nowrap;
+    margin-bottom: -2px;
 }
 
 .tab:hover {
-    border-color: var(--secondary);
-    color: var(--secondary);
+    color: var(--foreground);
+    border-bottom-color: var(--muted-foreground);
 }
 
 .activeTab {
-    background-color: var(--primary);
-    border-color: var(--primary);
-    color: var(--primary-foreground);
+    color: var(--primary);
+    border-bottom-color: var(--primary);
     font-weight: bold;
+    text-shadow: 0 0 12px rgba(253, 213, 5, 0.25);
 }
 
 /* ── Tab Content Container ── */
@@ -80,18 +88,34 @@
     width: 100%;
 }
 
-/* ── Table Styles for all tabs ── */
+/* ── Section Header (per-tab) ── */
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+}
+
+.sectionTitle {
+    font-size: var(--font-size-xl);
+    color: var(--secondary);
+    margin: 0;
+}
+
+/* ── Table ── */
 .tableWrapper {
     width: 100%;
     overflow-x: auto;
     background-color: var(--card);
-    border: 4px solid var(--border);
+    border: 2px solid var(--border);
+    -webkit-overflow-scrolling: touch;
 }
 
 .table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 800px;
+    min-width: 850px;
 }
 
 .table th,
@@ -100,6 +124,7 @@
     text-align: left;
     border-bottom: 1px solid var(--border);
     font-size: var(--font-size-xs);
+    vertical-align: middle;
 }
 
 .table th {
@@ -108,6 +133,8 @@
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 1px;
+    font-size: var(--font-size-xxs);
+    padding: var(--space-sm) var(--space-lg);
 }
 
 .table tr:last-child td {
@@ -118,19 +145,25 @@
     transition: background-color 0.15s ease;
 }
 
-.table tbody tr:hover td {
-    background-color: rgba(253, 213, 5, 0.03);
+.table tbody tr:nth-child(even) {
+    background-color: rgba(0, 18, 64, 0.3);
 }
 
+.table tbody tr:hover td {
+    background-color: rgba(253, 213, 5, 0.04);
+}
+
+/* ── Actions (buttons row) ── */
 .actions {
     display: flex;
     gap: var(--space-sm);
     align-items: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 }
 
 .avatarColumn {
     width: 50px;
+    text-align: center;
 }
 
 .emptyState {
@@ -140,23 +173,8 @@
     font-size: var(--font-size-sm);
 }
 
-.sectionHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-md);
-    flex-wrap: wrap;
-    gap: var(--space-sm);
-}
-
-.sectionTitle {
-    font-size: var(--font-size-xl);
-    color: var(--secondary);
-    margin: 0;
-}
-
 /* ============================================ */
-/* ── RESPONSIVE: Tablet ────────────────────── */
+/* ── RESPONSIVE: Tablet (≤ 1024px) ─────────── */
 /* ============================================ */
 @media (max-width: 1024px) {
     .container {
@@ -166,14 +184,19 @@
     .title {
         font-size: var(--font-size-xxl);
     }
+
+    .tab {
+        padding: var(--space-sm) var(--space-lg);
+        font-size: var(--font-size-xs);
+    }
 }
 
 /* ============================================ */
-/* ── RESPONSIVE: Mobile ────────────────────── */
+/* ── RESPONSIVE: Mobile (≤ 768px) ──────────── */
 /* ============================================ */
 @media (max-width: 768px) {
     .container {
-        padding: var(--space-md);
+        padding: var(--space-md) var(--space-sm);
     }
 
     /* ── Compact header ── */
@@ -192,11 +215,12 @@
     .badge {
         font-size: var(--font-size-xxs);
         padding: 2px var(--space-xs);
+        letter-spacing: 1px;
     }
 
-    /* ── Tabs: full width ── */
+    /* ── Tabs: stretch fill ── */
     .tabs {
-        gap: var(--space-xs);
+        gap: 0;
         margin-bottom: var(--space-lg);
     }
 
@@ -207,9 +231,13 @@
         text-align: center;
     }
 
-    /* ── Reduce min-height ── */
+    /* ── Content ── */
     .fixedContentWrapper {
         min-height: auto;
+    }
+
+    .content {
+        gap: var(--space-lg);
     }
 
     /* ── Section header: stack ── */
@@ -248,13 +276,17 @@
     }
 
     .table tbody tr {
-        display: grid;
-        grid-template-columns: 1fr;
+        display: flex;
+        flex-direction: column;
         background-color: var(--card);
         border: 2px solid var(--border);
         padding: var(--space-lg);
         gap: var(--space-sm);
         transition: border-color 0.2s ease;
+    }
+
+    .table tbody tr:nth-child(even) {
+        background-color: var(--card);
     }
 
     .table tbody tr:hover {
@@ -276,18 +308,15 @@
         word-break: break-word;
     }
 
-    /* 
-     * Labels via data-label attribute:
-     * <td data-label="Email">user@example.com</td>
-     */
+    /* Labels via data-label attribute */
     .table tbody tr td[data-label]:not([data-label=""])::before {
         content: attr(data-label) ": ";
         color: var(--muted-foreground);
         text-transform: uppercase;
         letter-spacing: 1px;
         flex-shrink: 0;
-        min-width: 60px;
-        font-size: 8px;
+        min-width: 70px;
+        font-size: var(--font-size-xxs);
     }
 
     .avatarColumn {
@@ -295,13 +324,42 @@
         justify-content: center;
     }
 
-    /* ── Stack action buttons vertically ── */
+    /* ── Action buttons in cards ── */
     .actions {
-        flex-direction: column;
         width: 100%;
         gap: var(--space-xs);
         margin-top: var(--space-sm);
         padding-top: var(--space-sm);
         border-top: 1px solid var(--border);
+    }
+}
+
+/* ============================================ */
+/* ── RESPONSIVE: Small Mobile (≤ 480px) ────── */
+/* ============================================ */
+@media (max-width: 480px) {
+    .container {
+        padding: var(--space-sm) var(--space-xs);
+    }
+
+    .title {
+        font-size: var(--font-size-sm);
+    }
+
+    .tab {
+        font-size: 9px;
+        padding: var(--space-xs) var(--space-sm);
+    }
+
+    .table tbody tr {
+        padding: var(--space-md);
+    }
+
+    .sectionTitle {
+        font-size: var(--font-size-xs);
+    }
+
+    .actions {
+        flex-direction: column;
     }
 }

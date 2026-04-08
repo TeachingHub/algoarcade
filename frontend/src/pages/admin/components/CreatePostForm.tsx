@@ -197,12 +197,11 @@ export default function CreatePostForm({ postToEdit, onPostCreated, onCancel }: 
                         accept="image/*"
                         onChange={handleImageUpload}
                         className={formStyles.input}
-                        style={{ padding: '8px' }}
                     />
                     {coverImage && (
-                        <div style={{ marginTop: '10px', display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                            <img src={coverImage} alt="Cover Preview" style={{ maxWidth: '200px', maxHeight: '100px', objectFit: 'cover', borderRadius: '4px' }} />
-                            <button type="button" onClick={() => setCoverImage("")} style={{ color: 'var(--destructive)', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>[ REMOVE ]</button>
+                        <div className={formStyles.imagePreview}>
+                            <img src={coverImage} alt="Cover Preview" />
+                            <button type="button" onClick={() => setCoverImage("")} className={formStyles.removeImageBtn}>[ REMOVE ]</button>
                         </div>
                     )}
                 </div>
