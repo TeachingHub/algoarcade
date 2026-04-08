@@ -2,10 +2,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 40px 20px;
+    padding: 40px 24px;
     min-height: 400px;
-    max-width: 700px;
-    margin: 0 auto;
     width: 100%;
 }
 
@@ -21,19 +19,31 @@
     margin-bottom: 30px;
 }
 
+/* ─── Table Wrapper (card container) ─────────────────────────── */
+
+.tableWrapper {
+    width: 100%;
+    max-width: 1000px;
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    padding: var(--space-xl);
+    overflow-x: auto;
+}
+
 /* ─── Table ─────────────────────────────────────────────────── */
 
 .table {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 0 6px;
+    border-spacing: 0 8px;
 }
 
 .tableHead th {
     font-size: var(--font-size-xxs);
     color: var(--muted-foreground);
     text-align: left;
-    padding: 0 12px 8px;
+    padding: 0 16px 10px;
     border-bottom: 1px solid var(--border);
 }
 
@@ -45,22 +55,22 @@
 }
 
 .row {
-    background: var(--card);
+    background: var(--muted);
     transition: background 0.15s;
 }
 
 .row:hover {
-    background: var(--muted);
+    background: color-mix(in srgb, var(--muted) 70%, var(--foreground) 10%);
 }
 
 .rowHighlight {
-    background: var(--muted);
+    background: color-mix(in srgb, var(--primary) 15%, var(--card));
     outline: 1px solid var(--primary);
 }
 
 .row td {
-    padding: 10px 12px;
-    font-size: var(--font-size-xxs);
+    padding: 14px 16px;
+    font-size: var(--font-size-xs);
     color: var(--foreground);
     vertical-align: middle;
 }
@@ -87,25 +97,25 @@
 .userCell {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 .avatar {
-    width: 30px;
-    height: 30px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     object-fit: cover;
 }
 
 .avatarPlaceholder {
-    width: 30px;
-    height: 30px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    background: var(--muted);
+    background: var(--border);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 9px;
+    font-size: 10px;
     color: var(--muted-foreground);
 }
 
@@ -155,4 +165,41 @@
     color: var(--muted-foreground);
     font-size: var(--font-size-xs);
     padding: 40px 0;
+}
+
+/* ─── Responsive ──────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+    .container {
+        padding: 24px 12px;
+    }
+
+    .tableWrapper {
+        padding: var(--space-md);
+    }
+
+    .title {
+        font-size: var(--font-size-md);
+    }
+
+    .row td {
+        padding: 10px 8px;
+        font-size: var(--font-size-xxs);
+    }
+
+    .tableHead th {
+        padding: 0 8px 8px;
+        font-size: 9px;
+    }
+
+    .avatar,
+    .avatarPlaceholder {
+        width: 28px;
+        height: 28px;
+    }
+
+    .medalCell {
+        min-width: 30px;
+        font-size: var(--font-size-xxs);
+    }
 }

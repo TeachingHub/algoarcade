@@ -2,7 +2,7 @@
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    padding: var(--space-sm) var(--space-xl) var(--space-xl);
+    padding: var(--space-xl);
     min-height: calc(100vh - var(--navbar-height) - var(--footer-min-height));
 }
 
@@ -90,7 +90,7 @@
 
 @media (max-width: 768px) {
     .container {
-        padding: var(--space-sm) var(--space-md) var(--space-xl);
+        padding: var(--space-md);
     }
     .title {
         font-size: 1.8rem;

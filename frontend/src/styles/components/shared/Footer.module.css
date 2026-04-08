@@ -1,97 +1,110 @@
 .footer {
     background-color: var(--card);
     width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: var(--footer-min-height);
-    border-top: 5px solid var(--border);
-
-    .content {
-        width: 90%;
-        max-width: var(--max-width);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-        gap: var(--space-md);
-        padding: 0 var(--space-xl);
-        margin-top: var(--space-xxxl);
-
-        .sections {
-            display: flex;
-            flex-direction: row;
-            gap: var(--space-md);
-            width: 100%;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
-
-        .section {
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-xxs);
-
-            h3 {
-                font-size: var(--font-size-sm);
-                margin-bottom: var(--space-xs);
-                letter-spacing: 1px;
-                color: var(--foreground);
-            }
-
-            p {
-                font-size: var(--font-size-xs);
-                margin: 0;
-                color: var(--muted-foreground);
-                line-height: 1.6;
-            }
-        }
-
-        .footerLink {
-            font-size: var(--font-size-xs);
-            color: var(--muted-foreground);
-            text-decoration: none;
-            transition: color 0.2s;
-            line-height: 1.8;
-        }
-
-        .footerLink:hover {
-            color: var(--primary);
-        }
-
-        .bottom {
-            display: flex;
-            justify-content: center;
-            padding-top: var(--space-sm);
-            margin-bottom: var(--space-xxl);
-
-            p {
-                margin: 0;
-                font-size: var(--font-size-xs);
-                color: var(--muted-foreground);
-            }
-        }
-    }
+    border-top: 3px solid var(--border);
 }
 
+.content {
+    width: 90%;
+    max-width: var(--max-width);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-lg);
+    padding: var(--space-xxxl) var(--space-xl) var(--space-xl);
+}
+
+/* ── Sections row ── */
+.sections {
+    display: flex;
+    flex-direction: row;
+    gap: var(--space-xxxl);
+    width: 100%;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.sectionTitle {
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-xs);
+    letter-spacing: 1px;
+    color: var(--foreground);
+    font-weight: bold;
+}
+
+.sectionText {
+    font-size: var(--font-size-xs);
+    margin: 0;
+    color: var(--muted-foreground);
+    line-height: 1.8;
+}
+
+.footerLink {
+    font-size: var(--font-size-xs);
+    color: var(--muted-foreground);
+    text-decoration: none;
+    transition: color 0.2s;
+    line-height: 2;
+}
+
+.footerLink:hover {
+    color: var(--primary);
+}
+
+/* ── Bottom ── */
+.bottom {
+    display: flex;
+    justify-content: center;
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--border);
+    width: 100%;
+}
+
+.bottomText {
+    margin: 0;
+    font-size: var(--font-size-xxs);
+    color: var(--muted-foreground);
+    padding-bottom: var(--space-lg);
+}
+
+/* ── Responsive ── */
 @media (max-width: 768px) {
-    .footer .content .sections {
+    .content {
+        padding: var(--space-xl) var(--space-md) var(--space-md);
+    }
+
+    .sections {
         flex-direction: column;
         gap: var(--space-xl);
-        align-items: center;
-        text-align: center;
+        align-items: flex-start;
     }
-    
-    .footer .section h3 {
+
+    .section {
+        width: 100%;
+    }
+
+    .sectionTitle {
         font-size: var(--font-size-xs);
     }
-    
-    .footer .section p,
-    .footer .footerLink {
-        font-size: 10px;
+
+    .sectionText {
+        font-size: var(--font-size-xxs);
+        line-height: 2;
     }
-    
-    .footer .bottom p {
-        font-size: 10px;
+
+    .footerLink {
+        font-size: var(--font-size-xxs);
+        line-height: 2.2;
+    }
+
+    .bottomText {
+        font-size: 9px;
     }
 }

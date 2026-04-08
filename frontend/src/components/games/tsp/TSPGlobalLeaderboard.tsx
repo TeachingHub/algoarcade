@@ -25,6 +25,7 @@ export default function TSPGlobalLeaderboard() {
             ) : entries.length === 0 ? (
                 <p className={styles.empty}>No medals have been awarded yet. Play the daily challenge!</p>
             ) : (
+                <div className={styles.tableWrapper}>
                 <table className={styles.table}>
                     <thead className={styles.tableHead}>
                         <tr>
@@ -69,6 +70,7 @@ export default function TSPGlobalLeaderboard() {
                         ))}
                     </tbody>
                 </table>
+                </div>
             )}
         </div>
     );
