@@ -1,4 +1,4 @@
-![AlgoArcade](media/banner.png)
+<img src="media/banner.png" width="100%" alt="AlgoArcade" />
 
 # AlgoArcade
 
