@@ -184,3 +184,16 @@ Para que funcionen necesitan acceso a Firebase Admin SDK. Añade tu `FIREBASE_SE
 ## Trabajo Fin de Grado
 
 Este proyecto es el resultado del TFG *"AlgoArcade: Plataforma Web Educativa para el Aprendizaje de Algoritmia mediante Game-Based Learning"* del Grado en Ingeniería del Software de la URJC.
+
+## Licencia
+
+Este proyecto se distribuye bajo licencia [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/). Véase el archivo [`LICENSE`](LICENSE) para el texto legal completo.
+
+En resumen, eres libre de:
+- **Compartir** — copiar y redistribuir el material en cualquier medio o formato
+- **Adaptar** — remezclar, transformar y construir a partir del material
+
+Bajo las siguientes condiciones:
+- **Atribución** — debes dar crédito apropiado e indicar si se hicieron cambios
+- **NoComercial** — no puedes usar el material con fines comerciales
+- **CompartirIgual** — si remezclas o transformas el material, debes distribuir tus contribuciones bajo la misma licencia
