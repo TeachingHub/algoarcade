@@ -92,7 +92,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                         let profile = await getUserDocument(currentUser);
 
                         // Redirect-based Google login may reach here before profile is created.
-                        if (!profile) {
+                        if (!profile && currentUser.displayName) {
                             await createUserDocument(currentUser);
                             profile = await getUserDocument(currentUser);
                         }
