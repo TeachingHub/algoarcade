@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword, EmailAuthProvider, GoogleAuthProvider, reauthenticateWithCredential, reauthenticateWithPopup, signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, signOut, updateProfile, type User } from "firebase/auth";
+import { createUserWithEmailAndPassword, EmailAuthProvider, GoogleAuthProvider, reauthenticateWithCredential, reauthenticateWithPopup, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, signOut, updateProfile, type User } from "firebase/auth";
 import { auth } from "@/firebase/config";
 import { createUserDocument, deleteUserDocument, getUserDocument, updateUserDocument } from "./userService";
 
@@ -126,4 +126,9 @@ export const updateUserProfile = async (user: User, data: { username?: string; p
         console.error("Error updating profile:", error);
         throw error;
     }
+};
+
+
+export const recoverPassword = (email: string) => {
+    return sendPasswordResetEmail(auth, email);
 };
