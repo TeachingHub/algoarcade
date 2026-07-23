@@ -100,7 +100,7 @@ export default function LoginPage() {
                             Remember me
                         </label>
                     </div>
-                    <a href="#" className={styles.forgotLink}>
+                    <a href="recover-password" className={styles.forgotLink}>
                         Forgot Password?
                     </a>
                 </div>
