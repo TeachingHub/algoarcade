@@ -17,6 +17,7 @@ import BlogPostPage from "./pages/BlogPostPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ErrorBoundary from "./components/shared/ErrorBoundary";
 import RecoverPasswordPage from "./pages/RecoverPasswordPage";
+import ChangePasswordPage from "./pages/ChangePasswordPage";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
     const { user, loading } = useAuth();
@@ -85,6 +86,11 @@ export default function Router() {
                 <Route path="/profile/edit" element={
                     <ProtectedRoute>
                         <EditProfilePage />
+                    </ProtectedRoute>
+                } />
+                <Route path="/profile/change-password" element={
+                    <ProtectedRoute>
+                        <ChangePasswordPage />
                     </ProtectedRoute>
                 } />
                 <Route path="/recover-password" element={<RecoverPasswordPage />} />
