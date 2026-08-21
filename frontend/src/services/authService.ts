@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword, EmailAuthProvider, GoogleAuthProvider, reauthenticateWithCredential, reauthenticateWithPopup, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, signOut, updateProfile, type User } from "firebase/auth";
+import { createUserWithEmailAndPassword, EmailAuthProvider, GoogleAuthProvider, reauthenticateWithCredential, reauthenticateWithPopup, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, signOut, updatePassword, updateProfile, type User } from "firebase/auth";
 import { auth } from "@/firebase/config";
 import { createUserDocument, deleteUserDocument, getUserDocument, updateUserDocument } from "./userService";
 
@@ -126,6 +126,27 @@ export const updateUserProfile = async (user: User, data: { username?: string; p
         console.error("Error updating profile:", error);
         throw error;
     }
+};
+
+export const changePassword = async (currentPassword: string,newPassword: string) => {
+  const user = auth.currentUser;
+
+  if (!user || !user.email) {
+    throw new Error("There is no authenticated user");
+  }
+
+  const isGoogleUser = user.providerData.some(
+        (provider) => provider.providerId === "google.com"
+    );
+
+    if (isGoogleUser) {
+        throw new Error("GoogleUserChangePassword");
+    }
+
+  const credential = EmailAuthProvider.credential(user.email,currentPassword);
+
+  await reauthenticateWithCredential(user, credential);
+  await updatePassword(user, newPassword);
 };
 
 
