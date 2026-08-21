@@ -85,6 +85,11 @@ export default function ProfilePage() {
                                 label="DELETE ACCOUNT"
                                 onClick={() => setIsDeleteModalOpen(true)}
                             />
+                            <Button
+                                style={["secondary"]}
+                                label="CHANGE PASSWORD"
+                                onClick={() => navigate("/profile/change-password")}
+                            />
                         </div>
                     </div>
                 </div>

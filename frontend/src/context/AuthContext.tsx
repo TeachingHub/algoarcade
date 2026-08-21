@@ -4,7 +4,7 @@ import { auth, configError } from "../firebase/config";
 import type { UserProfileData } from "@/types/user/user";
 import { createUserDocument, getUserDocument } from "../services/userService";
 import { getFromLocalStorage, saveToLocalStorage } from "@/utils/localStorageUtils";
-import { loginUser, registerUser, loginWithGoogle as loginWithGoogleService } from "@/services/authService";
+import { loginUser, registerUser, loginWithGoogle as loginWithGoogleService, changePassword as changePasswordService } from "@/services/authService";
 import ErrorFallback from "@/components/shared/ErrorFallback";
 
 interface AuthContextType {
@@ -15,6 +15,7 @@ interface AuthContextType {
     register: (email: string, password: string, username: string) => Promise<void>;
     loginWithGoogle: () => Promise<void>;
     refreshUserProfile: () => Promise<void>;
+    changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -25,6 +26,7 @@ const AuthContext = createContext<AuthContextType>({
     register: () => Promise.resolve(),
     loginWithGoogle: () => Promise.resolve(),
     refreshUserProfile: () => Promise.resolve(),
+    changePassword: () => Promise.resolve()
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -73,6 +75,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             setUserProfile(updatedProfile);
         }
     };
+
+    const changePassword = async (currentPassword: string, newPassword: string) => {
+        await changePasswordService(currentPassword, newPassword);
+    }
 
     useEffect(() => {
         // Don't try to initialize auth if Firebase config is invalid
@@ -134,7 +140,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     return (
-        <AuthContext.Provider value={{ user, userProfile, loading, login, register, loginWithGoogle, refreshUserProfile }}>
+        <AuthContext.Provider value={{ user, userProfile, loading, login, register, loginWithGoogle, refreshUserProfile, changePassword }}>
             {!loading && children}
         </AuthContext.Provider>
     );
