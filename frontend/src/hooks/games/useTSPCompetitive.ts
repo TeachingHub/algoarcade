@@ -4,6 +4,7 @@ import type { TSPState } from "@/types/games/tsp";
 import { calculateTotalDistance } from "@/utils/tsp";
 import { useTSPDailyChallenge, normalizeDistance } from './tsp/useTSPDailyChallenge';
 import { useTSPLeaderboard } from './tsp/useTSPLeaderboard';
+import { useGameTimer } from "@/hooks/useGameTimer";
 
 /**
  * Orchestrator hook for TSP Competitive (Daily Challenge) mode.
@@ -35,6 +36,7 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
     // --- Sub-hooks ---
     const dailyChallenge = useTSPDailyChallenge(canvasSize);
     const { leaderboard, isSubmitting, fetchLeaderboard, checkSubmission, submitScore } = useTSPLeaderboard();
+    const { start, pause, reset, elapsedMs } = useGameTimer();
 
     // --- Sync daily challenge instance into game state ---
     useEffect(() => {
@@ -53,6 +55,8 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
             setHasSubmitted(false);
             // Fetch leaderboard for this date
             fetchLeaderboard(dailyChallenge.selectedDate);
+            // Reset timer
+            reset();
 
             // Check if user already submitted for this date
             if (user) {
@@ -88,12 +92,20 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
                 }));
             }
         }
-    }, [hasSubmitted, gameResult, manualPath, gameState.points, user]);
+        
+        // Start timer
+        if (manualPath.length === 0) {
+            start();
+        }
+    }, [hasSubmitted, gameResult, manualPath, gameState.points, user, start]);
 
     // --- Submission ---
 
     const submitManualPath = useCallback(async () => {
         if (manualPath.length !== gameState.points.length || hasSubmitted) return;
+
+        // Stop timer
+        pause();
 
         let distance = calculateTotalDistance(gameState.points, manualPath);
         
@@ -111,22 +123,24 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
 
         // Practice mode: past challenges don't save scores
         if (!dailyChallenge.isToday) {
-            setGameResult(`Practice mode! Distance: ${Math.round(distance)}. This score won't be saved.`);
+            setGameResult(`Practice mode! Distance: ${Math.round(distance)}. Time: ${Math.round(elapsedMs / 1000)}s. This score won't be saved.`);
             return;
         }
 
         if (user) {
-            const resultMessage = await submitScore(user, distance, manualPath, dailyChallenge.selectedDate);
+            const resultMessage = await submitScore(user, distance, manualPath, dailyChallenge.selectedDate, elapsedMs);
             setGameResult(resultMessage);
         } else {
-            setGameResult(`Finished! Distance: ${Math.round(distance)}. Login to save your score!`);
+            setGameResult(`Finished! Distance: ${Math.round(distance)}. Time: ${Math.round(elapsedMs / 1000)}s. Login to save your score!`);
         }
-    }, [manualPath, gameState.points, hasSubmitted, user, submitScore, dailyChallenge.isToday, dailyChallenge.selectedDate, canvasSize]);
+    }, [manualPath, gameState.points, hasSubmitted, user, submitScore, dailyChallenge.isToday, dailyChallenge.selectedDate, canvasSize, pause, elapsedMs]);
 
     // --- Clear path ---
 
     const clearAll = useCallback(() => {
         if (hasSubmitted) return;
+        pause();
+        reset();
         setGameState(prev => ({
             ...prev,
             bestPath: [],
@@ -134,7 +148,7 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
             bestDistance: Infinity
         }));
         setManualPath([]);
-    }, [hasSubmitted]);
+    }, [hasSubmitted, pause, reset]);
 
     // --- Derived loading state ---
     const isLoading = dailyChallenge.isLoading || isSubmitting;

@@ -124,8 +124,9 @@ export interface TSPLeaderboardEntry {
     displayName: string;
     photoURL: string;
     distance: number;
-    path: number[]; // Save the path they submitted just in case
+    path: number[];
     timestamp: any;
+    time_ms?: number | null;
 }
 
 export async function saveDailyScore(dateString: string, score: TSPLeaderboardEntry): Promise<void> {
@@ -165,6 +166,22 @@ export async function getDailyLeaderboard(dateString: string): Promise<TSPLeader
         // Client-side tiebreaker: same distance → earlier timestamp wins
         scores.sort((a, b) => {
             if (a.distance !== b.distance) return a.distance - b.distance;
+            const getMs = (t: any): number => {
+                if (!t) return Infinity;
+                if (typeof t.toMillis === 'function') return t.toMillis();
+                if (t.seconds) return t.seconds * 1000;
+                return Infinity;
+            };
+            return getMs(a.timestamp) - getMs(b.timestamp);
+        });
+
+        // Client-side tiebreaker: same distance → less duration wins
+        scores.sort((a, b) => {
+            if (a.distance !== b.distance) return a.distance - b.distance;
+            const aDuration = (a.time_ms ?? Infinity);
+            const bDuration = (b.time_ms ?? Infinity);
+            if (aDuration !== bDuration) return aDuration - bDuration;
+            // Client-side tiebreaker: same distance and duration→ earlier timestamp wins
             const getMs = (t: any): number => {
                 if (!t) return Infinity;
                 if (typeof t.toMillis === 'function') return t.toMillis();

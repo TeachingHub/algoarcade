@@ -35,6 +35,7 @@ export const useTSPLeaderboard = () => {
         distance: number,
         path: number[],
         dateStr: string,
+        time_ms?: number,
     ): Promise<string> => {
         setIsSubmitting(true);
         try {
@@ -44,14 +45,16 @@ export const useTSPLeaderboard = () => {
                 photoURL: user.photoURL || "",
                 distance,
                 path,
-                timestamp: serverTimestamp()
+                timestamp: serverTimestamp(),
+                time_ms: time_ms ?? null
             });
 
             // Refresh leaderboard after submission
             const board = await getDailyLeaderboard(dateStr);
             setLeaderboard(board);
 
-            return `Submitted! Your distance: ${Math.round(distance)}`;
+            const timeText = time_ms ? `Your time: ${Math.round(time_ms/1000)}s` : '';
+            return `Submitted! Your distance: ${Math.round(distance)}. ${timeText}`;
         } catch (e) {
             console.error("Error submitting score:", e);
             return "Error submitting score";

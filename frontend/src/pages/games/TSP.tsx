@@ -4,6 +4,7 @@ import GameTabs from '@/components/games/shared/GameTabs';
 import TSPSandbox from '@/components/games/tsp/TSPSandbox';
 import TSPCompetitive from '@/components/games/tsp/TSPCompetitive';
 import TSPGlobalLeaderboard from '@/components/games/tsp/TSPGlobalLeaderboard';
+import { GameTimerProvider } from "@/context/GameTimerContext";
 
 const TSP_TABS = [
     { key: 'sandbox', label: 'SANDBOX' },
@@ -15,17 +16,19 @@ export default function TSPPage() {
     const [mode, setMode] = useState('sandbox');
 
     return (
-        <Layout noFooter noPadding>
-            <GameTabs
-                gameName="TSP"
-                tabs={TSP_TABS}
-                activeTab={mode}
-                onTabChange={setMode}
-            />
+        <GameTimerProvider>
+            <Layout noFooter noPadding>
+                <GameTabs
+                    gameName="TSP"
+                    tabs={TSP_TABS}
+                    activeTab={mode}
+                    onTabChange={setMode}
+                />
 
-            {mode === 'sandbox' && <TSPSandbox />}
-            {mode === 'competitive' && <TSPCompetitive />}
-            {mode === 'leaderboard' && <TSPGlobalLeaderboard />}
-        </Layout>
+                {mode === 'sandbox' && <TSPSandbox />}
+                {mode === 'competitive' && <TSPCompetitive />}
+                {mode === 'leaderboard' && <TSPGlobalLeaderboard />}
+            </Layout>
+        </GameTimerProvider>
     );
 }
