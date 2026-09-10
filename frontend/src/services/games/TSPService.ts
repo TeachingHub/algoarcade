@@ -163,18 +163,6 @@ export async function getDailyLeaderboard(dateString: string): Promise<TSPLeader
             scores.push(doc.data() as TSPLeaderboardEntry);
         });
 
-        // Client-side tiebreaker: same distance → earlier timestamp wins
-        scores.sort((a, b) => {
-            if (a.distance !== b.distance) return a.distance - b.distance;
-            const getMs = (t: any): number => {
-                if (!t) return Infinity;
-                if (typeof t.toMillis === 'function') return t.toMillis();
-                if (t.seconds) return t.seconds * 1000;
-                return Infinity;
-            };
-            return getMs(a.timestamp) - getMs(b.timestamp);
-        });
-
         // Client-side tiebreaker: same distance → less duration wins
         scores.sort((a, b) => {
             if (a.distance !== b.distance) return a.distance - b.distance;
