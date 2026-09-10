@@ -1,4 +1,3 @@
-import React from "react";
 import { useGameTimer } from "@/hooks/useGameTimer";
 
 function fmt(ms: number) {
