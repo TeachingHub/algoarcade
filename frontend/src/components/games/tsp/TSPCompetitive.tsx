@@ -7,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import Button from "@/components/shared/Button";
 import { formatDistance } from "@/utils/tsp";
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import GameTimer from '@/components/games/shared/GameTimer';
 
 /** Format a Firestore Timestamp or Date to HH:MM */
 function formatTime(timestamp: unknown): string {
@@ -15,6 +16,14 @@ function formatTime(timestamp: unknown): string {
         ? (timestamp as any).toDate()
         : new Date(timestamp as string | number);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function formatTimeDuration(ms?: number | null){
+    if (!ms && ms !== 0) return ';'
+    const s = Math.floor((ms ?? 0) / 1000);
+    const mm = Math.floor(s / 60).toString().padStart(2, '0');
+    const ss = (s % 60).toString().padStart(2, '0');
+    return `${mm}:${ss}`
 }
 
 export default function TSPCompetitive() {
@@ -78,6 +87,7 @@ export default function TSPCompetitive() {
             ]}
             controls={
                 <div className={styles.competitiveControls}>
+                    <GameTimer />
                     {/* ── Date Navigation ──────────────────────── */}
                     <div className={styles.dateNav}>
                         <button
@@ -159,6 +169,9 @@ export default function TSPCompetitive() {
                                         <div className={styles.leaderboardName}>{entry.displayName}</div>
                                         <div className={styles.leaderboardDistance}>
                                             {formatDistance(entry.distance)}
+                                            {entry.time_ms != null && (
+                                                <span className={styles.leaderboardTime}> · {formatTimeDuration(entry.time_ms)}</span>
+                                            )}
                                             {entry.timestamp && (
                                                 <span className={styles.leaderboardTime}> · {formatTime(entry.timestamp)}</span>
                                             )}
