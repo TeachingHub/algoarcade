@@ -35,6 +35,7 @@ export default function ChangePasswordPage() {
         try {
             await changePassword(currentPassword, newPassword);
             setSuccessMessage("Password changed successfully.");
+            await new Promise((resolve) => setTimeout(resolve, 3000));
             navigate("/profile");
         } catch (err: any) {
             if (err.message === "GoogleUserChangePassword") {
