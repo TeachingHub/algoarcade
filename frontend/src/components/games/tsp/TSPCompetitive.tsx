@@ -10,6 +10,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import GameTimer from '@/components/games/shared/GameTimer';
 
 /** Format a Firestore Timestamp or Date to HH:MM */
+/*
 function formatTime(timestamp: unknown): string {
     if (!timestamp) return '';
     const date = typeof (timestamp as any)?.toDate === 'function'
@@ -17,6 +18,7 @@ function formatTime(timestamp: unknown): string {
         : new Date(timestamp as string | number);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
+*/
 
 function formatTimeDuration(ms?: number | null){
     if (!ms && ms !== 0) return ';'
