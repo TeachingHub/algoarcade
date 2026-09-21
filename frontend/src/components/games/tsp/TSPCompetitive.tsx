@@ -172,9 +172,6 @@ export default function TSPCompetitive() {
                                             {entry.time_ms != null && (
                                                 <span className={styles.leaderboardTime}> · {formatTimeDuration(entry.time_ms)}</span>
                                             )}
-                                            {entry.timestamp && (
-                                                <span className={styles.leaderboardTime}> · {formatTime(entry.timestamp)}</span>
-                                            )}
                                         </div>
                                     </div>
                                 </li>
