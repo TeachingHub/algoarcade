@@ -154,6 +154,7 @@
     font-size: var(--font-size-xs);
     width: 100%;
     cursor: pointer;
+    margin-bottom: var(--space-md);
 }
 
 .selectInput:focus {
@@ -169,7 +170,20 @@
     border-radius: var(--radius-sm);
     font-family: inherit;
     font-size: var(--font-size-xs);
-    width: 60px;
+    width: 80px;
+    margin-bottom: var(--space-md);
+}
+
+.textInput {
+    background: var(--background);
+    border: 1px solid var(--border);
+    color: var(--foreground);
+    padding: var(--space-sm);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: var(--font-size-xs);
+    width: 100%;
+    margin-bottom: var(--space-md);
 }
 
 .customGenRow {
@@ -177,6 +191,19 @@
     gap: var(--space-sm);
     align-items: stretch;
     min-width: 0;
+}
+
+.valueWeightRow {
+    display: flex;
+    gap: var(--space-md);
+}
+
+.valueWeightRow > div {
+    flex: 1;
+}
+
+.customCheckbox {
+    margin-right: var(--space-md);
 }
 
 .slider {

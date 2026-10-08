@@ -1,0 +1,118 @@
+import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router';
+import { getGameInstance, saveGameInstance } from '@/services/games/KnapsackService';
+import type { KnapsackItem } from "@/types/games/knapsack";
+
+/**
+ * Handles loading a shared Knapsack instance from a URL parameter and sharing new instances.
+ * 
+ * Manages:
+ * - Reading `?instance=<id>` from the URL
+ * - Validating the Firestore document ID format
+ * - Loading the instance from Firestore
+ * - Saving a new instance and copying the shareable URL to clipboard
+ */
+
+// Firestore auto-generated IDs are 20 alphanumeric chars
+const isValidFirestoreId = (id: string) => /^[a-zA-Z0-9]{20}$/.test(id);
+
+interface UseInstanceSharingOptions {
+    /** Called when an instance is loaded successfully */
+    onInstanceLoaded: (points: KnapsackItem[], maxWeight: number, author: string) => void;
+    /** Called when no instance is found or loading fails — should generate default scenario */
+    onFallback: () => void;
+}
+
+export const useKnapsackInstanceSharing = (
+    options: UseInstanceSharingOptions
+) => {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [isLoading, setIsLoading] = useState(false);
+    const [hasInitialized, setHasInitialized] = useState(false);
+
+    // Load instance from URL on mount
+    useEffect(() => {
+        if (hasInitialized) return;
+
+        const instanceId = searchParams.get('instance');
+
+        const initGame = async () => {
+            if (instanceId) {
+                if (!isValidFirestoreId(instanceId)) {
+                    console.warn("Invalid instance ID format");
+                    setSearchParams(prev => {
+                        const newParams = new URLSearchParams(prev);
+                        newParams.delete('instance');
+                        return newParams;
+                    });
+                    options.onFallback();
+                    setHasInitialized(true);
+                    return;
+                }
+
+                setIsLoading(true);
+                try {
+                    const instance = await getGameInstance(instanceId);
+                    if (instance) {
+                        options.onInstanceLoaded(
+                            instance.items,
+                            instance.maxWeight,
+                            instance.author || 'an anonymous adventurer'
+                        );
+                    } else {
+                        console.warn("Instance not found");
+                        setSearchParams(prev => {
+                            const newParams = new URLSearchParams(prev);
+                            newParams.delete('instance');
+                            return newParams;
+                        });
+                        options.onFallback();
+                    }
+                } catch (e) {
+                    console.error("Error loading instance", e);
+                    setSearchParams(prev => {
+                        const newParams = new URLSearchParams(prev);
+                        newParams.delete('instance');
+                        return newParams;
+                    });
+                    options.onFallback();
+                } finally {
+                    setIsLoading(false);
+                }
+            } else {
+                options.onFallback();
+            }
+            setHasInitialized(true);
+        };
+
+        initGame();
+    }, [hasInitialized]);
+
+    // Share current instance
+    const shareInstance = useCallback(async (items: KnapsackItem[], maxWeight: number, authorName: string): Promise<string | null> => {
+        if (items.length === 0) return null;
+
+        try {
+            const id = await saveGameInstance({
+                items: items,
+                maxWeight: maxWeight,
+                author: authorName
+            });
+
+            setSearchParams(prev => {
+                prev.set('instance', id);
+                return prev;
+            });
+
+            return `${window.location.origin}${window.location.pathname}?instance=${id}`;
+        } catch (e) {
+            console.error("Error sharing:", e);
+            return null;
+        }
+    }, [setSearchParams]);
+
+    return {
+        isLoading,
+        shareInstance,
+    };
+};
