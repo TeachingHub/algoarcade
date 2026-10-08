@@ -24,6 +24,15 @@ export default function Games() {
             difficulty: 'MEDIUM' as const,
             tags: ['Graph', 'Pathfinding', 'Search'],
             thumbnail: '/banners/pathfinder-banner.png'
+        },
+        {
+            id: 'knapsack',
+            title: 'Knapsack Game',
+            description: 'Select the best items to maximaze the value of your knapsack, be careful, you have  a weight limit.',
+            path: '/games/knapsack',
+            difficulty: 'MEDIUM' as const,
+            tags: ['Knapsack', 'Greedy', 'Optimization'],
+            thumbnail: '/banners/knapsack-banner.jpeg'
         }
     ];
 
