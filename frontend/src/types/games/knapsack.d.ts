@@ -14,7 +14,6 @@ export interface KnapsackState {
     currentSelection: number[];
     bestValue: number;
     isRunning: boolean;
-    speed?: number;
 }
 
 export interface KnapsackInstance {
