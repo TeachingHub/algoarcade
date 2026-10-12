@@ -18,7 +18,7 @@ const isValidFirestoreId = (id: string) => /^[a-zA-Z0-9]{20}$/.test(id);
 
 interface UseInstanceSharingOptions {
     /** Called when an instance is loaded successfully */
-    onInstanceLoaded: (points: KnapsackItem[], maxWeight: number, author: string) => void;
+    onInstanceLoaded: (items: KnapsackItem[], maxWeight: number, author: string) => void;
     /** Called when no instance is found or loading fails — should generate default scenario */
     onFallback: () => void;
 }
