@@ -4,7 +4,6 @@ import {
     calculateSolutionValue,
     greedyKnapsack,
 } from "@/utils/knapsack";
-import { useKnapsackAnimation } from './useKnapsackAnimation';
 
 /**
  * Handles Knapsack algorithm execution and manual selection submission.
@@ -31,14 +30,11 @@ export const useKnapsackAlgorithms = () => {
         currentSelection: [],
         bestValue: -1,
         isRunning: false,
-        speed: 50
     });
 
     const [algorithm, setAlgorithmState] = useState<AlgorithmMode>('manual');
     const [manualSelection, setManualSelection] = useState<number[]>([]);
     const [gameResult, setGameResult] = useState<SandboxResult | null>(null);
-
-    const animation = useKnapsackAnimation(gameState.speed ?? 50); //Sin implementar
 
     // --- State setters exposed for external use (scenario loading, builder, etc.) ---
 
@@ -103,7 +99,6 @@ export const useKnapsackAlgorithms = () => {
     const setAlgorithm = useCallback((mode: AlgorithmMode) => {
         setAlgorithmState(mode);
         if (gameState.isRunning) {
-            animation.stop();
             setGameState(prev => ({ ...prev, isRunning: false }));
         }
         setManualSelection([]);
@@ -115,14 +110,13 @@ export const useKnapsackAlgorithms = () => {
             currentSelection: [],
             bestValue: -1
         }));
-    }, [gameState.isRunning, animation]);
+    }, [gameState.isRunning]);
 
     // --- Stop ---
 
     const stopAlgorithm = useCallback(() => {
-        animation.stop();
         setGameState(prev => ({ ...prev, isRunning: false }));
-    }, [animation]);
+    }, []);
 
     // --- Run ---
 
@@ -142,7 +136,7 @@ export const useKnapsackAlgorithms = () => {
                 isRunning: false
             }));
         }
-    }, [algorithm, gameState.items, gameState.maxWeight, gameState.isRunning, animation]);
+    }, [algorithm, gameState.items, gameState.maxWeight, gameState.isRunning]);
 
     // --- Manual selection ---
 
@@ -207,7 +201,6 @@ export const useKnapsackAlgorithms = () => {
     // --- Clear ---
 
     const clearAll = useCallback(() => {
-        animation.stop();
         setGameState(prev => ({
             ...prev,
             items: algorithm === 'builder' ? [] : prev.items,
@@ -218,14 +211,7 @@ export const useKnapsackAlgorithms = () => {
         }));
         setManualSelection([]);
         setGameResult(null);
-    }, [animation, algorithm]);
-
-    // --- Speed ---
-
-    const setSpeed = useCallback((speed: number) => {
-        animation.setSpeed(speed);
-        setGameState(prev => ({ ...prev, speed }));
-    }, [animation]);
+    }, [algorithm]);
 
     return {
         gameState,
@@ -244,7 +230,6 @@ export const useKnapsackAlgorithms = () => {
             handleItemClick,
             submitManualSelection,
             clearAll,
-            setSpeed,
         }
     };
 };

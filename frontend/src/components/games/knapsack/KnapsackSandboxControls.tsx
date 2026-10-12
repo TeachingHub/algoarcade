@@ -112,49 +112,51 @@ export default function KnapsackControls({
                 </div>
             </div>
 
-            <div className={styles.controlPanel}>
-                <h3>CONTROLS</h3>
-                <div className={styles.actions}>
-                    {selectedMode === 'builder' ? (
-                        <Button
-                            style={["primary", "fullWidth"]}
-                            label="CLEAR ITEMS"
-                            onClick={onReset}
-                        />
-                    ) : selectedMode !== 'manual' ? (
-                        <>
-                            {!isRunning ? (
-                                <Button
-                                    style={["primary", "fullWidth"]}
-                                    label="RUN ALGORITHM"
-                                    onClick={onRun}
-                                />
-                            ) : (
-                                <Button
-                                    style={["secondary", "fullWidth"]}
-                                    label="STOP"
-                                    onClick={onStop}
-                                />
-                            )}
-                        </>
-                    ) : (
-                        <Button
-                            style={["primary", "fullWidth"]}
-                            label="SUBMIT"
-                            onClick={onSubmit}
-                            disabled={manualSelectionLength < 1 || !!gameResult}
-                        />
-                    )}
+            {selectedMode !== 'random' && (
+                <div className={styles.controlPanel}>
+                    <h3>CONTROLS</h3>
+                    <div className={styles.actions}>
+                        {selectedMode === 'builder' ? (
+                            <Button
+                                style={["primary", "fullWidth"]}
+                                label="CLEAR ITEMS"
+                                onClick={onReset}
+                            />
+                        ) : selectedMode === 'algorithm' ? (
+                            <>
+                                {!isRunning ? (
+                                    <Button
+                                        style={["primary", "fullWidth"]}
+                                        label="RUN ALGORITHM"
+                                        onClick={onRun}
+                                    />
+                                ) : (
+                                    <Button
+                                        style={["secondary", "fullWidth"]}
+                                        label="STOP"
+                                        onClick={onStop}
+                                    />
+                                )}
+                            </>
+                        ) : (
+                            <Button
+                                style={["primary", "fullWidth"]}
+                                label="SUBMIT"
+                                onClick={onSubmit}
+                                disabled={manualSelectionLength < 1 || !!gameResult}
+                            />
+                        )}
 
-                    {selectedMode !== 'builder' && (
-                        <Button
-                            style={["secondary", "fullWidth"]}
-                            label="RESET SOLUTION"
-                            onClick={onReset}
-                        />
-                    )}
-                </div>
-            </div>
+                        {selectedMode !== 'builder' && (
+                            <Button
+                                style={["secondary", "fullWidth"]}
+                                label="RESET SOLUTION"
+                                onClick={onReset}
+                            />
+                        )}
+                    </div>
+                </div> 
+            )}
 
             {(selectedMode === 'builder') && (
                 <div className={styles.controlPanel}>
