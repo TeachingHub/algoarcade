@@ -37,7 +37,7 @@ export const useKnapsackSandbox = () => {
     const setMode = useCallback((algo: 'algorithm' | 'random' | 'manual' | 'builder') => {
         // If leaving builder mode with invalid item count or invalid maxWeight value, show warning
         if (algorithms.algorithm === 'builder' && algo !== 'builder') {
-            if (!builder.isValidBuilderState(algorithms.gameState.items.length, algorithms.gameState.maxWeight)) { //Cambiar esto cuando esté hecho el builder
+            if (!builder.isValidBuilderState(algorithms.gameState.items.length, algorithms.gameState.maxWeight)) {
                 setPendingModeSwitch(algo);
                 return;
             }
@@ -122,7 +122,6 @@ export const useKnapsackSandbox = () => {
         setMaxWeight,
         submitManualSelection: algorithms.actions.submitManualSelection,
         clearAll: algorithms.actions.clearAll,
-        setSpeed: algorithms.actions.setSpeed,
         shareInstance,
     }), [
         generateScenario,
