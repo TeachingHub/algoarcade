@@ -1,4 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
+import type { KnapsackItem } from '@/types/games/knapsack';
+
 import { useKnapsackAlgorithms } from './useKnapsackAlgorithms';
 import { useKnapsackScenarios } from './useKnapsackScenarios';
 import { useKnapsackBuilder } from './useKnapsackBuilder';
@@ -88,27 +90,43 @@ export const useKnapsackSandbox = () => {
 
     // --- Instance sharing (wraps sharing + algorithms + scenarios) ---
 
-    const { isLoading, shareInstance: shareInstanceRaw } = useKnapsackInstanceSharing( {
-            onInstanceLoaded: useCallback((items, maxWeight, author) => {
-                algorithms.setItems(items);
-                algorithms.setMaxWeight(maxWeight);
-                scenarios.setScenarioInfo({
-                    name: "Shared Challenge",
-                    description: `Created by ${author}`
-                });
-            }, [algorithms, scenarios]),
+    const handleSharedInstanceLoaded = useCallback((items: KnapsackItem[], maxWeight: number, author: string) => {
+            algorithms.setItems(items);
+            algorithms.setMaxWeight(maxWeight);
 
-            onFallback: useCallback(() => {
-                const knapsackInstance = scenarios.generateScenario();
-                algorithms.setItems(knapsackInstance.items);
-                algorithms.setMaxWeight(knapsackInstance.maxWeight)
-            }, [algorithms, scenarios]),
-        }
+            scenarios.setScenarioInfo({
+                name: "Shared Challenge",
+                description: `Created by ${author}`,
+            });
+        },
+        [algorithms, scenarios]
     );
 
-    const shareInstance = useCallback(async (authorName: string) => {
-        return shareInstanceRaw(algorithms.gameState.items, algorithms.gameState.maxWeight, authorName);
-    }, [shareInstanceRaw, algorithms.gameState.items, algorithms.gameState.maxWeight]);
+    const handleSharingFallback = useCallback(() => {
+        const knapsackInstance = scenarios.generateScenario();
+
+        algorithms.setItems(knapsackInstance.items);
+        algorithms.setMaxWeight(knapsackInstance.maxWeight);
+    }, [algorithms, scenarios]);
+
+    const {
+        isLoading,
+        shareInstance: shareInstanceRaw,
+    } = useKnapsackInstanceSharing({
+        onInstanceLoaded: handleSharedInstanceLoaded,
+        onFallback: handleSharingFallback,
+    });
+
+    const shareInstance = useCallback(
+        async (authorName: string) => {
+            return shareInstanceRaw({
+                items: algorithms.gameState.items,
+                maxWeight: algorithms.gameState.maxWeight,
+                author: authorName,
+            });
+        },
+        [shareInstanceRaw, algorithms.gameState.items, algorithms.gameState.maxWeight]
+    );
 
     // --- Compose the public API  ---
 
