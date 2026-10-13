@@ -1,4 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
+import type { Point } from '@/types/games/tsp';
+
 import { useTSPAlgorithms } from './tsp/useTSPAlgorithms';
 import { useTSPScenarios } from './tsp/useTSPScenarios';
 import { useTSPBuilder } from './tsp/useTSPBuilder';
@@ -73,28 +75,42 @@ export const useTSPSandbox = (canvasSize: { width: number, height: number }) => 
 
     // --- Instance sharing (wraps sharing + algorithms + scenarios) ---
 
-    const { isLoading, shareInstance: shareInstanceRaw } = useTSPInstanceSharing(
+    const handleSharedInstanceLoaded = useCallback((points: Point[], author: string) => {
+            algorithms.setPoints(points);
+
+            scenarios.setScenarioInfo({
+                name: "Shared Challenge",
+                description: `Created by ${author}`,
+            });
+        },
+        [algorithms, scenarios]
+    );
+
+    const handleSharingFallback = useCallback(() => {
+        const points = scenarios.generateScenario('random');
+        algorithms.setPoints(points);
+    }, [algorithms, scenarios]);
+
+    const {
+        isLoading,
+        shareInstance: shareInstanceRaw,
+    } = useTSPInstanceSharing(
         canvasSize,
         {
-            onInstanceLoaded: useCallback((points, author) => {
-                algorithms.setPoints(points);
-                scenarios.setScenarioInfo({
-                    name: "Shared Challenge",
-                    description: `Created by ${author}`
-                });
-            }, [algorithms, scenarios]),
-
-            onFallback: useCallback(() => {
-                const points = scenarios.generateScenario('random');
-                algorithms.setPoints(points);
-            }, [algorithms, scenarios]),
+            onInstanceLoaded: handleSharedInstanceLoaded,
+            onFallback: handleSharingFallback,
         }
     );
 
-    const shareInstance = useCallback(async (authorName: string) => {
-        return shareInstanceRaw(algorithms.gameState.points, authorName);
-    }, [shareInstanceRaw, algorithms.gameState.points]);
-
+    const shareInstance = useCallback(
+        async (authorName: string) => {
+            return shareInstanceRaw({
+                points: algorithms.gameState.points,
+                author: authorName,
+            });
+        },
+        [shareInstanceRaw, algorithms.gameState.points]
+    );
     // --- Compose the public API (same shape as the original hook) ---
 
     const actions = useMemo(() => ({
