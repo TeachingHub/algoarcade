@@ -20,10 +20,11 @@ export interface KnapsackInstance {
     items: KnapsackItem[];
     maxWeight: number;
     author: string;
+    knapsackType: 'fractional' | 'binary';
 }
 
 export interface KnapsackSolution {
     items: number[];
-    lastItemFraction: number;
+    lastItemFraction?: number;
     solutionValue: number;
 }

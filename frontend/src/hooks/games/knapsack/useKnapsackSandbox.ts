@@ -47,6 +47,10 @@ export const useKnapsackSandbox = () => {
         algorithms.setAlgorithm(algo);
     }, [algorithms, builder]);
 
+    const setKnapsackType = useCallback((mode: 'fractional' | 'binary') => {
+        algorithms.setKnapsackType(mode);
+    }, [algorithms]);
+
     const confirmModeSwitch = useCallback(() => {
         if (!pendingModeSwitch) return;
         const knapsackInstance = scenarios.generateFallback();
@@ -90,10 +94,11 @@ export const useKnapsackSandbox = () => {
 
     // --- Instance sharing (wraps sharing + algorithms + scenarios) ---
 
-    const handleSharedInstanceLoaded = useCallback((items: KnapsackItem[], maxWeight: number, author: string) => {
+    const handleSharedInstanceLoaded = useCallback((items: KnapsackItem[], maxWeight: number, author: string, knapsackType: 'fractional' | 'binary') => {
             algorithms.setItems(items);
             algorithms.setMaxWeight(maxWeight);
-
+            algorithms.setKnapsackType(knapsackType);
+            
             scenarios.setScenarioInfo({
                 name: "Shared Challenge",
                 description: `Created by ${author}`,
@@ -123,9 +128,10 @@ export const useKnapsackSandbox = () => {
                 items: algorithms.gameState.items,
                 maxWeight: algorithms.gameState.maxWeight,
                 author: authorName,
+                knapsackType: algorithms.KnapsackType
             });
         },
-        [shareInstanceRaw, algorithms.gameState.items, algorithms.gameState.maxWeight]
+        [shareInstanceRaw, algorithms.gameState.items, algorithms.gameState.maxWeight, algorithms.KnapsackType]
     );
 
     // --- Compose the public API  ---
@@ -152,6 +158,8 @@ export const useKnapsackSandbox = () => {
         gameState: algorithms.gameState,
         algorithm: algorithms.algorithm,
         setMode,
+        knapsackType: algorithms.KnapsackType,
+        setKnapsackType,
         manualSelection: algorithms.manualSelection,
         gameResult: algorithms.gameResult,
         scenarioInfo: scenarios.scenarioInfo,
