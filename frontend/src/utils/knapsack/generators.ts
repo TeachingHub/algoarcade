@@ -33,6 +33,7 @@ export const generateRandomGame = (numItems: number, minItemsWeight: number, max
     return {
         items,
         maxWeight,
-        author: "Random generator"
+        author: "Random generator",
+        knapsackType: 'fractional'
     };
 }
