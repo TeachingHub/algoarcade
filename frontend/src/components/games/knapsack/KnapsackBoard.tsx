@@ -27,6 +27,13 @@ export default function KnapsackBoard({
     const availableItems = items.filter((item) => !selectedItems.includes(item.id));
 
     const selectedKnapsackItems = items.filter((item) => selectedItems.includes(item.id));
+
+    let usedWeight = 0;
+    for (const item of selectedKnapsackItems) {
+        usedWeight += item.weight; 
+    }
+
+    if (usedWeight > maxWeight) usedWeight = maxWeight;
     
     return (
         <div
@@ -73,7 +80,7 @@ export default function KnapsackBoard({
                         </h3>
 
                         <span className={styles.capacity}>
-                            MAX WEIGHT: {maxWeight}
+                            MAX WEIGHT: {usedWeight}/{maxWeight}
                         </span>
                     </div>
 

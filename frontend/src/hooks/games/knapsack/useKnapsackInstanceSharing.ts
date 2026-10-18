@@ -3,35 +3,26 @@ import {
     useInstanceSharing,
     type InstanceSharingAdapter,
 } from '@/hooks/shared/useInstanceSharing';
-import {
-    getGameInstance,
-    saveGameInstance,
-} from '@/services/games/KnapsackService';
-import type {
-    KnapsackInstance,
-    KnapsackItem,
-} from '@/types/games/knapsack';
+import { getGameInstance, saveGameInstance, } from '@/services/games/KnapsackService';
+import type { KnapsackInstance, KnapsackItem, } from '@/types/games/knapsack';
 
 interface KnapsackInstanceSharingOptions {
     onInstanceLoaded: (
         items: KnapsackItem[],
         maxWeight: number,
-        author: string
+        author: string,
+        knapsackType: 'fractional' | 'binary',
     ) => void;
     onFallback: () => void;
 }
 
-export const useKnapsackInstanceSharing = (
-    options: KnapsackInstanceSharingOptions
-) => {
+export const useKnapsackInstanceSharing = (options: KnapsackInstanceSharingOptions) => {
     const {
         onInstanceLoaded,
         onFallback,
     } = options;
 
-    const adapter = useMemo<
-        InstanceSharingAdapter<KnapsackInstance, KnapsackInstance>
-    >(() => ({
+    const adapter = useMemo<InstanceSharingAdapter<KnapsackInstance, KnapsackInstance>>(() => ({
         load: getGameInstance,
 
         save: saveGameInstance,
@@ -40,25 +31,19 @@ export const useKnapsackInstanceSharing = (
             return instance.items.length > 0;
         },
 
-        /*
-         * Knapsack no depende de un canvas que tenga que medirse
-         * antes de crear la instancia.
-         */
         isReady: true,
 
         onLoaded: (instance) => {
             onInstanceLoaded(
                 instance.items,
                 instance.maxWeight,
-                instance.author || 'an anonymous adventurer'
+                instance.author || 'an anonymous adventurer',
+                instance.knapsackType
             );
         },
 
         onFallback,
-    }), [
-        onFallback,
-        onInstanceLoaded,
-    ]);
+    }), [onFallback, onInstanceLoaded,]);
 
     return useInstanceSharing<KnapsackInstance, KnapsackInstance>(adapter);
 };

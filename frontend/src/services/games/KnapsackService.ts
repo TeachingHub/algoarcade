@@ -13,20 +13,22 @@ function encodeKnapsackInstance(instance: KnapsackInstance): string {
     const itemsArray = instance.items.map(item => [item.id, item.name, item.value, item.weight, item.icon ?? null]);
     // 3. Extract maxWeight
     const { maxWeight} = instance;
+    // 4. Extract knapsackType
+    const { knapsackType } = instance;
 
     // 4. Serialize to JSON string: [author, [[id,name,value,weight,icon], maxWeight]]
-    return JSON.stringify([author, itemsArray, maxWeight]);
+    return JSON.stringify([author, itemsArray, maxWeight, knapsackType]);
 }
 
 function decodeKnapsackInstance(encodedData: string): KnapsackInstance {
     try {
         const parsed = JSON.parse(encodedData);
-        // Expecting [author, itemsArray, maxWeight]
-        if (!Array.isArray(parsed) || parsed.length !== 3) {
+        // Expecting [author, itemsArray, maxWeight, knapsackType]
+        if (!Array.isArray(parsed) || parsed.length !== 4) {
             throw new Error("Invalid encoded data format");
         }
 
-        const [author, itemsArray, maxWeight] = parsed;
+        const [author, itemsArray, maxWeight, knapsackType] = parsed;
 
         // Reconstruct Items objects
         const items: KnapsackItem[] = (itemsArray as [
@@ -34,7 +36,8 @@ function decodeKnapsackInstance(encodedData: string): KnapsackInstance {
             string,
             number,
             number,
-            string | null
+            string | null,
+            'fractional' | 'binary',
         ][]).map(item => ({
             id: item[0],
             name: item[1],
@@ -46,7 +49,8 @@ function decodeKnapsackInstance(encodedData: string): KnapsackInstance {
         return {
             author,
             items,
-            maxWeight
+            maxWeight,
+            knapsackType
         };
     } catch (error) {
         console.error("Error decoding Knapsack instance:", error);

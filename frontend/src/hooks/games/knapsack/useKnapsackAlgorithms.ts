@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import type { KnapsackItem, KnapsackState } from "@/types/games/knapsack"
 import {
     calculateSolutionValue,
+    binaryKnapsack,
     greedyKnapsack,
 } from "@/utils/knapsack";
 
@@ -14,6 +15,7 @@ import {
  */
 
 export type AlgorithmMode = 'algorithm' | 'random' | 'manual' | 'builder';
+export type KnapsackTypeMode = 'fractional' | 'binary';
 
 export interface SandboxResult {
     won: boolean;
@@ -33,6 +35,7 @@ export const useKnapsackAlgorithms = () => {
     });
 
     const [algorithm, setAlgorithmState] = useState<AlgorithmMode>('manual');
+    const [KnapsackType, setKnapsackTypeState] = useState<KnapsackTypeMode>('fractional');
     const [manualSelection, setManualSelection] = useState<number[]>([]);
     const [gameResult, setGameResult] = useState<SandboxResult | null>(null);
 
@@ -112,6 +115,22 @@ export const useKnapsackAlgorithms = () => {
         }));
     }, [gameState.isRunning]);
 
+    const setKnapsackType = useCallback((mode: KnapsackTypeMode) => {
+        setKnapsackTypeState(mode);
+        if (gameState.isRunning) {
+            setGameState(prev => ({ ...prev, isRunning: false }));
+        }
+        setManualSelection([]);
+        setGameResult(null);
+        setGameState(prev => ({
+            ...prev,
+            freeWeight: prev.maxWeight,
+            bestSolution: [],
+            currentSelection: [],
+            bestValue: -1
+        }));
+    }, [gameState.isRunning]);
+
     // --- Stop ---
 
     const stopAlgorithm = useCallback(() => {
@@ -126,16 +145,17 @@ export const useKnapsackAlgorithms = () => {
         setGameState(prev => ({ ...prev, isRunning: true }));
         setManualSelection([]);
 
-        if (algorithm === 'algorithm') {
-            const solution = greedyKnapsack(gameState.items, gameState.maxWeight);
-            setGameState(prev => ({
-                ...prev,
-                bestSolution: solution.items,
-                bestValue: solution.solutionValue,
-                currentSelection: solution.items,
-                isRunning: false
-            }));
-        }
+        const solution = KnapsackType === 'fractional'
+            ? greedyKnapsack(gameState.items, gameState.maxWeight)
+            : binaryKnapsack(gameState.items, gameState.maxWeight);
+
+        setGameState(prev => ({
+            ...prev,
+            bestSolution: solution.items,
+            bestValue: solution.solutionValue,
+            currentSelection: solution.items,
+            isRunning: false
+        }));
     }, [algorithm, gameState.items, gameState.maxWeight, gameState.isRunning]);
 
     // --- Manual selection ---
@@ -144,8 +164,8 @@ export const useKnapsackAlgorithms = () => {
         if (algorithm !== 'manual' || gameState.isRunning || gameResult) return;
 
         if (!manualSelection.includes(itemId)) { //Click in a not selected item
-            if (gameState.freeWeight > 0) {
-                const newManualSelection = [...manualSelection, itemId]; //Add the item to the end of selection (last item will be the one that gets divided)
+            if (gameState.freeWeight > 0 && (KnapsackType === 'fractional' || gameState.freeWeight >= gameState.items[itemId].weight)) {
+                const newManualSelection = [...manualSelection, itemId]; //Add the item to the end of selection (last item will be the one that gets divided in fractional mode)
                 setManualSelection(newManualSelection);
                 setFreeWeight(gameState.freeWeight - gameState.items[itemId].weight);
 
@@ -185,7 +205,10 @@ export const useKnapsackAlgorithms = () => {
             isRunning: false
         }));
 
-        const algorithmSolution = greedyKnapsack(gameState.items, gameState.maxWeight);
+        const algorithmSolution = KnapsackType === 'fractional'
+            ? greedyKnapsack(gameState.items, gameState.maxWeight)
+            : binaryKnapsack(gameState.items, gameState.maxWeight);
+
         const algoScore = algorithmSolution.solutionValue
 
         const won = userScore >= algoScore;
@@ -216,12 +239,14 @@ export const useKnapsackAlgorithms = () => {
     return {
         gameState,
         algorithm,
+        KnapsackType,
         manualSelection,
         gameResult,
         setItems,
         setMaxWeight,
         setKnapsackInstance,
         setAlgorithm,
+        setKnapsackType,
         resetSelection,
         setGameState,
         actions: {

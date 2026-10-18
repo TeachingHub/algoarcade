@@ -7,6 +7,8 @@ import { itemCategories } from "@/utils/knapsack/items";
 
 
 interface KnapsackControlsProps {
+    knapsackType: 'fractional' | 'binary';
+    setKnapsackType: (mode: 'fractional' | 'binary') => void;
     selectedMode: 'algorithm' | 'random' | 'manual' | 'builder';
     setSelectedMode: (mode: 'algorithm' | 'random' | 'manual' | 'builder') => void;
     isRunning: boolean;
@@ -32,6 +34,8 @@ interface KnapsackControlsProps {
 }
 
 export default function KnapsackControls({
+    knapsackType,
+    setKnapsackType,
     selectedMode,
     setSelectedMode,
     isRunning,
@@ -91,6 +95,27 @@ export default function KnapsackControls({
 
     return (
         <>
+            <div className={styles.controlPanel}>
+                <h3>KNAPSACK TYPE</h3>
+                <div className={styles.knapsackTypeToggle} role="group" aria-label="Choose knapsack type">
+                    <button type="button" className={`${styles.knapsackTypeOption} ${knapsackType === "fractional" ? styles.knapsackTypeOptionActive : ""}`}
+                    onClick={() => setKnapsackType("fractional")}
+                    disabled={isRunning}
+                    aria-pressed={knapsackType === "fractional"}>
+                        <span className={styles.knapsackTypeLabel}>FRACTIONAL</span>
+                        <span className={styles.knapsackTypeDescription}>Items can be divided</span>
+                    </button>
+
+                    <button type="button" className={`${styles.knapsackTypeOption} ${knapsackType === "binary" ? styles.knapsackTypeOptionActive : ""}`}
+                    onClick={() => setKnapsackType("binary")}
+                    disabled={isRunning}
+                    aria-pressed={knapsackType === "binary"}>
+                        <span className={styles.knapsackTypeLabel}>BINARY</span>
+                        <span className={styles.knapsackTypeDescription}>Take or leave each item</span>
+                    </button>
+                </div>
+            </div>
+
             <div className={styles.controlPanel}>
                 <h3>MODE</h3>
                 <div className={styles.modeGrid2x2}>
