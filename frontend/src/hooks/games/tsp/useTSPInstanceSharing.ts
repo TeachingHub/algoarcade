@@ -3,14 +3,8 @@ import {
     useInstanceSharing,
     type InstanceSharingAdapter,
 } from '@/hooks/shared/useInstanceSharing';
-import {
-    getGameInstance,
-    saveGameInstance,
-} from '@/services/games/TSPService';
-import type {
-    Point,
-    TSPInstance,
-} from '@/types/games/tsp';
+import { getGameInstance, saveGameInstance, } from '@/services/games/TSPService';
+import type { Point, TSPInstance, } from '@/types/games/tsp';
 
 interface TSPInstanceSharingOptions {
     onInstanceLoaded: (points: Point[], author: string) => void;
@@ -26,9 +20,7 @@ export const useTSPInstanceSharing = (
         onFallback,
     } = options;
 
-    const adapter = useMemo<
-        InstanceSharingAdapter<TSPInstance, TSPInstance>
-    >(() => ({
+    const adapter = useMemo<InstanceSharingAdapter<TSPInstance, TSPInstance>>(() => ({
         load: getGameInstance,
 
         save: saveGameInstance,
@@ -47,12 +39,7 @@ export const useTSPInstanceSharing = (
         },
 
         onFallback,
-    }), [
-        canvasSize.width,
-        canvasSize.height,
-        onFallback,
-        onInstanceLoaded,
-    ]);
+    }), [canvasSize.width, canvasSize.height, onFallback, onInstanceLoaded,]);
 
     return useInstanceSharing<TSPInstance, TSPInstance>(adapter);
 };

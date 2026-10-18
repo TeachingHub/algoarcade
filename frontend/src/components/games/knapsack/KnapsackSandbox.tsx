@@ -36,6 +36,8 @@ export default function KnapsackSandbox() {
     // Game Logic Hook
     const {
         gameState,
+        knapsackType,
+        setKnapsackType,
         algorithm,
         setMode,
         manualSelection,
@@ -79,9 +81,9 @@ export default function KnapsackSandbox() {
                 { label: "ITEMS", value: gameState.items.length}
             ]}
             instructions={[
-                {title: "1. Choose a Mode", description: "Create your own game with BUILDER or generate one randomly with RANDOM." },
-                { title: "2. Maximize the value of your knapsack", description: "Select the best items to maximize your value while staying within the knapsack's maximum weight limit. The last item you select will be divided if its weight exceeds the knapsack's capacity." },
-                { title: "3. Beat the AI", description: "Submit your selection and see if the knapsack's greedy algorithm can improve it. If it can't, you win!" }
+                {title: "1. Choose a Mode", description: "Choose between FRACTIONAL or BINARY knapsack. Create your own game with BUILDER or generate one randomly with RANDOM." },
+                { title: "2. Maximize the value of your knapsack", description: knapsackType === 'fractional' ? "Select the best items to maximize your value while staying within the knapsack's maximum weight limit. The last item you select will be divided if its weight exceeds the knapsack's capacity.": "Select the best items to maximize your value while staying within the knapsack's maximum weight limit. Items can't be divided" },
+                { title: "3. Beat the AI", description: "Submit your selection and see if the knapsack's algorithm can improve it. If it can't, you win!" }
             ]}
             contextInfo={scenarioInfo ? {
                 title: scenarioInfo.name,
@@ -91,6 +93,8 @@ export default function KnapsackSandbox() {
                 <KnapsackSandboxControls
                     selectedMode={algorithm}
                     setSelectedMode={setMode}
+                    knapsackType={knapsackType}
+                    setKnapsackType={setKnapsackType}
                     isRunning={gameState.isRunning}
                     itemsCount={gameState.items.length}
                     manualSelectionLength={manualSelection.length}
