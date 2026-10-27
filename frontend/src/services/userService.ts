@@ -1,10 +1,10 @@
-import { collection, deleteDoc, getDoc, getDocs, orderBy, limit, query, setDoc, updateDoc, where } from "firebase/firestore";
+import { collection, deleteDoc, getDoc, getDocs, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase/config";
 import type { User } from "firebase/auth";
 import { doc } from "firebase/firestore";
 import type { UserProfileData } from "@/types/user/user";
 
-
+type Game = "tsp" | "knapsack";
 
 export async function createUserDocument(user: User) {
     try {
@@ -66,28 +66,31 @@ export interface GlobalLeaderboardEntry {
     totalMedals: number;
 }
 
-export async function getGlobalLeaderboard(topN: number = 20): Promise<GlobalLeaderboardEntry[]> {
+export async function getGlobalLeaderboard(game: Game, topN: number = 20): Promise<GlobalLeaderboardEntry[]> {
     try {
         const usersRef = collection(db, "users");
-        const q = query(
-            usersRef,
-            where("tspMedals.gold", ">=", 0),
-            orderBy("tspMedals.gold", "desc"),
-            limit(topN * 2)
-        );
+        const medalsField = `${game}Medals`;
 
-        const snapshot = await getDocs(q);
+        const snapshot = await getDocs(usersRef);
         const entries: GlobalLeaderboardEntry[] = [];
 
         snapshot.forEach((docSnap) => {
             const data = docSnap.data() as UserProfileData;
-            const medals = data.tspMedals;
+            const medals = data[medalsField as keyof UserProfileData] as {
+                gold?: number;
+                silver?: number;
+                bronze?: number;
+            } | undefined;
+
+            console.log(medals);
+
             if (!medals) return;
 
             const gold = medals.gold ?? 0;
             const silver = medals.silver ?? 0;
             const bronze = medals.bronze ?? 0;
-            if (gold + silver + bronze === 0) return;
+            const totalMedals = gold + silver + bronze;
+            if (totalMedals === 0) return;
 
             entries.push({
                 uid: docSnap.id,
@@ -96,7 +99,7 @@ export async function getGlobalLeaderboard(topN: number = 20): Promise<GlobalLea
                 gold,
                 silver,
                 bronze,
-                totalMedals: gold + silver + bronze,
+                totalMedals,
             });
         });
 

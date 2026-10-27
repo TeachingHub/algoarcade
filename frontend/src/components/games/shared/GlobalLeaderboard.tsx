@@ -2,15 +2,19 @@ import { useState, useEffect } from 'react';
 import { getGlobalLeaderboard, type GlobalLeaderboardEntry } from '@/services/userService';
 import { useAuth } from '@/context/AuthContext';
 import { CircleStar } from 'lucide-react';
-import styles from '@/styles/components/games/tsp/TSPGlobalLeaderboard.module.css';
+import styles from '@/styles/components/games/shared/GlobalLeaderboard.module.css';
 
-export default function TSPGlobalLeaderboard() {
+interface GlobalLeaderboardProps {
+    game: "tsp" | "knapsack";
+}
+
+export default function GlobalLeaderboard({game}: GlobalLeaderboardProps) {
     const { user } = useAuth();
     const [entries, setEntries] = useState<GlobalLeaderboardEntry[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        getGlobalLeaderboard(20)
+        getGlobalLeaderboard(game, 20)
             .then(setEntries)
             .finally(() => setLoading(false));
     }, []);

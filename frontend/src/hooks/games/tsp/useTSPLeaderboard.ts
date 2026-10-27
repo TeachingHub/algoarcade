@@ -32,7 +32,7 @@ export const useTSPLeaderboard = () => {
      */
     const submitScore = useCallback(async (
         user: User,
-        distance: number,
+        score: number,
         path: number[],
         dateStr: string,
         time_ms?: number,
@@ -43,7 +43,7 @@ export const useTSPLeaderboard = () => {
                 userId: user.uid,
                 displayName: user.displayName || "Anonymous",
                 photoURL: user.photoURL || "",
-                distance,
+                score,
                 path,
                 timestamp: serverTimestamp(),
                 time_ms: time_ms ?? null
@@ -54,7 +54,7 @@ export const useTSPLeaderboard = () => {
             setLeaderboard(board);
 
             const timeText = time_ms ? `Your time: ${Math.round(time_ms/1000)}s` : '';
-            return `Submitted! Your distance: ${Math.round(distance)}. ${timeText}`;
+            return `Submitted! Your distance: ${Math.round(score)}. ${timeText}`;
         } catch (e) {
             console.error("Error submitting score:", e);
             return "Error submitting score";

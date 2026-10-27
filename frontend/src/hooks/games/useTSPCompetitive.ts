@@ -5,13 +5,15 @@ import { calculateTotalDistance } from "@/utils/tsp";
 import { useTSPDailyChallenge, normalizeDistance } from './tsp/useTSPDailyChallenge';
 import { useTSPLeaderboard } from './tsp/useTSPLeaderboard';
 import { useGameTimer } from "@/hooks/useGameTimer";
+import { useDailyChallengeDate } from './shared/useDailyChallengeDate';
 
 /**
  * Orchestrator hook for TSP Competitive (Daily Challenge) mode.
  *
  * Composes:
- *  - useTSPDailyChallenge → loads/creates today's challenge (or past days)
- *  - useTSPLeaderboard    → leaderboard fetch & score submission
+ *  - useTSPDailyChallenge  → loads/creates today's challenge (or past days)
+ *  - useTSPLeaderboard     → leaderboard fetch & score submission
+ *  - useDailyChallengeDate → change date to navigate between past days
  *
  * Owns:
  *  - Manual path building (click-to-add)
@@ -32,43 +34,45 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
     const [manualPath, setManualPath] = useState<number[]>([]);
     const [gameResult, setGameResult] = useState<string | null>(null);
     const [hasSubmitted, setHasSubmitted] = useState(false);
+    const [hasTimerStarted, setHasTimerStarted] = useState(false);
 
     // --- Sub-hooks ---
-    const dailyChallenge = useTSPDailyChallenge(canvasSize);
+    const dailyDate = useDailyChallengeDate();
+    const dailyChallenge = useTSPDailyChallenge(canvasSize, dailyDate.selectedDate);
     const { leaderboard, isSubmitting, fetchLeaderboard, checkSubmission, submitScore } = useTSPLeaderboard();
     const { start, pause, reset, elapsedMs } = useGameTimer();
 
     // --- Sync daily challenge instance into game state ---
     useEffect(() => {
-        if (dailyChallenge.instance) {
-            setGameState(prev => ({
-                ...prev,
-                points: dailyChallenge.instance!.points,
-                bestPath: [],
-                currentPath: [],
-                bestDistance: Infinity,
-                isRunning: false
-            }));
-            // Reset play state when navigating dates
-            setManualPath([]);
-            setGameResult(null);
-            setHasSubmitted(false);
-            // Fetch leaderboard for this date
-            fetchLeaderboard(dailyChallenge.selectedDate);
-            // Reset timer
-            reset();
+        if (!dailyChallenge.instance || dailyChallenge.loadedDate !== dailyDate.selectedDate) {return};
 
-            // Check if user already submitted for this date
-            if (user) {
-                checkSubmission(user.uid, dailyChallenge.selectedDate).then(alreadySubmitted => {
-                    if (alreadySubmitted) {
-                        setHasSubmitted(true);
-                        setGameResult('You already submitted your score for this day!');
-                    }
-                });
-            }
+        setGameState(prev => ({
+            ...prev,
+            points: dailyChallenge.instance!.points,
+            bestPath: [],
+            currentPath: [],
+            bestDistance: Infinity,
+            isRunning: false
+        }));
+        // Reset play state when navigating dates
+        setManualPath([]);
+        setGameResult(null);
+        setHasSubmitted(false);
+        // Fetch leaderboard for this date
+        fetchLeaderboard(dailyDate.selectedDate);
+        // Reset timer
+        reset();
+        // Check if user already submitted for this date
+        if (user) {
+            checkSubmission(user.uid, dailyDate.selectedDate).then(alreadySubmitted => {
+                if (alreadySubmitted) {
+                    setHasSubmitted(true);
+                    setGameResult('You already submitted your score for this day!');
+                }
+            });
         }
-    }, [dailyChallenge.instance, dailyChallenge.selectedDate, fetchLeaderboard, checkSubmission, user]);
+        
+    }, [dailyChallenge.instance, dailyDate.selectedDate, fetchLeaderboard, checkSubmission, user]);
 
     // --- Manual path building ---
 
@@ -94,10 +98,11 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
         }
         
         // Start timer
-        if (manualPath.length === 0) {
+        if (!hasTimerStarted) {
+            setHasTimerStarted(true);
             start();
         }
-    }, [hasSubmitted, gameResult, manualPath, gameState.points, user, start]);
+    }, [hasSubmitted, hasTimerStarted, gameResult, manualPath, gameState.points, user, start]);
 
     // --- Submission ---
 
@@ -122,25 +127,23 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
         setHasSubmitted(true);
 
         // Practice mode: past challenges don't save scores
-        if (!dailyChallenge.isToday) {
+        if (!dailyDate.isToday) {
             setGameResult(`Practice mode! Distance: ${Math.round(distance)}. Time: ${Math.round(elapsedMs / 1000)}s. This score won't be saved.`);
             return;
         }
 
         if (user) {
-            const resultMessage = await submitScore(user, distance, manualPath, dailyChallenge.selectedDate, elapsedMs);
+            const resultMessage = await submitScore(user, distance, manualPath, dailyDate.selectedDate, elapsedMs);
             setGameResult(resultMessage);
         } else {
             setGameResult(`Finished! Distance: ${Math.round(distance)}. Time: ${Math.round(elapsedMs / 1000)}s. Login to save your score!`);
         }
-    }, [manualPath, gameState.points, hasSubmitted, user, submitScore, dailyChallenge.isToday, dailyChallenge.selectedDate, canvasSize, pause, elapsedMs]);
+    }, [manualPath, gameState.points, hasSubmitted, user, submitScore, dailyDate.isToday, dailyDate.selectedDate, canvasSize, pause, elapsedMs]);
 
     // --- Clear path ---
 
     const clearAll = useCallback(() => {
         if (hasSubmitted) return;
-        pause();
-        reset();
         setGameState(prev => ({
             ...prev,
             bestPath: [],
@@ -148,7 +151,7 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
             bestDistance: Infinity
         }));
         setManualPath([]);
-    }, [hasSubmitted, pause, reset]);
+    }, [hasSubmitted]);
 
     // --- Derived loading state ---
     const isLoading = dailyChallenge.isLoading || isSubmitting;
@@ -161,19 +164,19 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
         hasSubmitted,
         leaderboard,
         // Date navigation
-        isToday: dailyChallenge.isToday,
+        isToday: dailyDate.isToday,
         notFound: dailyChallenge.notFound,
-        selectedDate: dailyChallenge.selectedDate,
-        dateLabel: dailyChallenge.dateLabel,
-        canGoNext: dailyChallenge.canGoNext,
+        selectedDate: dailyDate.selectedDate,
+        dateLabel: dailyDate.dateLabel,
+        canGoNext: dailyDate.canGoNext,
         actions: {
             handlePointClick,
             submitManualPath,
             clearAll,
             reloadLeaderboard: dailyChallenge.reload,
-            goToPrevDay: dailyChallenge.goToPrevDay,
-            goToNextDay: dailyChallenge.goToNextDay,
-            goToToday: dailyChallenge.goToToday,
+            goToPrevDay: dailyDate.goToPrevDay,
+            goToNextDay: dailyDate.goToNextDay,
+            goToToday: dailyDate.goToToday,
         }
     };
 };
