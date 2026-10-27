@@ -1,73 +1,40 @@
-import { useState, useCallback } from 'react';
-import type { User } from 'firebase/auth';
 import { serverTimestamp } from 'firebase/firestore';
 import { saveDailyScore, getDailyLeaderboard, hasUserSubmitted } from '@/services/games/TSPService';
 import type { TSPLeaderboardEntry } from '@/services/games/TSPService';
-
-/**
- * Manages the daily leaderboard: fetching scores and submitting new ones.
- *
- * Accepts a dateString to support viewing past leaderboards.
- */
+import { useDailyLeaderboard } from '../shared/useDailyLeaderboard';
 
 export const useTSPLeaderboard = () => {
-    const [leaderboard, setLeaderboard] = useState<TSPLeaderboardEntry[]>([]);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    return useDailyLeaderboard<
+        TSPLeaderboardEntry,
+        number[]
+    >({
+        getLeaderboard: getDailyLeaderboard,
+        hasUserSubmitted,
 
-    const fetchLeaderboard = useCallback(async (dateStr: string) => {
-        const board = await getDailyLeaderboard(dateStr);
-        setLeaderboard(board);
-    }, []);
-
-    /**
-     * Checks if the user already submitted a score for the given date.
-     */
-    const checkSubmission = useCallback(async (userId: string, dateStr: string): Promise<boolean> => {
-        return hasUserSubmitted(dateStr, userId);
-    }, []);
-
-    /**
-     * Submits the user's score and refreshes the leaderboard.
-     * Returns the result message to display.
-     */
-    const submitScore = useCallback(async (
-        user: User,
-        score: number,
-        path: number[],
-        dateStr: string,
-        time_ms?: number,
-    ): Promise<string> => {
-        setIsSubmitting(true);
-        try {
+        saveScore: async ({
+            user,
+            score,
+            selection,
+            dateStr,
+            timeMs
+        }) => {
             await saveDailyScore(dateStr, {
                 userId: user.uid,
-                displayName: user.displayName || "Anonymous",
-                photoURL: user.photoURL || "",
+                displayName: user.displayName || 'Anonymous',
+                photoURL: user.photoURL || '',
                 score,
-                path,
+                path: selection,
                 timestamp: serverTimestamp(),
-                time_ms: time_ms ?? null
+                time_ms: timeMs ?? null
             });
+        },
 
-            // Refresh leaderboard after submission
-            const board = await getDailyLeaderboard(dateStr);
-            setLeaderboard(board);
+        getScoreMessage: (score, timeMs) => {
+            const timeText = timeMs != null
+                ? `Your time: ${Math.round(timeMs / 1000)}s`
+                : '';
 
-            const timeText = time_ms ? `Your time: ${Math.round(time_ms/1000)}s` : '';
             return `Submitted! Your distance: ${Math.round(score)}. ${timeText}`;
-        } catch (e) {
-            console.error("Error submitting score:", e);
-            return "Error submitting score";
-        } finally {
-            setIsSubmitting(false);
         }
-    }, []);
-
-    return {
-        leaderboard,
-        isSubmitting,
-        fetchLeaderboard,
-        checkSubmission,
-        submitScore,
-    };
+    });
 };

@@ -1,11 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import type { User } from 'firebase/auth';
-import type { KnapsackState } from "@/types/games/knapsack";
-import { calculateSolutionValue } from "@/utils/knapsack"
+import type { KnapsackState } from '@/types/games/knapsack';
+import { calculateSolutionValue } from '@/utils/knapsack';
 import { useKnapsackDailyChallenge } from './useKnapsackDailyChallenge';
-import { useKnapsackLeaderboard } from './/useKnapsackLeaderboard';
-import { useGameTimer } from "@/hooks/useGameTimer";
+import { useKnapsackLeaderboard } from './useKnapsackLeaderboard';
 import { useDailyChallengeDate } from '../shared/useDailyChallengeDate';
+import { useGameCompetitive } from '../shared/useGameCompetitive';
 
 /**
  * Orchestrator hook for Knapsack Competitive (Daily Challenge) mode.
@@ -34,153 +34,153 @@ export const useKnapsackCompetitive = (user: User | null) => {
     });
 
     const [manualSelection, setManualSelection] = useState<number[]>([]);
-    const [gameResult, setGameResult] = useState<string | null>(null);
-    const [hasSubmitted, setHasSubmitted] = useState(false);
-    const [hasTimerStarted, setHasTimerStarted] = useState(false);
     const [knapsackType, setKnapsackType] = useState<'fractional' | 'binary'>('fractional');
 
-    // --- Sub-hooks ---
     const dailyDate = useDailyChallengeDate();
+
     const dailyChallenge = useKnapsackDailyChallenge(dailyDate.selectedDate);
-    const { leaderboard, isSubmitting, fetchLeaderboard, checkSubmission, submitScore } = useKnapsackLeaderboard();
-    const { start, pause, reset, elapsedMs } = useGameTimer();
 
-    // --- Sync daily challenge instance into game state ---
-    useEffect(() => {
-        if (!dailyChallenge.instance || dailyChallenge.loadedDate !== dailyDate.selectedDate) {return};
+    const {
+        leaderboard,
+        isSubmitting,
+        fetchLeaderboard,
+        checkSubmission,
+        submitScore
+    } = useKnapsackLeaderboard();
 
-        setKnapsackType(dailyChallenge.instance.knapsackType);
+    const resetGame = useCallback(() => {
+        if (!dailyChallenge.instance) return;
 
-        setGameState(prev => ({
-            ...prev,
-            items: dailyChallenge.instance!.items,
-            maxWeight: dailyChallenge.instance!.maxWeight,
-            freeWeight: dailyChallenge.instance!.maxWeight,
+        const challenge = dailyChallenge.instance;
+
+        setKnapsackType(challenge.knapsackType);
+
+        setGameState({
+            items: challenge.items,
+            maxWeight: challenge.maxWeight,
+            freeWeight: challenge.maxWeight,
             bestSolution: [],
             currentSelection: [],
             bestValue: 0,
             isRunning: false
-        }));
-        // Reset play state when navigating dates
-        setManualSelection([]);
-        setGameResult(null);
-        setHasSubmitted(false);
-        // Fetch leaderboard for this date
-        fetchLeaderboard(dailyDate.selectedDate);
-        // Reset timer
-        reset();
-        // Check if user already submitted for this date
-        if (user) {
-            checkSubmission(user.uid, dailyDate.selectedDate).then(alreadySubmitted => {
-                if (alreadySubmitted) {
-                    setHasSubmitted(true);
-                    setGameResult('You already submitted your score for this day!');
-                }
-            });
-        }
-        
-    }, [dailyChallenge.instance, dailyDate.selectedDate, fetchLeaderboard, checkSubmission, user]);
+        });
 
-    // --- Manual items selection ---
+        setManualSelection([]);
+    }, [dailyChallenge.instance]);
+
+    const game = useGameCompetitive<number[], number>({
+        user,
+        selectedDate: dailyDate.selectedDate,
+        isToday: dailyDate.isToday,
+        challengeReady:
+            dailyChallenge.instance !== null &&
+            dailyChallenge.loadedDate === dailyDate.selectedDate,
+        resetGame,
+        fetchLeaderboard,
+        checkSubmission,
+        submitScore,
+
+        formatPracticeResult: (score, elapsedMs) =>
+            `Practice mode! Score: ${Math.round(score)}. Time: ${Math.round(elapsedMs / 1000)}s. This score won't be saved.`,
+
+        formatAnonymousResult: (score, elapsedMs) =>
+            `Finished! Score: ${Math.round(score)}. Time: ${Math.round(elapsedMs / 1000)}s. Login to save your score!`
+    });
 
     const handleItemClick = useCallback((itemId: number) => {
-        if (hasSubmitted || gameResult) return;
+        if (game.hasSubmitted || game.gameResult) return;
 
-        if (!manualSelection.includes(itemId)) {
-            if (gameState.freeWeight > 0 && (knapsackType === 'fractional' || gameState.freeWeight >= gameState.items[itemId].weight)) {
-                const newManualSelection = [...manualSelection, itemId];
-                setManualSelection(newManualSelection);
-                const solutionValue = calculateSolutionValue(gameState.items, newManualSelection, gameState.maxWeight);
-                
-                setGameState(prev => ({
-                    ...prev,
-                    currentSelection: newManualSelection,
-                    freeWeight: gameState.freeWeight - gameState.items[itemId].weight,
-                    bestValue: solutionValue
-                }));
-            }
-        } else {
-            const newManualSelection = manualSelection.filter(id => id !== itemId);
-            setManualSelection(newManualSelection);
-            const solutionValue = calculateSolutionValue(gameState.items, newManualSelection, gameState.maxWeight);
-                
+        const item = gameState.items[itemId];
+
+        if (!item) return;
+
+        const isSelected = manualSelection.includes(itemId);
+
+        if (isSelected) {
+            const newSelection = manualSelection.filter(id => id !== itemId);
+
+            const solutionValue = calculateSolutionValue(gameState.items,newSelection,gameState.maxWeight);
+
+            setManualSelection(newSelection);
+
             setGameState(prev => ({
-                    ...prev,
-                    currentSelection: newManualSelection,
-                    freeWeight: gameState.freeWeight + gameState.items[itemId].weight,
-                    bestValue: solutionValue
-                }));
-        }
-        
-        // Start timer
-        if (!hasTimerStarted) {
-            setHasTimerStarted(true);
-            start();
-        }
-    }, [hasSubmitted, hasTimerStarted, gameResult, manualSelection, gameState.items,, gameState.maxWeight, user, start]);
+                ...prev,
+                currentSelection: newSelection,
+                freeWeight: prev.freeWeight + item.weight,
+                bestValue: solutionValue
+            }));
 
-    // --- Submission ---
+            return;
+        }
+
+        const canAddItem = gameState.freeWeight > 0 && (knapsackType === 'fractional' || gameState.freeWeight >= item.weight);
+
+        if (!canAddItem) return;
+
+        const newSelection = [...manualSelection, itemId];
+
+        const solutionValue = calculateSolutionValue(gameState.items, newSelection, gameState.maxWeight);
+
+        setManualSelection(newSelection);
+
+        setGameState(prev => ({
+            ...prev,
+            currentSelection: newSelection,
+            freeWeight: prev.freeWeight - item.weight,
+            bestValue: solutionValue
+        }));
+
+        game.startTimerIfNeeded();
+    }, [game.hasSubmitted, game.gameResult, manualSelection, gameState.items, gameState.maxWeight, gameState.freeWeight, knapsackType, game.startTimerIfNeeded]);
 
     const submitManualSelection = useCallback(async () => {
-        if (manualSelection.length === 0 || hasSubmitted) return;
+        if (manualSelection.length === 0 || game.hasSubmitted) {return;}
 
-        // Stop timer
-        pause();
+        const score = calculateSolutionValue(gameState.items, manualSelection, gameState.maxWeight);
 
-        let score = calculateSolutionValue(gameState.items, manualSelection, gameState.maxWeight);
-        
         setGameState(prev => ({
             ...prev,
             bestSolution: manualSelection,
             bestValue: score
         }));
 
-        setHasSubmitted(true);
-
-        // Practice mode: past challenges don't save scores
-        if (!dailyDate.isToday) {
-            setGameResult(`Practice mode! Score: ${Math.round(score)}. Time: ${Math.round(elapsedMs / 1000)}s. This score won't be saved.`);
-            return;
-        }
-
-        if (user) {
-            const resultMessage = await submitScore(user, score, manualSelection, dailyDate.selectedDate, elapsedMs);
-            setGameResult(resultMessage);
-        } else {
-            setGameResult(`Finished! Score: ${Math.round(score)}. Time: ${Math.round(elapsedMs / 1000)}s. Login to save your score!`);
-        }
-    }, [manualSelection, gameState.items, gameState.maxWeight, hasSubmitted, user, submitScore, dailyDate.isToday, dailyDate.selectedDate, pause, elapsedMs]);
-
-    // --- Clear path ---
+        await game.submitGameScore({
+            score,
+            selection: manualSelection
+        });
+    }, [manualSelection, game.hasSubmitted, gameState.items, gameState.maxWeight, game.submitGameScore]);
 
     const clearAll = useCallback(() => {
-        if (hasSubmitted) return;
+        if (game.hasSubmitted) return;
+
         setGameState(prev => ({
             ...prev,
             bestSolution: [],
             currentSelection: [],
-            freeWeight: gameState.maxWeight,
-            bestValue: -1
+            freeWeight: prev.maxWeight,
+            bestValue: 0
         }));
-        setManualSelection([]);
-    }, [hasSubmitted]);
 
-    // --- Derived loading state ---
+        setManualSelection([]);
+    }, [game.hasSubmitted]);
+
     const isLoading = dailyChallenge.isLoading || isSubmitting;
 
     return {
         gameState,
         manualSelection,
-        gameResult,
+        gameResult: game.gameResult,
         isLoading,
-        hasSubmitted,
+        hasSubmitted: game.hasSubmitted,
         leaderboard,
-        // Date navigation
+
         isToday: dailyDate.isToday,
         notFound: dailyChallenge.notFound,
         selectedDate: dailyDate.selectedDate,
         dateLabel: dailyDate.dateLabel,
         canGoNext: dailyDate.canGoNext,
+        knapsackType,
+
         actions: {
             handleItemClick,
             submitManualSelection,
@@ -188,7 +188,7 @@ export const useKnapsackCompetitive = (user: User | null) => {
             reloadLeaderboard: dailyChallenge.reload,
             goToPrevDay: dailyDate.goToPrevDay,
             goToNextDay: dailyDate.goToNextDay,
-            goToToday: dailyDate.goToToday,
+            goToToday: dailyDate.goToToday
         }
     };
 };

@@ -34,6 +34,7 @@ export default function KnapsackCompetitive() {
         notFound,
         dateLabel,
         canGoNext,
+        knapsackType,
         actions
     } = useKnapsackCompetitive(user);
 
@@ -63,7 +64,8 @@ export default function KnapsackCompetitive() {
             ]}
             instructions={[
                 { title: "Select the items", description: "Select the best items to maximize the value without exceeding the maximum weight." },
-                { title: "No Help, No Re-dos", description: "You cannot use algorithms. Select items, Submit and see your rank!" }
+                { title: "No Help, No Re-dos", description: "You cannot use algorithms. Select items, Submit and see your rank!" },
+                { title: knapsackType === 'fractional' ? "Fractional mode" : "Binary mode", description: knapsackType === 'fractional' ? "Items can be divided, the last item you select will be the divided one." : "Items can't be divided, if an item exceed the free weight, you will not be able to select it."}
             ]}
             controls={
                     <DailyChallengeControls

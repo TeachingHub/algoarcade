@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
 import type { TSPInstance } from '@/types/games/tsp';
 import { getDailyChallenge } from '@/services/games/TSPService';
+import { useDailyChallenge } from '../shared/useGameDailyChallenge';
 
 /**
  * Handles loading the daily TSP challenge from Firestore.
@@ -27,69 +28,22 @@ const scaleToCanvas = (instance: TSPInstance, width: number, height: number): TS
     };
 };
 
-/** Standard canvas dimensions used for fair scoring */
-export const STANDARD_CANVAS = { width: 800, height: 500 } as const;
+export const useTSPDailyChallenge = (
+    canvasSize: { width: number; height: number; } ,selectedDate: string) => {
+    const { width, height } = canvasSize;
 
-/**
- * Normalizes a distance to the standard canvas size.
- * This ensures fair scoring regardless of the actual canvas size (desktop vs mobile).
- * Formula: distance * (diagonalStandard / diagonalActual)
- */
-export const normalizeDistance = (
-    distance: number,
-    actualWidth: number,
-    actualHeight: number
-): number => {
-    const standardDiagonal = Math.sqrt(STANDARD_CANVAS.width ** 2 + STANDARD_CANVAS.height ** 2);
-    const actualDiagonal = Math.sqrt(actualWidth ** 2 + actualHeight ** 2);
-    return distance * (standardDiagonal / actualDiagonal);
-};
-
-export const useTSPDailyChallenge = (canvasSize: { width: number; height: number }, selectedDate: string) => {
-    const [instance, setInstance] = useState<TSPInstance | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [notFound, setNotFound] = useState(false);
-    const [loadedDate, setLoadedDate] = useState<string | null>(null);
-
-    const loadChallenge = useCallback(async (dateStr: string) => {
-        setIsLoading(true);
-        setNotFound(false);
-        setInstance(null);
-        setLoadedDate(null);
-
-        try {
-            const loaded = await getDailyChallenge(dateStr);
-
-            if (loaded) {
-                // Scale normalized coordinates (0-1) to canvas pixels if needed
-                const w = canvasSize.width > 0 ? canvasSize.width : 800;
-                const h = canvasSize.height > 0 ? canvasSize.height : 500;
-                const scaled = isNormalized(loaded) ? scaleToCanvas(loaded, w, h) : loaded;
-                setInstance(scaled);
-                setLoadedDate(dateStr);
-            } else {
-                setNotFound(true);
-            }
-        } catch (error) {
-            console.error("Error loading daily challenge:", error);
-            setNotFound(true);
-        } finally {
-            setIsLoading(false);
+    const transformChallenge = useCallback((instance: TSPInstance): TSPInstance => {
+        if (!isNormalized(instance)) {
+            return instance;
         }
-    }, [canvasSize]);
 
-    // Auto-load when canvas is ready or date changes
-    useEffect(() => {
-        if (canvasSize.width > 0 && canvasSize.height > 0) {
-            loadChallenge(selectedDate);
-        }
-    }, [canvasSize.width, canvasSize.height, selectedDate, loadChallenge]);
+        return scaleToCanvas(instance, width, height);
+    }, [width, height]);
 
-    return {
-        instance,
-        isLoading,
-        notFound,
-        loadedDate,
-        reload: () => loadChallenge(selectedDate),
-    };
+    return useDailyChallenge<TSPInstance>({
+        selectedDate,
+        getChallenge: getDailyChallenge,
+        transform: transformChallenge,
+        enabled: width > 0 && height > 0
+    });
 };
