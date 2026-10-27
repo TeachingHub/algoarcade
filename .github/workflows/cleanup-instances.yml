@@ -1,11 +1,11 @@
 # ───────────────────────────────────────────────────────
-# 🧹 AlgoArcade — Cleanup Old Shared TSP Instances
+# 🧹 AlgoArcade — Cleanup Old Shared  Instances
 # ───────────────────────────────────────────────────────
-# Runs daily at 00:10 UTC to delete shared TSP instances
-# older than 7 days from Firestore.
+# Runs daily at 00:10 UTC to delete shared instances
+# older than 7 days from Firestore for all games.
 # ───────────────────────────────────────────────────────
 
-name: Cleanup Shared TSP Instances
+name: Cleanup Shared Instances
 
 on:
   schedule:

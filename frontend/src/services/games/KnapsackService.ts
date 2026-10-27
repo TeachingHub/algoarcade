@@ -1,10 +1,10 @@
-import { db } from "@/firebase/config";
 import type { KnapsackInstance, KnapsackItem } from "@/types/games/knapsack";
-//import { addDoc, serverTimestamp, collection, doc, getDoc, setDoc, query, orderBy, limit, getDocs } from "firebase/firestore"; // Daily challenge not implemented yet
-import { addDoc, serverTimestamp, collection, doc, getDoc } from "firebase/firestore";
+
+import * as gameService from "@services/games/gameService";
 
 const COLLECTION_NAME = "knapsack_instances";
-//const DAILY_COLLECTION_NAME = "knapsack_daily_challenges"; // Daily challenge not implemented yet
+const DAILY_COLLECTION_NAME = "knapsack_daily_challenges";
+const LEADERBOARD_COLLECTION_NAME = "knapsack_leaderboards";
 
 function encodeKnapsackInstance(instance: KnapsackInstance): string {
     // 1. Extract author
@@ -59,46 +59,71 @@ function decodeKnapsackInstance(encodedData: string): KnapsackInstance {
 }
 
 export async function saveGameInstance(instanceData: KnapsackInstance): Promise<string> {
-    try {
-        const encoded = encodeKnapsackInstance(instanceData);
-
-        const docRef = await addDoc(collection(db, COLLECTION_NAME), {
-            data: encoded, // Store as a single string field
-            createdAt: serverTimestamp()
-        });
-        return docRef.id;
-    } catch (error) {
-        console.error("Error saving game instance:", error);
-        throw new Error("Failed to save game instance");
-    }
+    return gameService.saveGameInstance(
+        COLLECTION_NAME,
+        instanceData,
+        encodeKnapsackInstance
+    );
 }
-
 
 export async function getGameInstance(instanceId: string): Promise<KnapsackInstance | null> {
-    try {
-        const docRef = doc(db, COLLECTION_NAME, instanceId);
-        const docSnap = await getDoc(docRef)
+    return gameService.getGameInstance(
+        COLLECTION_NAME,
+        instanceId,
+        decodeKnapsackInstance
+    );
+} 
 
-        if (docSnap.exists()) {
-            const docData = docSnap.data();
-            // Check if we have the new 'data' string field
-            if (typeof docData.data === 'string') {
-                return decodeKnapsackInstance(docData.data);
-            }
 
-            // Fallback: Return null or handle legacy data if needed. 
-            // For now assuming we only read new format or legacy data handling is not required by prompt instructions.
-            return null;
-        } else {
-            return null;
-        }
+// --- DAILY CHALLENGE ---
 
-    } catch (error) {
-        console.error("Error fetching game instance:", error)
-        throw new Error("Failed to load game instance")
-    }
+export async function getDailyChallenge(dateString: string): Promise<KnapsackInstance | null> {
+    return gameService.getDailyChallenge(
+        DAILY_COLLECTION_NAME,
+        dateString,
+        decodeKnapsackInstance
+    );
 }
 
-// --- COMPETITIVE MODE ---
+export async function createDailyChallenge(dateString: string, instanceData: KnapsackInstance): Promise<void> {
+    return gameService.createDailyChallenge(
+        DAILY_COLLECTION_NAME,
+        dateString,
+        instanceData,
+        encodeKnapsackInstance
+    );
+}
 
-// Daily challenge not implemented yet
+export interface KnapsackLeaderboardEntry {
+    userId: string;
+    displayName: string;
+    photoURL: string;
+    score: number;
+    selectedItems: number[];
+    timestamp: any;
+    time_ms?: number | null;
+}
+
+export async function saveDailyScore(dateString: string, score: KnapsackLeaderboardEntry): Promise<void> {
+    return gameService.saveDailyScore(
+        LEADERBOARD_COLLECTION_NAME,
+        dateString,
+        score
+    );
+}
+
+export async function hasUserSubmitted(dateString: string, userId: string): Promise<boolean> {
+    return gameService.hasUserSubmitted(
+        LEADERBOARD_COLLECTION_NAME,
+        dateString,
+        userId
+    );
+}
+
+export async function getDailyLeaderboard(dateString: string): Promise<KnapsackLeaderboardEntry[]> {
+    return gameService.getDailyLeaderboard<KnapsackLeaderboardEntry> ({
+        collectionName: LEADERBOARD_COLLECTION_NAME,
+        dateString,
+        socreDirection: "desc"
+    });
+}

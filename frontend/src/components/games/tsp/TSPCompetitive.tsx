@@ -4,29 +4,8 @@ import GameLayout from "@/layouts/GameLayout";
 import TSPCanvas from "@/components/games/tsp/TSPCanvas";
 import { useTSPCompetitive } from "@/hooks/games/useTSPCompetitive";
 import { useAuth } from "@/context/AuthContext";
-import Button from "@/components/shared/Button";
 import { formatDistance } from "@/utils/tsp";
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import GameTimer from '@/components/games/shared/GameTimer';
-
-/** Format a Firestore Timestamp or Date to HH:MM */
-/*
-function formatTime(timestamp: unknown): string {
-    if (!timestamp) return '';
-    const date = typeof (timestamp as any)?.toDate === 'function'
-        ? (timestamp as any).toDate()
-        : new Date(timestamp as string | number);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
-*/
-
-function formatTimeDuration(ms?: number | null){
-    if (!ms && ms !== 0) return ';'
-    const s = Math.floor((ms ?? 0) / 1000);
-    const mm = Math.floor(s / 60).toString().padStart(2, '0');
-    const ss = (s % 60).toString().padStart(2, '0');
-    return `${mm}:${ss}`
-}
+import DailyChallengeControls from '../shared/DailyChallengeControls';
 
 export default function TSPCompetitive() {
     const [canvasSize, setCanvasSize] = useState(() => {
@@ -88,104 +67,23 @@ export default function TSPCompetitive() {
                 { title: "No Help, No Re-dos", description: "You cannot preview paths or use algorithms. Connect, Submit and see your rank!" }
             ]}
             controls={
-                <div className={styles.competitiveControls}>
-                    <GameTimer />
-                    {/* ── Date Navigation ──────────────────────── */}
-                    <div className={styles.dateNav}>
-                        <button
-                            className={styles.dateNavButton}
-                            onClick={actions.goToPrevDay}
-                            aria-label="Previous day"
-                        >
-                            <ChevronLeft size={16} />
-                        </button>
-                        <div className={styles.dateNavCenter}>
-                            <span className={styles.dateNavLabel}>{dateLabel}</span>
-                            <span className={`${styles.dateNavBadge} ${isToday ? styles.dateNavBadgeLive : styles.dateNavBadgePractice}`}>
-                                {isToday ? '● LIVE' : 'PRACTICE'}
-                            </span>
-                        </div>
-                        <button
-                            className={styles.dateNavButton}
-                            onClick={actions.goToNextDay}
-                            disabled={!canGoNext}
-                            aria-label="Next day"
-                        >
-                            <ChevronRight size={16} />
-                        </button>
-                    </div>
-
-                    <h3 className={styles.sectionTitle}>
-                        {isToday ? 'DAILY CHALLENGE' : 'PRACTICE MODE'}
-                    </h3>
-
-                    {user ? (
-                        <div className={styles.buttonGroup}>
-                            <Button
-                                style={["primary", "fullWidth"]}
-                                label={hasSubmitted ? "ALREADY SUBMITTED" : (isToday ? "SUBMIT SCORE" : "SUBMIT (PRACTICE)")}
-                                onClick={actions.submitManualPath}
-                                disabled={hasSubmitted || !isPathComplete}
-                            />
-                            <Button
-                                style={["secondary", "fullWidth"]}
-                                label="CLEAR PATH"
-                                onClick={actions.clearAll}
-                                disabled={hasSubmitted || manualPath.length === 0}
-                            />
-                        </div>
-                    ) : (
-                        <div className={styles.buttonGroup}>
-                            <p className={styles.loginPrompt}>
-                                Log in to submit your score and compete on the leaderboard!
-                            </p>
-                            <Button
-                                style={["primary", "fullWidth"]}
-                                label="LOG IN"
-                                to="/login"
-                            />
-                            <Button
-                                style={["secondary", "fullWidth"]}
-                                label="REGISTER"
-                                to="/register"
-                            />
-                        </div>
-                    )}
-
-                    <h3 className={styles.leaderboardTitle}>LEADERBOARD</h3>
-                    {isLoading && leaderboard.length === 0 ? (
-                        <p className={styles.loadingText}>Loading...</p>
-                    ) : leaderboard.length > 0 ? (
-                        <ul className={styles.leaderboardList}>
-                            {leaderboard.map((entry, idx) => (
-                                <li key={entry.userId} className={`${styles.leaderboardItem} ${entry.userId === user?.uid ? styles.leaderboardItemActive : styles.leaderboardItemInactive}`}>
-                                    <span className={styles.leaderboardRank}>{idx + 1}.</span>
-                                    {entry.photoURL ? (
-                                        <img src={entry.photoURL} alt={entry.displayName} className={styles.leaderboardAvatar} />
-                                    ) : (
-                                        <div className={styles.leaderboardAvatarPlaceholder}>
-                                            {entry.displayName.slice(0, 2).toUpperCase()}
-                                        </div>
-                                    )}
-                                    <div className={styles.leaderboardInfo}>
-                                        <div className={styles.leaderboardName}>{entry.displayName}</div>
-                                        <div className={styles.leaderboardDistance}>
-                                            {formatDistance(entry.distance)}
-                                            {entry.time_ms != null && (
-                                                <span className={styles.leaderboardTime}> · {formatTimeDuration(entry.time_ms)}</span>
-                                            )}
-                                        </div>
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <p className={styles.emptyLeaderboard}>
-                            {isToday ? 'Be the first to submit a score today!' : 'No scores for this day.'}
-                        </p>
-                    )}
-
-                </div>
+                    <DailyChallengeControls
+                    dateLabel={dateLabel}
+                    isToday={isToday}
+                    canGoNext={canGoNext}
+                    hasSubmitted={hasSubmitted}
+                    canSubmit={isPathComplete}
+                    canClear={manualPath.length > 0}
+                    isAuthenticated={Boolean(user)}
+                    onPreviousDay={actions.goToPrevDay}
+                    onNextDay={actions.goToNextDay}
+                    onSubmit={actions.submitManualPath}
+                    onClear={actions.clearAll}
+                    leaderboard={leaderboard}
+                    currentUserId={user?.uid}
+                    isLoading={isLoading}
+                    formatScore={formatDistance}
+                />
             }
         >
             <div ref={canvasAreaRef} className={styles.canvasArea}>

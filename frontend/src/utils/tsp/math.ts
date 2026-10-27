@@ -31,3 +31,23 @@ export const calculateTotalDistance = (points: Point[], path: number[]): number 
 export const formatDistance = (distance: number): string => {
     return Math.round(distance).toString();
 };
+
+
+export const STANDARD_CANVAS = { width: 800, height: 500} as const;
+
+/**
+ * Normalizes a distance to the standard canvas size.
+ * This ensures fair scoring regardless of the actual canvas size (desktop vs mobile).
+ * Formula: distance * (diagonalStandard / diagonalActual)
+ */
+
+export const normalizeDistance = (distance: number, actualWidth: number, actualHeight: number): number => {
+    const actualDiagonal = Math.sqrt(actualHeight ** 2 + actualWidth ** 2);
+    if (actualDiagonal === 0) {
+        return distance;
+    }
+
+    const standardDiagonal = Math.sqrt(STANDARD_CANVAS.width ** 2 + STANDARD_CANVAS.height ** 2);
+
+    return distance * (standardDiagonal / actualDiagonal);
+};

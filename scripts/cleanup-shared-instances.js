@@ -1,8 +1,7 @@
 /**
- * Cleanup Old Shared TSP Instances
+ * Cleanup Old Shared Instances
  *
- * Deletes shared TSP instances (from the "tsp_instances" collection)
- * that are older than 7 days, to prevent database bloat.
+ * Deletes shared instances that are older than 7 days, to prevent database bloat.
  *
  * Designed to run as a GitHub Actions cron job once daily.
  *
@@ -32,11 +31,54 @@ const db = admin.firestore();
 
 // ─── 2. Config ──────────────────────────────────────────────────
 
-const COLLECTION_NAME = "tsp_instances";
+const GAMES = [
+    "tsp",
+    "knapsack"
+];
 const MAX_AGE_DAYS = 7;
 const BATCH_SIZE = 100;
 
-// ─── 3. Main ────────────────────────────────────────────────────
+// ─── 3. Delete instances ────────────────────────────────────────────────────
+
+async function deleteOldInstancesForGame(gameId, cutoff) {
+    const collectionName = `${gameId}_instances`;
+
+    console.log(`Deleting shared instances from ${collectionName} older than ${cutoff.toISOString()}...`);
+
+    let totalDeleted = 0;
+
+    while (true) {
+        const snapshot = await db
+            .collection(collectionName)
+            .where("createdAt", "<", cutoff)
+            .limit(BATCH_SIZE)
+            .get();
+        
+        if (snapshot.empty) break;
+
+        const batch = db.batch();
+
+        snapshot.docs.forEach((doc => {
+            batch.delete(doc.ref);
+        }));
+
+        await batch.commit();
+
+        totalDeleted += snapshot.size;
+
+        console.log(`  [${gameId}] Deleted batch of ${snapshot.size} (total: ${totalDeleted})`);
+
+        if (snapshot.size < BATCH_SIZE) {
+            break;
+        }
+    }
+
+    console.log(`Done with ${collectionName}. Deleted ${totalDeleted} old shared instance(s).`);
+
+    return totalDeleted;
+}
+
+// ─── 4. Main ────────────────────────────────────────────────────
 
 async function main() {
     const cutoff = new Date();
@@ -44,36 +86,17 @@ async function main() {
 
     console.log(`Deleting shared instances older than ${cutoff.toISOString()}...`);
 
-    const query = db
-        .collection(COLLECTION_NAME)
-        .where("createdAt", "<", cutoff)
-        .limit(BATCH_SIZE);
-
     let totalDeleted = 0;
-    let hasMore = true;
 
-    while (hasMore) {
-        const snapshot = await query.get();
-
-        if (snapshot.empty) {
-            hasMore = false;
-            break;
-        }
-
-        const batch = db.batch();
-        snapshot.docs.forEach((doc) => batch.delete(doc.ref));
-        await batch.commit();
-
-        totalDeleted += snapshot.size;
-        console.log(`  Deleted batch of ${snapshot.size} (total: ${totalDeleted})`);
-
-        // If we got fewer than BATCH_SIZE, we're done
-        if (snapshot.size < BATCH_SIZE) {
-            hasMore = false;
+    for (const gameId of GAMES) {
+        try {
+            totalDeleted += await deleteOldInstancesForGame(gameId, cutoff);
+        } catch (error) {
+            console.error(`Error deleting old instances for game ${gameId}:`, error);
         }
     }
 
-    console.log(`Done. Deleted ${totalDeleted} old shared instance(s).`);
+    console.log(`Done. Deleted ${totalDeleted} old shared instances(s) in total.`);
 }
 
 main().catch((err) => {

@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import {
     useInstanceSharing,
     type InstanceSharingAdapter,
-} from '@/hooks/shared/useInstanceSharing';
+} from '@/hooks/games/shared/useInstanceSharing';
 import { getGameInstance, saveGameInstance, } from '@/services/games/TSPService';
 import type { Point, TSPInstance, } from '@/types/games/tsp';
 

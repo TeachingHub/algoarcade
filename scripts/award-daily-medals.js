@@ -1,5 +1,5 @@
 /**
- * Award Daily TSP Medals
+ * Award Daily Medals
  *
  * Evaluates yesterday's leaderboard and increments medal counters
  * on user documents:
@@ -35,6 +35,23 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 const FieldValue = admin.firestore.FieldValue;
 
+const MEDAL_KEYS = ["gold", "silver", "bronze"];
+
+const GAMES = [
+    {
+        id: "tsp",
+        leaderboardsCollection: "tsp_leaderboards",
+        dailyChallengesCollection: "tsp_daily_challenges",
+        scoreOrder: "asc"
+    },
+    {
+        id: "knapsack",
+        leaderboardsCollection: "knapsack_leaderboards",
+        dailyChallengesCollection: "knspasack_daily_challenges",
+        scoreOrder: "desc"
+    },
+];
+
 // ─── 2. Helpers ─────────────────────────────────────────────────
 
 /** Yesterday's date as YYYY-MM-DD in UTC */
@@ -44,69 +61,88 @@ function getYesterdayDateString() {
     return `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}-${String(now.getUTCDate()).padStart(2, "0")}`;
 }
 
-const MEDAL_KEYS = ["gold", "silver", "bronze"];
+function getTimestampMilliseconds(timestamp) {
+    if (!timestamp) return Infinity;
+    if (typeof timestamp.toMillis === "function") return timestamp.toMillis();
+    if (timestamp._seconds) return timestamp._seconds * 1000;
+    return Infinity;
+};
 
-// ─── 3. Main ────────────────────────────────────────────────────
+function compareScores(a, b, scoreOrder) {
+    if (a.score !== b.score) {
+        return scoreOrder === "asc" ? a.score - b.score : b.score -a.score;
+    }
+    if (a.time_ms !== b.time_ms) {
+        return a.time_ms - b.time_ms;
+    }
+    return (getTimestampMilliseconds(a.timestamp) - getTimestampMilliseconds(b.timestamp));
+}
 
-async function main() {
-    const yesterday = getYesterdayDateString();
-    console.log(`Awarding medals for: ${yesterday}`);
+// ─── 3. Award Medals ────────────────────────────────────────────────────
 
-    // Check if medals were already awarded (idempotency)
-    const metaRef = db.collection("tsp_daily_challenges").doc(`daily_${yesterday}`);
+async function awardMedalsForGame(game, yesterday) {
+    const { id: gameId, leaderboardsCollection, dailyChallengesCollection, scoreOrder } = game;
+
+    const metaRef = db.collection(dailyChallengesCollection).doc(`daily_${yesterday}`);
     const metaSnap = await metaRef.get();
+
     if (metaSnap.exists && metaSnap.data().medalsAwarded) {
-        console.log(`Medals for ${yesterday} already awarded. Skipping.`);
-        process.exit(0);
+        console.log(`Medals for ${gameId} on ${yesterday} already awarded. Skipping.`);
+        return;
     }
 
-    // Fetch the leaderboard for yesterday (top 3 by distance ascending)
     const scoresRef = db
-        .collection("tsp_leaderboards")
+        .collection(leaderboardsCollection)
         .doc(yesterday)
         .collection("scores");
 
-    // Fetch more than 3 to handle ties at the boundary correctly
-    const snapshot = await scoresRef.orderBy("distance", "asc").limit(10).get();
+    const snapshot = await scoresRef.orderBy("score", scoreOrder).limit(10).get();
 
     if (snapshot.empty) {
-        console.log(`No scores found for ${yesterday}. Nothing to award.`);
-        // Mark as processed anyway to avoid re-checking
+        console.log(`No scores founf for ${gameId} on ${yesterday}.`);
+
         await metaRef.set({ medalsAwarded: true }, { merge: true });
-        process.exit(0);
+        return;
     }
 
-    const winners = [];
-    snapshot.forEach((doc) => winners.push(doc.data()));
+    const winners = []
 
-    // Client-side tiebreaker: same distance → earlier timestamp wins
-    winners.sort((a, b) => {
-        if (a.distance !== b.distance) return a.distance - b.distance;
-        const getMs = (t) => {
-            if (!t) return Infinity;
-            if (typeof t.toMillis === "function") return t.toMillis();
-            if (t._seconds) return t._seconds * 1000;
-            return Infinity;
-        };
-        return getMs(a.timestamp) - getMs(b.timestamp);
+    snapshot.forEach((doc) => {
+        const data = doc.data();
+
+        if (typeof data.score !== "number") {
+            console.warn(`Ignoring ${gameId} score ${doc.id}: score is not a number.`);
+            return;
+        }
+
+        winners.push({...data, documentId: doc.id});
     });
 
-    console.log(`Found ${winners.length} top scorers.`);
+    winners.sort((a, b) => compareScores(a, b, scoreOrder));
 
-    // Award medals
+    console.log(`Found ${winners.length} valid scores for ${gameId}.`);
+
     const batch = db.batch();
 
     for (let i = 0; i < Math.min(winners.length, 3); i++) {
-        const userId = winners[i].userId;
-        const medalKey = MEDAL_KEYS[i]; // gold, silver, bronze
-        const userRef = db.collection("users").doc(userId);
+        const winner = winners[i];
+        const medalKey = MEDAL_KEYS[i];
 
-        console.log(`  ${medalKey.toUpperCase()} → ${winners[i].displayName} (${userId}) — distance: ${winners[i].distance}`);
+        if (!winner.userId) {
+            console.warn(`Ignoring winner ${winner.documentId}: missing userId.`);
+            continue;
+        }
+        
+        const userRef = db.collection("users").doc(winner.userId);
+
+        console.log(`  ${medalKey.toUpperCase()} → ${winner.displayName || winner.userId} (${winner.userId}) — score: ${winner.score}`);
+
+        const medalsField = `${gameId}Medals`;
 
         batch.set(
             userRef,
             {
-                tspMedals: {
+                [medalsField]: {
                     [medalKey]: FieldValue.increment(1),
                 },
             },
@@ -114,11 +150,30 @@ async function main() {
         );
     }
 
-    // Mark challenge as processed
     batch.set(metaRef, { medalsAwarded: true }, { merge: true });
 
     await batch.commit();
-    console.log("Medals awarded successfully!");
+
+    console.log(`Medals for ${gameId} awarded successfully!`);
+}
+        
+
+// ─── 4. Main ────────────────────────────────────────────────────
+
+async function main() {
+    const yesterday = getYesterdayDateString();
+
+    console.log(`Awarding medals for all games on: ${yesterday}`);
+
+    for (const game of GAMES) {
+        try {
+            await awardMedalsForGame(game, yesterday);
+        } catch (error) {
+            console.error(`Error processing game ${game.id}:`, error)
+        }
+    }
+
+    console.log("\nFinished processing all games");
 }
 
 main().catch((err) => {
