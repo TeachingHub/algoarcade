@@ -1,12 +1,12 @@
 # ───────────────────────────────────────────────────────
-# 🏅 AlgoArcade — Award Daily TSP Medals
+# 🏅 AlgoArcade — Award Daily Medals
 # ───────────────────────────────────────────────────────
 # Runs every day at 00:05 UTC to evaluate the previous
 # day's leaderboard and award gold/silver/bronze medals
-# to the top 3 players.
+# to the top 3 players for all games.
 # ───────────────────────────────────────────────────────
 
-name: Award Daily TSP Medals
+name: Award Daily Medals
 
 on:
   schedule:

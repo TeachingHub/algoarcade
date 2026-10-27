@@ -1,17 +1,19 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import type { User } from 'firebase/auth';
-import type { TSPState } from "@/types/games/tsp";
-import { calculateTotalDistance } from "@/utils/tsp";
-import { useTSPDailyChallenge, normalizeDistance } from './tsp/useTSPDailyChallenge';
+import type { TSPState } from '@/types/games/tsp';
+import { calculateTotalDistance, normalizeDistance } from '@/utils/tsp';
+import { useTSPDailyChallenge } from './tsp/useTSPDailyChallenge';
 import { useTSPLeaderboard } from './tsp/useTSPLeaderboard';
-import { useGameTimer } from "@/hooks/useGameTimer";
+import { useDailyChallengeDate } from './shared/useDailyChallengeDate';
+import { useGameCompetitive } from './shared/useGameCompetitive';
 
 /**
  * Orchestrator hook for TSP Competitive (Daily Challenge) mode.
  *
  * Composes:
- *  - useTSPDailyChallenge → loads/creates today's challenge (or past days)
- *  - useTSPLeaderboard    → leaderboard fetch & score submission
+ *  - useTSPDailyChallenge  → loads/creates today's challenge (or past days)
+ *  - useTSPLeaderboard     → leaderboard fetch & score submission
+ *  - useDailyChallengeDate → change date to navigate between past days
  *
  * Owns:
  *  - Manual path building (click-to-add)
@@ -20,7 +22,7 @@ import { useGameTimer } from "@/hooks/useGameTimer";
  *  - Practice mode for past challenges
  */
 
-export const useTSPCompetitive = (canvasSize: { width: number, height: number }, user: User | null) => {
+export const useTSPCompetitive = (canvasSize: { width: number; height: number; }, user: User | null) => {
     const [gameState, setGameState] = useState<TSPState>({
         points: [],
         bestPath: [],
@@ -30,87 +32,81 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
     });
 
     const [manualPath, setManualPath] = useState<number[]>([]);
-    const [gameResult, setGameResult] = useState<string | null>(null);
-    const [hasSubmitted, setHasSubmitted] = useState(false);
 
-    // --- Sub-hooks ---
-    const dailyChallenge = useTSPDailyChallenge(canvasSize);
-    const { leaderboard, isSubmitting, fetchLeaderboard, checkSubmission, submitScore } = useTSPLeaderboard();
-    const { start, pause, reset, elapsedMs } = useGameTimer();
+    const dailyDate = useDailyChallengeDate();
 
-    // --- Sync daily challenge instance into game state ---
-    useEffect(() => {
-        if (dailyChallenge.instance) {
-            setGameState(prev => ({
-                ...prev,
-                points: dailyChallenge.instance!.points,
-                bestPath: [],
-                currentPath: [],
-                bestDistance: Infinity,
-                isRunning: false
-            }));
-            // Reset play state when navigating dates
-            setManualPath([]);
-            setGameResult(null);
-            setHasSubmitted(false);
-            // Fetch leaderboard for this date
-            fetchLeaderboard(dailyChallenge.selectedDate);
-            // Reset timer
-            reset();
+    const dailyChallenge = useTSPDailyChallenge(canvasSize, dailyDate.selectedDate);
 
-            // Check if user already submitted for this date
-            if (user) {
-                checkSubmission(user.uid, dailyChallenge.selectedDate).then(alreadySubmitted => {
-                    if (alreadySubmitted) {
-                        setHasSubmitted(true);
-                        setGameResult('You already submitted your score for this day!');
-                    }
-                });
-            }
-        }
-    }, [dailyChallenge.instance, dailyChallenge.selectedDate, fetchLeaderboard, checkSubmission, user]);
+    const {
+        leaderboard,
+        isSubmitting,
+        fetchLeaderboard,
+        checkSubmission,
+        submitScore
+    } = useTSPLeaderboard();
 
-    // --- Manual path building ---
+    const resetGame = useCallback(() => {
+        if (!dailyChallenge.instance) return;
+
+        setGameState({
+            points: dailyChallenge.instance.points,
+            bestPath: [],
+            currentPath: [],
+            bestDistance: Infinity,
+            isRunning: false
+        });
+
+        setManualPath([]);
+    }, [dailyChallenge.instance]);
+
+    const game = useGameCompetitive<number[], number>({
+        user,
+        selectedDate: dailyDate.selectedDate,
+        isToday: dailyDate.isToday,
+        challengeReady:
+            dailyChallenge.instance !== null &&
+            dailyChallenge.loadedDate === dailyDate.selectedDate,
+
+        resetGame,
+        fetchLeaderboard,
+        checkSubmission,
+        submitScore,
+
+        formatPracticeResult: (distance, elapsedMs) =>
+            `Practice mode! Distance: ${Math.round(distance)}. Time: ${Math.round(elapsedMs / 1000)}s. This score won't be saved.`,
+
+        formatAnonymousResult: (distance, elapsedMs) =>
+            `Finished! Distance: ${Math.round(distance)}. Time: ${Math.round(elapsedMs / 1000)}s. Login to save your score!`
+    });
 
     const handlePointClick = useCallback((pointId: number) => {
-        if (hasSubmitted || gameResult) return;
+        if (game.hasSubmitted || game.gameResult) return;
 
-        if (!manualPath.includes(pointId)) {
-            const newManualPath = [...manualPath, pointId];
+        if (!gameState.points[pointId]) return;
+        if (manualPath.includes(pointId)) return;
 
-            // Block the final point for non-logged users (can't submit)
-            if (!user && newManualPath.length === gameState.points.length) return;
+        const newPath = [...manualPath, pointId];
 
-            setManualPath(newManualPath);
+        setManualPath(newPath);
 
-            if (newManualPath.length === gameState.points.length) {
-                const distance = calculateTotalDistance(gameState.points, newManualPath);
-                setGameState(prev => ({
-                    ...prev,
-                    currentPath: newManualPath,
-                    bestDistance: distance
-                }));
-            }
+        if (newPath.length === gameState.points.length) {
+            const distance = calculateTotalDistance(gameState.points, newPath);
+
+            setGameState(prev => ({
+                ...prev,
+                currentPath: newPath,
+                bestDistance: distance
+            }));
         }
-        
-        // Start timer
-        if (manualPath.length === 0) {
-            start();
-        }
-    }, [hasSubmitted, gameResult, manualPath, gameState.points, user, start]);
 
-    // --- Submission ---
+        game.startTimerIfNeeded();
+    }, [game.hasSubmitted, game.gameResult, gameState.points, manualPath, user, game.startTimerIfNeeded]);
 
     const submitManualPath = useCallback(async () => {
-        if (manualPath.length !== gameState.points.length || hasSubmitted) return;
-
-        // Stop timer
-        pause();
+        if (manualPath.length !== gameState.points.length || game.hasSubmitted) return;
 
         let distance = calculateTotalDistance(gameState.points, manualPath);
-        
-        // Normalize distance to standard canvas size (800x500) for fair scoring
-        // This ensures mobile players don't get unfair advantages due to smaller canvas
+
         distance = normalizeDistance(distance, canvasSize.width, canvasSize.height);
 
         setGameState(prev => ({
@@ -119,61 +115,49 @@ export const useTSPCompetitive = (canvasSize: { width: number, height: number },
             bestDistance: distance
         }));
 
-        setHasSubmitted(true);
-
-        // Practice mode: past challenges don't save scores
-        if (!dailyChallenge.isToday) {
-            setGameResult(`Practice mode! Distance: ${Math.round(distance)}. Time: ${Math.round(elapsedMs / 1000)}s. This score won't be saved.`);
-            return;
-        }
-
-        if (user) {
-            const resultMessage = await submitScore(user, distance, manualPath, dailyChallenge.selectedDate, elapsedMs);
-            setGameResult(resultMessage);
-        } else {
-            setGameResult(`Finished! Distance: ${Math.round(distance)}. Time: ${Math.round(elapsedMs / 1000)}s. Login to save your score!`);
-        }
-    }, [manualPath, gameState.points, hasSubmitted, user, submitScore, dailyChallenge.isToday, dailyChallenge.selectedDate, canvasSize, pause, elapsedMs]);
-
-    // --- Clear path ---
+        await game.submitGameScore({
+            score: distance,
+            selection: manualPath
+        });
+    }, [manualPath, gameState.points, game.hasSubmitted, canvasSize.width, canvasSize.height, game.submitGameScore]);
 
     const clearAll = useCallback(() => {
-        if (hasSubmitted) return;
-        pause();
-        reset();
+        if (game.hasSubmitted) return;
+
         setGameState(prev => ({
             ...prev,
             bestPath: [],
             currentPath: [],
             bestDistance: Infinity
         }));
-        setManualPath([]);
-    }, [hasSubmitted, pause, reset]);
 
-    // --- Derived loading state ---
+        setManualPath([]);
+    }, [game.hasSubmitted]);
+
     const isLoading = dailyChallenge.isLoading || isSubmitting;
 
     return {
         gameState,
         manualPath,
-        gameResult,
+        gameResult: game.gameResult,
         isLoading,
-        hasSubmitted,
+        hasSubmitted: game.hasSubmitted,
         leaderboard,
-        // Date navigation
-        isToday: dailyChallenge.isToday,
+
+        isToday: dailyDate.isToday,
         notFound: dailyChallenge.notFound,
-        selectedDate: dailyChallenge.selectedDate,
-        dateLabel: dailyChallenge.dateLabel,
-        canGoNext: dailyChallenge.canGoNext,
+        selectedDate: dailyDate.selectedDate,
+        dateLabel: dailyDate.dateLabel,
+        canGoNext: dailyDate.canGoNext,
+
         actions: {
             handlePointClick,
             submitManualPath,
             clearAll,
             reloadLeaderboard: dailyChallenge.reload,
-            goToPrevDay: dailyChallenge.goToPrevDay,
-            goToNextDay: dailyChallenge.goToNextDay,
-            goToToday: dailyChallenge.goToToday,
+            goToPrevDay: dailyDate.goToPrevDay,
+            goToNextDay: dailyDate.goToNextDay,
+            goToToday: dailyDate.goToToday
         }
     };
 };

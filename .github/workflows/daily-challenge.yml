@@ -1,14 +1,15 @@
 # ───────────────────────────────────────────────────────
-# 🎮 AlgoArcade — Generate Daily TSP Challenge
+# 🎮 AlgoArcade — Generate Daily Challenge
 # ───────────────────────────────────────────────────────
-# Runs every day at 00:00 UTC to create a new TSP daily
-# challenge in Firestore, independent of user access.
+# Runs every day at 00:00 UTC to create a new daily
+# challenge for all games in Firestore, independent
+# of user access.
 #
 # Can also be triggered manually from the GitHub UI
 # via the "Run workflow" button.
 # ───────────────────────────────────────────────────────
 
-name: Generate Daily TSP Challenge
+name: Generate Daily Challenge
 
 on:
   schedule:

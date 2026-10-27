@@ -2,14 +2,14 @@ import { useState } from 'react';
 import Layout from '@/layouts/Layout';
 import GameTabs from '@/components/games/shared/GameTabs';
 import KnapsackSandbox from '@/components/games/knapsack/KnapsackSandbox';
-//import KnapsackCompetitive from '@/components/games/knapsack/KnapsackCompetitive'; //Daily challenge not implemented yet
-//import KnapsackGlobalLeaderboard from '@/components/games/knapsack/KnapsackGlobalLeaderboard'; //Daily challenge not implemented yet
+import KnapsackCompetitive from '@/components/games/knapsack/KnapsackCompetitive';
+import GlobalLeaderboard from '@/components/games/shared/GlobalLeaderboard';
 import { GameTimerProvider } from "@/context/GameTimerContext";
 
 const Knapsack_TABS = [
     { key: 'sandbox', label: 'SANDBOX' },
-    //{ key: 'competitive', label: 'DAILY CHALLENGE' }, //Daily challenge not implemented yet
-    //{ key: 'leaderboard', label: 'GLOBAL LEADERBOARD' }, //Daily challenge not implemented yet
+    { key: 'competitive', label: 'DAILY CHALLENGE' },
+    { key: 'leaderboard', label: 'GLOBAL LEADERBOARD' },
 ];
 
 export default function KnapsackPage() {
@@ -26,8 +26,8 @@ export default function KnapsackPage() {
                 />
 
                 {mode === 'sandbox' && <KnapsackSandbox />}
-                {/*mode === 'competitive' && <KnapsackCompetitive />*/}
-                {/*mode === 'leaderboard' && <KnapsackGlobalLeaderboard />*/}
+                {mode === 'competitive' && <KnapsackCompetitive />}
+                {mode === 'leaderboard' && <GlobalLeaderboard game="knapsack" />}
             </Layout>
         </GameTimerProvider>
     );

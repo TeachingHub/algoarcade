@@ -3,7 +3,7 @@ import Layout from '@/layouts/Layout';
 import GameTabs from '@/components/games/shared/GameTabs';
 import TSPSandbox from '@/components/games/tsp/TSPSandbox';
 import TSPCompetitive from '@/components/games/tsp/TSPCompetitive';
-import TSPGlobalLeaderboard from '@/components/games/tsp/TSPGlobalLeaderboard';
+import GlobalLeaderboard from '@/components/games/shared/GlobalLeaderboard';
 import { GameTimerProvider } from "@/context/GameTimerContext";
 
 const TSP_TABS = [
@@ -27,7 +27,7 @@ export default function TSPPage() {
 
                 {mode === 'sandbox' && <TSPSandbox />}
                 {mode === 'competitive' && <TSPCompetitive />}
-                {mode === 'leaderboard' && <TSPGlobalLeaderboard />}
+                {mode === 'leaderboard' && <GlobalLeaderboard game="tsp" />}
             </Layout>
         </GameTimerProvider>
     );

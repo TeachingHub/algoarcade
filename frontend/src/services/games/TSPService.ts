@@ -1,9 +1,10 @@
-import { db } from "@/firebase/config";
 import type { TSPInstance, Point } from "@/types/games/tsp";
-import { addDoc, serverTimestamp, collection, doc, getDoc, setDoc, query, orderBy, limit, getDocs } from "firebase/firestore";
+
+import * as gameService from "@services/games/gameService";
 
 const COLLECTION_NAME = "tsp_instances";
 const DAILY_COLLECTION_NAME = "tsp_daily_challenges";
+const LEADERBOARD_COLLECTION_NAME = "tsp_leaderboards";
 
 function encodeTSPInstance(instance: TSPInstance): string {
     // 1. Extract author
@@ -43,145 +44,71 @@ function decodeTSPInstance(encodedData: string): TSPInstance {
 }
 
 export async function saveGameInstance(instanceData: TSPInstance): Promise<string> {
-    try {
-        const encoded = encodeTSPInstance(instanceData);
-
-        const docRef = await addDoc(collection(db, COLLECTION_NAME), {
-            data: encoded, // Store as a single string field
-            createdAt: serverTimestamp()
-        });
-        return docRef.id;
-    } catch (error) {
-        console.error("Error saving game instance:", error);
-        throw new Error("Failed to save game instance");
-    }
+    return gameService.saveGameInstance(
+        COLLECTION_NAME,
+        instanceData,
+        encodeTSPInstance
+    );
 }
-
 
 export async function getGameInstance(instanceId: string): Promise<TSPInstance | null> {
-    try {
-        const docRef = doc(db, COLLECTION_NAME, instanceId);
-        const docSnap = await getDoc(docRef)
+    return gameService.getGameInstance(
+        COLLECTION_NAME,
+        instanceId,
+        decodeTSPInstance
+    );
+} 
 
-        if (docSnap.exists()) {
-            const docData = docSnap.data();
-            // Check if we have the new 'data' string field
-            if (typeof docData.data === 'string') {
-                return decodeTSPInstance(docData.data);
-            }
 
-            // Fallback: Return null or handle legacy data if needed. 
-            // For now assuming we only read new format or legacy data handling is not required by prompt instructions.
-            return null;
-        } else {
-            return null;
-        }
-
-    } catch (error) {
-        console.error("Error fetching game instance:", error)
-        throw new Error("Failed to load game instance")
-    }
-}
-
-// --- COMPETITIVE MODE ---
+// --- DAILY CHALLENGE ---
 
 export async function getDailyChallenge(dateString: string): Promise<TSPInstance | null> {
-    try {
-        const docRef = doc(db, DAILY_COLLECTION_NAME, `daily_${dateString}`);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-            const docData = docSnap.data();
-            if (typeof docData.data === 'string') {
-                return decodeTSPInstance(docData.data);
-            }
-        }
-        return null;
-    } catch (error) {
-        console.error("Error fetching daily challenge:", error);
-        return null;
-    }
+    return gameService.getDailyChallenge(
+        DAILY_COLLECTION_NAME,
+        dateString,
+        decodeTSPInstance
+    );
 }
 
 export async function createDailyChallenge(dateString: string, instanceData: TSPInstance): Promise<void> {
-    try {
-        const encoded = encodeTSPInstance(instanceData);
-        const docRef = doc(db, DAILY_COLLECTION_NAME, `daily_${dateString}`);
-
-        // We use setDoc to specify the document ID explicitly (the date string)
-        await setDoc(docRef, {
-            data: encoded,
-            createdAt: serverTimestamp()
-        });
-    } catch (error) {
-        console.error("Error creating daily challenge:", error);
-        throw new Error("Failed to create daily challenge");
-    }
+    return gameService.createDailyChallenge(
+        DAILY_COLLECTION_NAME,
+        dateString,
+        instanceData,
+        encodeTSPInstance
+    );
 }
 
 export interface TSPLeaderboardEntry {
     userId: string;
     displayName: string;
     photoURL: string;
-    distance: number;
+    score: number;
     path: number[];
     timestamp: any;
     time_ms?: number | null;
 }
 
 export async function saveDailyScore(dateString: string, score: TSPLeaderboardEntry): Promise<void> {
-    try {
-        const leaderboardRef = collection(db, "tsp_leaderboards", dateString, "scores");
-        // We can use the user's ID as the doc ID so they only have one score per day
-        await setDoc(doc(leaderboardRef, score.userId), score);
-    } catch (error) {
-        console.error("Error saving daily score:", error);
-        throw new Error("Failed to save daily score");
-    }
+    return gameService.saveDailyScore(
+        LEADERBOARD_COLLECTION_NAME,
+        dateString,
+        score
+    );
 }
 
 export async function hasUserSubmitted(dateString: string, userId: string): Promise<boolean> {
-    try {
-        const scoreRef = doc(db, "tsp_leaderboards", dateString, "scores", userId);
-        const scoreSnap = await getDoc(scoreRef);
-        return scoreSnap.exists();
-    } catch (error) {
-        console.error("Error checking user submission:", error);
-        return false;
-    }
+    return gameService.hasUserSubmitted(
+        LEADERBOARD_COLLECTION_NAME,
+        dateString,
+        userId
+    );
 }
 
 export async function getDailyLeaderboard(dateString: string): Promise<TSPLeaderboardEntry[]> {
-    try {
-        const leaderboardRef = collection(db, "tsp_leaderboards", dateString, "scores");
-        // Single orderBy to avoid requiring a composite index
-        const q = query(leaderboardRef, orderBy("distance", "asc"), limit(10));
-
-        const querySnapshot = await getDocs(q);
-        const scores: TSPLeaderboardEntry[] = [];
-        querySnapshot.forEach((doc) => {
-            scores.push(doc.data() as TSPLeaderboardEntry);
-        });
-
-        // Client-side tiebreaker: same distance → less duration wins
-        scores.sort((a, b) => {
-            if (a.distance !== b.distance) return a.distance - b.distance;
-            const aDuration = (a.time_ms ?? Infinity);
-            const bDuration = (b.time_ms ?? Infinity);
-            if (aDuration !== bDuration) return aDuration - bDuration;
-            // Client-side tiebreaker: same distance and duration→ earlier timestamp wins
-            const getMs = (t: any): number => {
-                if (!t) return Infinity;
-                if (typeof t.toMillis === 'function') return t.toMillis();
-                if (t.seconds) return t.seconds * 1000;
-                return Infinity;
-            };
-            return getMs(a.timestamp) - getMs(b.timestamp);
-        });
-
-        return scores.slice(0, 5);
-    } catch (error) {
-        console.error("Error fetching daily leaderboard:", error);
-        return [];
-    }
+    return gameService.getDailyLeaderboard<TSPLeaderboardEntry> ({
+        collectionName: LEADERBOARD_COLLECTION_NAME,
+        dateString,
+        socreDirection: "asc"
+    });
 }
