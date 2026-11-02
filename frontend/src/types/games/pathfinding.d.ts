@@ -23,3 +23,8 @@ export interface PathfindingState {
     pathLength: number;
     speed: number;
 }
+
+export interface PathfindingInstance {
+    grid: Cell[][];
+    author: string;
+}

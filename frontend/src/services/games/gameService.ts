@@ -132,18 +132,18 @@ export async function hasUserSubmitted(
 interface GetDailyLeaderboardOptions {
     collectionName: string;
     dateString: string;
-    socreDirection: "asc" | "desc";
+    scoreDirection: "asc" | "desc";
 }
 
 export async function getDailyLeaderboard<T extends BaseLeaderboardEntry>({
     collectionName,
     dateString,
-    socreDirection
+    scoreDirection
 }: GetDailyLeaderboardOptions): Promise<T[]> {
     try {
         const leaderboardRef = collection(db, collectionName, dateString, "scores");
 
-        const leaderboardQuery = query(leaderboardRef, orderBy("score", socreDirection), limit(10));
+        const leaderboardQuery = query(leaderboardRef, orderBy("score", scoreDirection), limit(10));
 
         const querySnap = await getDocs(leaderboardQuery);
 
@@ -155,7 +155,7 @@ export async function getDailyLeaderboard<T extends BaseLeaderboardEntry>({
 
         scores.sort((a, b) => {
             if (a.score !== b.score) {
-                return socreDirection === "asc" ? a.score - b.score : b.score - a.score;
+                return scoreDirection === "asc" ? a.score - b.score : b.score - a.score;
             }
 
             const aDuration = a.time_ms ?? Infinity;

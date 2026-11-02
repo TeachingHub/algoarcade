@@ -109,6 +109,6 @@ export async function getDailyLeaderboard(dateString: string): Promise<TSPLeader
     return gameService.getDailyLeaderboard<TSPLeaderboardEntry> ({
         collectionName: LEADERBOARD_COLLECTION_NAME,
         dateString,
-        socreDirection: "asc"
+        scoreDirection: "asc"
     });
 }

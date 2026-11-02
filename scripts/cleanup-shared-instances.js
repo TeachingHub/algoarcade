@@ -33,7 +33,8 @@ const db = admin.firestore();
 
 const GAMES = [
     "tsp",
-    "knapsack"
+    "knapsack",
+    "pathfinding"
 ];
 const MAX_AGE_DAYS = 7;
 const BATCH_SIZE = 100;

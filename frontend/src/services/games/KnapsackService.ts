@@ -124,6 +124,6 @@ export async function getDailyLeaderboard(dateString: string): Promise<KnapsackL
     return gameService.getDailyLeaderboard<KnapsackLeaderboardEntry> ({
         collectionName: LEADERBOARD_COLLECTION_NAME,
         dateString,
-        socreDirection: "desc"
+        scoreDirection: "desc"
     });
 }

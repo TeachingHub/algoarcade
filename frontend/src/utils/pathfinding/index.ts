@@ -207,3 +207,41 @@ function isSolvable(grid: Cell[][]): boolean {
 
     return false;
 }
+
+// ─── Shared logic: extend manual path ────────────────────────────
+
+export function tryExtendManualPath(
+    prev: { row: number; col: number }[],
+    row: number,
+    col: number,
+    grid: Cell[][],
+): { row: number; col: number }[] {
+    // First cell must be the start
+    if (prev.length === 0) {
+        const start = findStart(grid);
+        if (!start || row !== start.row || col !== start.col) return prev;
+        return [{ row, col }];
+    }
+
+    // Undo: click on the second-to-last cell
+    if (prev.length >= 2) {
+        const prevStep = prev[prev.length - 2];
+        if (prevStep.row === row && prevStep.col === col) {
+            return prev.slice(0, -1);
+        }
+    }
+
+    // Must be adjacent to last step
+    const last = prev[prev.length - 1];
+    const dr = Math.abs(row - last.row);
+    const dc = Math.abs(col - last.col);
+    if (dr + dc !== 1) return prev;
+
+    // Can't cross walls
+    if (grid[row][col].type === 'wall') return prev;
+
+    // Can't revisit
+    if (prev.some(p => p.row === row && p.col === col)) return prev;
+
+    return [...prev, { row, col }];
+}
