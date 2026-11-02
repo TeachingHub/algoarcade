@@ -6,11 +6,11 @@ import styles from '@/styles/components/games/pathfinding/PathfindingGrid.module
 interface PathfindingGridProps {
     grid: Cell[][];
     manualPath: { row: number; col: number }[];
-    algoComparisonPath: { row: number; col: number }[] | null;
+    algoComparisonPath?: { row: number; col: number }[] | null;
     isRunning: boolean;
     onCellClick: (row: number, col: number) => void;
     onCellDrag: (row: number, col: number) => void;
-    onDragEnd: () => void;
+    onDragEnd?: () => void;
 }
 
 export default function PathfindingGrid({
@@ -36,7 +36,7 @@ export default function PathfindingGrid({
 
     const handleMouseUp = useCallback(() => {
         isDragging.current = false;
-        onDragEnd();
+        onDragEnd?.();
     }, [onDragEnd]);
 
     // Build lookup sets for fast rendering

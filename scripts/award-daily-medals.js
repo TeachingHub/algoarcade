@@ -47,8 +47,14 @@ const GAMES = [
     {
         id: "knapsack",
         leaderboardsCollection: "knapsack_leaderboards",
-        dailyChallengesCollection: "knspasack_daily_challenges",
+        dailyChallengesCollection: "knapsack_daily_challenges",
         scoreOrder: "desc"
+    },
+    {
+        id: "pathfinding",
+        leaderboardsCollection: "pathfinding_leaderboards",
+        dailyChallengesCollection: "pathfinding_daily_challenges",
+        scoreOrder: "asc"
     },
 ];
 
@@ -99,7 +105,7 @@ async function awardMedalsForGame(game, yesterday) {
     const snapshot = await scoresRef.orderBy("score", scoreOrder).limit(10).get();
 
     if (snapshot.empty) {
-        console.log(`No scores founf for ${gameId} on ${yesterday}.`);
+        console.log(`No scores found for ${gameId} on ${yesterday}.`);
 
         await metaRef.set({ medalsAwarded: true }, { merge: true });
         return;
