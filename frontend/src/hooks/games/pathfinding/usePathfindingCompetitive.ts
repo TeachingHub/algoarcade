@@ -84,17 +84,18 @@ export const usePathfindingCompetitive = (user: User | null) => {
     });
 
     const handleCellInteraction = useCallback((row: number, col: number) => {
-            if (gameState.isSolved) return;
-            setManualPath(prev => tryExtendManualPath(prev, row, col, gameState.grid));
-        }, [gameState.grid, gameState.isSolved]);
+        if (game.hasSubmitted || game.gameResult) return;
+        setManualPath(prev => tryExtendManualPath(prev, row, col, gameState.grid));
+        game.startTimerIfNeeded();
+    }, [gameState.grid, gameState.isSolved, game.hasSubmitted, game.gameResult]);
 
     const handleCellDrag = useCallback((row: number, col: number) => {
-            if (gameState.isSolved) return;
-            setManualPath(prev => tryExtendManualPath(prev, row, col, gameState.grid));
-    }, [gameState.grid, gameState.isSolved]);
+        if (game.hasSubmitted || game.gameResult) return;
+        setManualPath(prev => tryExtendManualPath(prev, row, col, gameState.grid));
+        game.startTimerIfNeeded();
+    }, [gameState.grid, gameState.isSolved, game.hasSubmitted, game.gameResult]);
 
     useEffect(() => {
-        if (gameState.isSolved || manualPath.length === 0) return;
 
         const end = findEnd(gameState.grid);
         const last = manualPath[manualPath.length - 1];
@@ -107,7 +108,7 @@ export const usePathfindingCompetitive = (user: User | null) => {
     }, [manualPath, gameState.grid, gameState.isSolved]);
 
     const submitManualPath = useCallback(async () => {
-        if (canSubmit || game.hasSubmitted) {return;}
+        if (!canSubmit || game.hasSubmitted) {return;}
 
         const score = manualPath.length;
 

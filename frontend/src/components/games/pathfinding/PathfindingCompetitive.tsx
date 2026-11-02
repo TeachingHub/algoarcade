@@ -42,7 +42,7 @@ export default function PathfindingCompetitive() {
                     canGoNext={canGoNext}
                     hasSubmitted={hasSubmitted}
                     canSubmit={canSubmit}
-                    canClear={gameState.pathLength > 0}
+                    canClear={manualPath.length > 0}
                     isAuthenticated={Boolean(user)}
                     onPreviousDay={actions.goToPrevDay}
                     onNextDay={actions.goToNextDay}

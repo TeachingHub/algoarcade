@@ -83,6 +83,7 @@ export default function KnapsackCompetitive() {
                     leaderboard={leaderboard}
                     currentUserId={user?.uid}
                     isLoading={isLoading}
+                    formatScore={(value) => Number(value.toFixed(2)).toString()}
                 />
             }
         >
