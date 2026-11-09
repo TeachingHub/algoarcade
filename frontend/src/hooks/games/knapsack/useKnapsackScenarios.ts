@@ -32,8 +32,8 @@ export const useKnapsackScenarios = () => {
 
         const numItems = count || customItemsCount;
         const minItemWeight = minWeight || customItemsMinWeight;
-        const maxItemWieght = maxWeight || customItemsMaxWeight;
-        instance = generateRandomGame(numItems, minItemWeight, maxItemWieght);
+        const maxItemWeight = maxWeight || customItemsMaxWeight;
+        instance = generateRandomGame(numItems, minItemWeight, maxItemWeight);
         newScenarioInfo = {
             name: "Knapsack game",
             description: "Select the best items to miximize your profit without exceeding the weight limit"
@@ -41,7 +41,7 @@ export const useKnapsackScenarios = () => {
 
         setScenarioInfo(newScenarioInfo);
         return instance;
-    }, [customItemsCount]);
+    }, [customItemsCount, customItemsMinWeight, customItemsMaxWeight]);
 
     /** Generate a fallback random scenario (used when builder has invalid items count) */
     const generateFallback = useCallback((): KnapsackInstance => {

@@ -77,7 +77,7 @@ export default function KnapsackSandbox() {
             title="KNAPSACK GAME: SANDBOX"
             badges={["HARD", "KNAPSACK"]}
             stats={[
-                { label: "SCORE", value: gameState.bestValue === Infinity ? '--' : formatTotalValue(gameState.bestValue) },
+                { label: "SCORE", value: gameState.bestValue === -1 ? '--' : formatTotalValue(gameState.bestValue) },
                 { label: "ITEMS", value: gameState.items.length}
             ]}
             instructions={[

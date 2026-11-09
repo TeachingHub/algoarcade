@@ -28,11 +28,20 @@ export default function Games() {
         {
             id: 'knapsack',
             title: 'Knapsack Game',
-            description: 'Select the best items to maximaze the value of your knapsack, be careful, you have  a weight limit.',
+            description: 'Select the best items to maximaze the value of your knapsack, be careful, you have a weight limit.',
             path: '/games/knapsack',
             difficulty: 'MEDIUM' as const,
             tags: ['Knapsack', 'Greedy', 'Optimization'],
             thumbnail: '/banners/knapsack-banner.jpeg'
+        },
+        {
+            id: 'flowshop',
+            title: 'Flowshop Game',
+            description: 'Order the jobs to minimaze the makespan.',
+            path: '/games/flowshop',
+            difficulty: 'HARD' as const,
+            tags: ['Scheduling', 'Optimization', 'NP-Hard'],
+            thumbnail: '/banners/flowshop-banner.jpeg'
         }
     ];
 
