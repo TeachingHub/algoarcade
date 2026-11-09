@@ -9,7 +9,7 @@ const LEADERBOARD_COLLECTION_NAME = "knapsack_leaderboards";
 function encodeKnapsackInstance(instance: KnapsackInstance): string {
     // 1. Extract author
     const { author } = instance;
-    // 2. Map points to [id, x, y] tuples to save space (removing keys "id", "x", "y")
+    // 2. Map items to [id, name, value, weight, icon] tuples to save space (removing keys "id", "name", "value", "weight", "icon")
     const itemsArray = instance.items.map(item => [item.id, item.name, item.value, item.weight, item.icon ?? null]);
     // 3. Extract maxWeight
     const { maxWeight} = instance;
