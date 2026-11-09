@@ -11,8 +11,9 @@ import ProfilePage from "./pages/ProfilePage";
 import EditProfilePage from "./pages/EditProfilePage";
 import Games from "./pages/games/Games";
 import TSP from "./pages/games/TSP";
-import Knapsack from "./pages/games/Knapsack";
 import Pathfinding from "./pages/games/Pathfinding";
+import Knapsack from "./pages/games/Knapsack";
+import Flowshop from "./pages/games/Flowshop";
 import BlogPage from "./pages/BlogPage";
 import BlogPostPage from "./pages/BlogPostPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -69,6 +70,11 @@ export default function Router() {
                 <Route path="/games/knapsack" element={
                     <ErrorBoundary>
                         <Knapsack />
+                    </ErrorBoundary>
+                } />
+                <Route path="/games/flowshop" element={
+                    <ErrorBoundary>
+                        <Flowshop />
                     </ErrorBoundary>
                 } />
                 <Route path="/blog" element={<BlogPage />} />

@@ -2,19 +2,20 @@ import type { KnapsackInstance, KnapsackItem } from "@/types/games/knapsack";
 import { itemCategories } from "./items";
 
 
-export const generateRandomGame = (numItems: number, minItemsWeight: number, maxItemWieght: number): KnapsackInstance => {
+export const generateRandomGame = (numItems: number, minItemsWeight: number, maxItemWeight: number): KnapsackInstance => {
     const items: KnapsackItem[] = [];
     let accumulatedWeight = 0;
     const factor = Number((Math.random() * 4 + 1).toFixed(2)); //Random factor between 1 and 5
 
+    const defaultItems = Object.values(itemCategories).flat();
+
     for (let i = 0; i < numItems; i++) {
-        const weight = Math.floor(Math.random() * (maxItemWieght - minItemsWeight + 1) + minItemsWeight);
+        const weight = Math.floor(Math.random() * (maxItemWeight - minItemsWeight + 1) + minItemsWeight);
         accumulatedWeight += weight;
         const baseValue = weight * factor;
         const variation = 0.7 + Math.random() * 0.6; //Random variation +- 30%
         const value = Math.round((baseValue * variation));
 
-        const defaultItems = Object.values(itemCategories).flat();
         const randomDefaultItem = defaultItems[Math.floor(Math.random() * defaultItems.length)];
 
         const item: KnapsackItem = {
