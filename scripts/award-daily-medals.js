@@ -56,6 +56,12 @@ const GAMES = [
         dailyChallengesCollection: "pathfinding_daily_challenges",
         scoreOrder: "asc"
     },
+    {
+        id: "flowshop",
+        leaderboardsCollection: "flowshop_leaderboards",
+        dailyChallengesCollection: "flowshop_daily_challenges",
+        scoreOrder: "asc"
+    },
 ];
 
 // ─── 2. Helpers ─────────────────────────────────────────────────

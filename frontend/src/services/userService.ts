@@ -4,7 +4,7 @@ import type { User } from "firebase/auth";
 import { doc } from "firebase/firestore";
 import type { UserProfileData } from "@/types/user/user";
 
-type Game = "tsp" | "knapsack" | "pathfinding";
+type Game = "tsp" | "knapsack" | "pathfinding" | "flowshop";
 
 export async function createUserDocument(user: User) {
     try {
