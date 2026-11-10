@@ -129,7 +129,7 @@ export const useFlowshopCompetitive = (user: User | null) => {
         }, []);
 
     const submitManualOrder = useCallback(async () => {
-        if (manualOrder.length === gameState.jobs.length || game.hasSubmitted) {return;}
+        if (manualOrder.length !== gameState.jobs.length || game.hasSubmitted) {return;}
 
         const score = calculateSolutionMakespan(gameState.jobs, manualOrder);
 
