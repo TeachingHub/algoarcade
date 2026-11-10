@@ -5,7 +5,7 @@ import { CircleStar } from 'lucide-react';
 import styles from '@/styles/components/games/shared/GlobalLeaderboard.module.css';
 
 interface GlobalLeaderboardProps {
-    game: "tsp" | "knapsack" | "pathfinding";
+    game: "tsp" | "knapsack" | "pathfinding" | "flowshop";
 }
 
 export default function GlobalLeaderboard({game}: GlobalLeaderboardProps) {
