@@ -3,8 +3,8 @@ import type { FlowshopInstance, Job } from "@/types/games/flowshop";
 import * as gameService from "@services/games/gameService";
 
 const COLLECTION_NAME = "flowshop_instances";
-//const DAILY_COLLECTION_NAME = "flowshop_daily_challenges";
-//const LEADERBOARD_COLLECTION_NAME = "flowshop_leaderboards";
+const DAILY_COLLECTION_NAME = "flowshop_daily_challenges";
+const LEADERBOARD_COLLECTION_NAME = "flowshop_leaderboards";
 
 function encodeFlowshopInstance(instance: FlowshopInstance): string {
     // 1. Extract author
@@ -64,3 +64,57 @@ export async function getGameInstance(instanceId: string): Promise<FlowshopInsta
         decodeFlowshopInstance
     );
 } 
+
+
+// --- DAILY CHALLENGE ---
+
+export async function getDailyChallenge(dateString: string): Promise<FlowshopInstance | null> {
+    return gameService.getDailyChallenge(
+        DAILY_COLLECTION_NAME,
+        dateString,
+        decodeFlowshopInstance
+    );
+}
+
+export async function createDailyChallenge(dateString: string, instanceData: FlowshopInstance): Promise<void> {
+    return gameService.createDailyChallenge(
+        DAILY_COLLECTION_NAME,
+        dateString,
+        instanceData,
+        encodeFlowshopInstance
+    );
+}
+
+export interface FlowshopLeaderboardEntry {
+    userId: string;
+    displayName: string;
+    photoURL: string;
+    score: number;
+    selectedOrder: number[];
+    timestamp: any;
+    time_ms?: number | null;
+}
+
+export async function saveDailyScore(dateString: string, score: FlowshopLeaderboardEntry): Promise<void> {
+    return gameService.saveDailyScore(
+        LEADERBOARD_COLLECTION_NAME,
+        dateString,
+        score
+    );
+}
+
+export async function hasUserSubmitted(dateString: string, userId: string): Promise<boolean> {
+    return gameService.hasUserSubmitted(
+        LEADERBOARD_COLLECTION_NAME,
+        dateString,
+        userId
+    );
+}
+
+export async function getDailyLeaderboard(dateString: string): Promise<FlowshopLeaderboardEntry[]> {
+    return gameService.getDailyLeaderboard<FlowshopLeaderboardEntry> ({
+        collectionName: LEADERBOARD_COLLECTION_NAME,
+        dateString,
+        scoreDirection: "asc"
+    });
+}

@@ -2,8 +2,8 @@ import { useState } from 'react';
 import Layout from '@/layouts/Layout';
 import GameTabs from '@/components/games/shared/GameTabs';
 import FlowshopSandbox from '@/components/games/flowshop/FlowshopSandbox';
-//import FlowshopCompetitive from '@/components/games/flowshop/FlowshopCompetitive'; //Daily challenge not implemented yet
-//import GlobalLeaderboard from '@/components/games/shared/GlobalLeaderboard';
+import FlowshopCompetitive from '@/components/games/flowshop/FlowshopCompetitive';
+import GlobalLeaderboard from '@/components/games/shared/GlobalLeaderboard';
 import { GameTimerProvider } from "@/context/GameTimerContext";
 
 const Flowshop_TABS = [
@@ -26,8 +26,8 @@ export default function FlowshopPage() {
                 />
 
                 {mode === 'sandbox' && <FlowshopSandbox />}
-                {/*mode === 'competitive' && <FlowshopCompetitive />/*}
-                {/*mode === 'leaderboard' && <GlobalLeaderboard game="flowshop" />*/}
+                {mode === 'competitive' && <FlowshopCompetitive />}
+                {mode === 'leaderboard' && <GlobalLeaderboard game="flowshop" />}
             </Layout>
         </GameTimerProvider>
     );
