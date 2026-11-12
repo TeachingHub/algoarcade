@@ -3,6 +3,7 @@ import type { InteractionMode } from '@/hooks/games/usePathfinding';
 import Button from '@/components/shared/Button';
 import styles from '@/styles/pages/games/Pathfinding.module.css';
 import { Pencil, Eraser, Gamepad2, Eye } from 'lucide-react';
+import InstanceSharingControls from "../shared/InstanceSharingControls";
 
 interface PathfindingControlsProps {
     algorithm: AlgorithmType;
@@ -23,6 +24,7 @@ interface PathfindingControlsProps {
     onGenMaze: () => void;
     onGenRandom: () => void;
     onSetSpeed: (speed: number) => void;
+    onShare: () => Promise<string | null>;
 }
 
 const ALGORITHMS: { value: AlgorithmType; label: string }[] = [
@@ -58,6 +60,7 @@ export default function PathfindingControls({
     onGenMaze,
     onGenRandom,
     onSetSpeed,
+    onShare
 }: PathfindingControlsProps) {
     return (
         <>
@@ -173,6 +176,10 @@ export default function PathfindingControls({
                     <Button style={["danger", "fullWidth"]} label="CLEAR BOARD" onClick={onClearBoard} disabled={isRunning} />
                 </div>
             </div>
+
+            <InstanceSharingControls
+                onShare={onShare}
+            />
         </>
     );
 }

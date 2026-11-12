@@ -1,9 +1,9 @@
 import { useState } from "react";
 import Button from "@/components/shared/Button";
-import Modal from "@/components/shared/Modal";
 import styles from "@/styles/components/games/tsp/TSPControls.module.css";
 import { Eye, RefreshCw, Gamepad2, Hammer } from "lucide-react";
 import { itemCategories } from "@/utils/knapsack/items";
+import InstanceSharingControls from "../shared/InstanceSharingControls";
 
 
 interface KnapsackControlsProps {
@@ -58,33 +58,12 @@ export default function KnapsackControls({
     onShare
 }: KnapsackControlsProps) {
 
-    const [shareUrl, setShareUrl] = useState<string | null>(null);
-    const [isSharing, setIsSharing] = useState(false);
-    const [copied, setCopied] = useState(false);
     const [isCustom, setIsCustom] = useState(false);
     const [newItemIcon, setNewItemIcon] = useState("");
     const [newItemName, setNewItemName] = useState("");
     const [newItemValue, setNewItemValue] = useState<number>(1);
     const [newItemWeight, setNewItemWeight] = useState<number>(1);
     const [newKnapsackWeight, setNewKnapsackWeight] = useState<number>(1);
-
-    const handleShareClick = async () => {
-        setIsSharing(true);
-        const url = await onShare();
-        if (url) {
-            setShareUrl(url);
-            setCopied(false);
-        }
-        setIsSharing(false);
-    };
-
-    const handleCopy = async () => {
-        if (shareUrl) {
-            await navigator.clipboard.writeText(shareUrl);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        }
-    };
 
     const modes = [
         { key: 'algorithm' as const, category: 'VISUALIZE', categoryClass: styles.categoryVisualize, icon: <Eye size={18} />, label: 'SOLUTION', description: 'See solution' },
@@ -329,29 +308,10 @@ export default function KnapsackControls({
                 </div>
             )}
 
-            <div className={styles.controlPanel}> 
-                <h3>SHARE CHALLENGE</h3>
-                <Button
-                    style={["primary", "fullWidth"]}
-                    label={isSharing ? "GENERATING..." : "SHARE INSTANCE"}
-                    onClick={handleShareClick}
-                    disabled={isSharing || itemsCount === 0}
-                />
-            </div>
-
-            <Modal
-                isOpen={!!shareUrl}
-                title="READY TO SHARE"
-                message="Send this link to challenge your friends to beat the AI on your custom game."
-                confirmLabel={copied ? "COPIED!" : "COPY LINK"}
-                cancelLabel="CLOSE"
-                onConfirm={handleCopy}
-                onCancel={() => setShareUrl(null)}
-            >
-                <div className={styles.shareUrlBox}>
-                    {shareUrl}
-                </div>
-            </Modal>
+            <InstanceSharingControls
+                onShare={onShare}
+                disabled={itemsCount === 0}
+            />
         </>
     );
 }

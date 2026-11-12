@@ -1,8 +1,7 @@
-import { useState } from "react";
 import Button from "@/components/shared/Button";
-import Modal from "@/components/shared/Modal";
 import styles from "@/styles/components/games/tsp/TSPControls.module.css";
 import { Eye, RefreshCw, Gamepad2, Hammer } from "lucide-react";
+import InstanceSharingControls from "../shared/InstanceSharingControls";
 
 
 interface TSPControlsProps {
@@ -44,28 +43,6 @@ export default function TSPControls({
     onGenerate,
     onShare
 }: TSPControlsProps) {
-
-    const [shareUrl, setShareUrl] = useState<string | null>(null);
-    const [isSharing, setIsSharing] = useState(false);
-    const [copied, setCopied] = useState(false);
-
-    const handleShareClick = async () => {
-        setIsSharing(true);
-        const url = await onShare();
-        if (url) {
-            setShareUrl(url);
-            setCopied(false);
-        }
-        setIsSharing(false);
-    };
-
-    const handleCopy = async () => {
-        if (shareUrl) {
-            await navigator.clipboard.writeText(shareUrl);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        }
-    };
 
     const modes = [
         { key: 'nearest' as const, category: 'VISUALIZE', categoryClass: styles.categoryVisualize, icon: <Eye size={18} />, label: 'NEAREST', description: 'Neighbor' },
@@ -196,16 +173,6 @@ export default function TSPControls({
                 </div>
             </div>
 
-            <div className={styles.controlPanel}>
-                <h3>SHARE CHALLENGE</h3>
-                <Button
-                    style={["primary", "fullWidth"]}
-                    label={isSharing ? "GENERATING..." : "SHARE INSTANCE"}
-                    onClick={handleShareClick}
-                    disabled={isSharing || pointsCount === 0}
-                />
-            </div>
-
             {(algorithm !== 'manual' && algorithm !== 'builder') && (
                 <div className={styles.controlPanel}>
                     <h3>SPEED: {speed}%</h3>
@@ -220,20 +187,11 @@ export default function TSPControls({
                     />
                 </div>
             )}
-            {/* Share Link Modal */}
-            <Modal
-                isOpen={!!shareUrl}
-                title="READY TO SHARE"
-                message="Send this link to challenge your friends to beat the AI on your custom map."
-                confirmLabel={copied ? "COPIED!" : "COPY LINK"}
-                cancelLabel="CLOSE"
-                onConfirm={handleCopy}
-                onCancel={() => setShareUrl(null)}
-            >
-                <div className={styles.shareUrlBox}>
-                    {shareUrl}
-                </div>
-            </Modal>
+
+            <InstanceSharingControls
+                onShare={onShare}
+                disabled={pointsCount === 0}
+            />
         </>
     );
 }

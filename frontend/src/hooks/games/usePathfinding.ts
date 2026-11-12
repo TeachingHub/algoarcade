@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
-import type { AlgorithmType, PathfindingState } from '@/types/games/pathfinding';
+import type { Cell, AlgorithmType, PathfindingState } from '@/types/games/pathfinding';
 import {
     createEmptyGrid,
     resetGridForSolve,
@@ -10,6 +10,7 @@ import {
     type SolveStep,
 } from '@/utils/pathfinding';
 import { getAlgorithm, ALGORITHM_LABELS } from '@/utils/pathfinding/algorithms';
+import { usePathfindingInstanceSharing } from './pathfinding/usePathfindingInstanceSharing';
 
 export type InteractionMode = 'wall' | 'erase' | 'manual' | 'visualize';
 
@@ -347,6 +348,39 @@ export function usePathfinding() {
         clearResults();
     }, [stopAlgorithm, clearResults]);
 
+    // ─── Instance Sharing ────────────────────────────────────────────────
+
+    const handleSharedInstanceLoaded = useCallback((grid: Cell[][]) => {
+            setState(prev => ({
+                ...prev,
+                grid: grid
+            }));
+            
+        },[]
+    );
+
+    const handleSharingFallback = useCallback(() => {
+        genMaze();
+    }, [genMaze]);
+
+    const {
+        isLoading,
+        shareInstance: shareInstanceRaw,
+    } = usePathfindingInstanceSharing({
+        onInstanceLoaded: handleSharedInstanceLoaded,
+        onFallback: handleSharingFallback,
+    });
+
+    const shareInstance = useCallback(
+        async (authorName: string) => {
+            return shareInstanceRaw({
+                grid: state.grid,
+                author: authorName
+            });
+        },
+        [shareInstanceRaw, state.grid]
+    );
+
     return {
         state,
         algorithm,
@@ -359,6 +393,7 @@ export function usePathfinding() {
         algoComparisonPath,
         resultMessage,
         gameResult,
+        isLoading,
         actions: {
             handleCellInteraction,
             handleCellDrag,
@@ -371,6 +406,7 @@ export function usePathfinding() {
             genMaze,
             genRandom,
             setSpeed,
+            shareInstance,
         },
     };
 }

@@ -1,9 +1,9 @@
 import { useState } from "react";
 import Button from "@/components/shared/Button";
-import Modal from "@/components/shared/Modal";
 import styles from "@/styles/components/games/tsp/TSPControls.module.css";
 import { Eye, RefreshCw, Gamepad2, Hammer } from "lucide-react";
 import { exampleJobs, exampleMachines } from "@/utils/flowshop";
+import InstanceSharingControls from "../shared/InstanceSharingControls";
 
 
 interface FlowshopControlsProps {
@@ -50,31 +50,10 @@ export default function FlowshopControls({
     onShare
 }: FlowshopControlsProps) {
 
-    const [shareUrl, setShareUrl] = useState<string | null>(null);
-    const [isSharing, setIsSharing] = useState(false);
-    const [copied, setCopied] = useState(false);
     const [isCustom, setIsCustom] = useState(false);
     const [newJobIcon, setNewJobIcon] = useState("");
     const [newJobName, setNewJobName] = useState("");
     const [newJobOperations, setNewJobOperations] = useState<number[]>([]);
-
-    const handleShareClick = async () => {
-        setIsSharing(true);
-        const url = await onShare();
-        if (url) {
-            setShareUrl(url);
-            setCopied(false);
-        }
-        setIsSharing(false);
-    };
-
-    const handleCopy = async () => {
-        if (shareUrl) {
-            await navigator.clipboard.writeText(shareUrl);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        }
-    };
 
     const modes = [
         { key: 'algorithm' as const, category: 'VISUALIZE', categoryClass: styles.categoryVisualize, icon: <Eye size={18} />, label: 'SOLUTION', description: 'See solution' },
@@ -277,29 +256,10 @@ export default function FlowshopControls({
                 </div>
             )}
 
-            <div className={styles.controlPanel}> 
-                <h3>SHARE CHALLENGE</h3>
-                <Button
-                    style={["primary", "fullWidth"]}
-                    label={isSharing ? "GENERATING..." : "SHARE INSTANCE"}
-                    onClick={handleShareClick}
-                    disabled={isSharing || jobsCount === 0}
-                />
-            </div>
-
-            <Modal
-                isOpen={!!shareUrl}
-                title="READY TO SHARE"
-                message="Send this link to challenge your friends to beat the AI on your custom game."
-                confirmLabel={copied ? "COPIED!" : "COPY LINK"}
-                cancelLabel="CLOSE"
-                onConfirm={handleCopy}
-                onCancel={() => setShareUrl(null)}
-            >
-                <div className={styles.shareUrlBox}>
-                    {shareUrl}
-                </div>
-            </Modal>
+            <InstanceSharingControls
+                onShare={onShare}
+                disabled={jobsCount === 0}
+            />
         </>
     );
 }

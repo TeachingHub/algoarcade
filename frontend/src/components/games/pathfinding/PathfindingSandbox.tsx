@@ -3,11 +3,15 @@ import GameLayout from "@/layouts/GameLayout";
 import styles from "@/styles/pages/games/Pathfinding.module.css";
 import { CircleStar, Bot, TriangleAlert } from 'lucide-react';
 
+import { useAuth } from "@/context/AuthContext";
+
 import PathfindingGrid from "@/components/games/pathfinding/PathfindingGrid";
 import PathfindingControls from "@/components/games/pathfinding/PathfindingControls";
 import { usePathfinding } from "@/hooks/games/usePathfinding";
 
 export default function Pathfinding() {
+    const { user } = useAuth();
+
     const [isMobile, setIsMobile] = useState(false);
     const {
         state,
@@ -64,6 +68,7 @@ export default function Pathfinding() {
                     onGenMaze={actions.genMaze}
                     onGenRandom={actions.genRandom}
                     onSetSpeed={actions.setSpeed}
+                    onShare={() => actions.shareInstance(user?.displayName || "")}
                 />
             }
         >
