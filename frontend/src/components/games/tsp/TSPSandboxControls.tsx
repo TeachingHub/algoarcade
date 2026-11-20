@@ -15,6 +15,7 @@ interface TSPControlsProps {
     setSpeed: (speed: number) => void;
     customPointCount: number;
     setCustomPointCount: (count: number) => void;
+    canPublish: boolean;
 
     // Actions
     onRun: () => void;
@@ -23,6 +24,7 @@ interface TSPControlsProps {
     onReset: () => void;
     onGenerate: (pattern: string, count?: number) => void;
     onShare: () => Promise<string | null>;
+    onPublish: (data: {title: string;}) => Promise<string | null>
 }
 
 export default function TSPControls({
@@ -36,12 +38,14 @@ export default function TSPControls({
     setSpeed,
     customPointCount,
     setCustomPointCount,
+    canPublish,
     onRun,
     onStop,
     onSubmit,
     onReset,
     onGenerate,
-    onShare
+    onShare,
+    onPublish
 }: TSPControlsProps) {
 
     const modes = [
@@ -190,7 +194,9 @@ export default function TSPControls({
 
             <InstanceSharingControls
                 onShare={onShare}
+                onPublish={onPublish}
                 disabled={pointsCount === 0}
+                canPublish={canPublish}
             />
         </>
     );

@@ -69,6 +69,13 @@ export default function Pathfinding() {
                     onGenRandom={actions.genRandom}
                     onSetSpeed={actions.setSpeed}
                     onShare={() => actions.shareInstance(user?.displayName || "")}
+                    onPublish={({title}) => {
+                        if (!user) {
+                            return Promise.resolve(null);
+                        }
+                        return actions.publishInstance({title, creatorId: user.uid, creatorName: user.displayName || "Anonymous"});
+                    }}
+                    canPublish={Boolean(user)}
                 />
             }
         >

@@ -23,6 +23,7 @@ interface KnapsackControlsProps {
     setCustomItemsMaxWeight: (count: number) => void;
     addItem: (name: string, value: number, weight: number, icon: string) => void
     setMaxWeight: (maxWeight: number) => void
+    canPublish: boolean;
 
     // Actions
     onRun: () => void;
@@ -31,6 +32,7 @@ interface KnapsackControlsProps {
     onReset: () => void;
     onGenerate: (count?: number, minWeight?: number, maxWeight?: number) => void;
     onShare: () => Promise<string | null>;
+    onPublish: (data: {title: string;}) => Promise<string | null>
 }
 
 export default function KnapsackControls({
@@ -48,6 +50,7 @@ export default function KnapsackControls({
     setCustomItemsMinWeight,
     customItemsMaxWeight,
     setCustomItemsMaxWeight,
+    canPublish,
     addItem,
     setMaxWeight,
     onRun,
@@ -55,7 +58,8 @@ export default function KnapsackControls({
     onSubmit,
     onReset,
     onGenerate,
-    onShare
+    onShare,
+    onPublish
 }: KnapsackControlsProps) {
 
     const [isCustom, setIsCustom] = useState(false);
@@ -310,7 +314,9 @@ export default function KnapsackControls({
 
             <InstanceSharingControls
                 onShare={onShare}
+                onPublish={onPublish}
                 disabled={itemsCount === 0}
+                canPublish={canPublish}
             />
         </>
     );

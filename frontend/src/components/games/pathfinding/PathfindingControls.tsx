@@ -16,6 +16,9 @@ interface PathfindingControlsProps {
     isSolved: boolean;
     speed: number;
     manualPathLength: number;
+    canPublish: boolean;
+
+    // Actions
     onRun: () => void;
     onStop: () => void;
     onSubmitManual: () => void;
@@ -25,6 +28,7 @@ interface PathfindingControlsProps {
     onGenRandom: () => void;
     onSetSpeed: (speed: number) => void;
     onShare: () => Promise<string | null>;
+    onPublish: (data: {title: string;}) => Promise<string | null>
 }
 
 const ALGORITHMS: { value: AlgorithmType; label: string }[] = [
@@ -52,6 +56,7 @@ export default function PathfindingControls({
     isSolved,
     speed,
     manualPathLength,
+    canPublish,
     onRun,
     onStop,
     onSubmitManual,
@@ -60,7 +65,8 @@ export default function PathfindingControls({
     onGenMaze,
     onGenRandom,
     onSetSpeed,
-    onShare
+    onShare,
+    onPublish
 }: PathfindingControlsProps) {
     return (
         <>
@@ -179,6 +185,8 @@ export default function PathfindingControls({
 
             <InstanceSharingControls
                 onShare={onShare}
+                onPublish={onPublish}
+                canPublish={canPublish}
             />
         </>
     );

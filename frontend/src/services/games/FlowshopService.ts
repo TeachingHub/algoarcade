@@ -2,6 +2,8 @@ import type { FlowshopInstance, Job } from "@/types/games/flowshop";
 
 import * as gameService from "@services/games/gameService";
 
+import type { PublicationMetadata } from "@/types/publishedInstance";
+
 const COLLECTION_NAME = "flowshop_instances";
 const DAILY_COLLECTION_NAME = "flowshop_daily_challenges";
 const LEADERBOARD_COLLECTION_NAME = "flowshop_leaderboards";
@@ -117,4 +119,22 @@ export async function getDailyLeaderboard(dateString: string): Promise<FlowshopL
         dateString,
         scoreDirection: "asc"
     });
+}
+
+
+// --- PUBLISH GAMES INSTANCES ---
+
+export async function publishInstance(instanceData: FlowshopInstance, metadata: PublicationMetadata): Promise<string> {
+    return gameService.createPublishedInstance(
+        encodeFlowshopInstance(instanceData),
+        "flowshop",
+        metadata
+    );
+}
+
+export async function getDecodedPublishedInstance(publicationId: string): Promise<FlowshopInstance | null> {
+    return gameService.getDecodedPublishedInstance(
+        publicationId,
+        decodeFlowshopInstance
+    );
 }

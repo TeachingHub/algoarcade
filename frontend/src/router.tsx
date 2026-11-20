@@ -20,6 +20,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import ErrorBoundary from "./components/shared/ErrorBoundary";
 import RecoverPasswordPage from "./pages/RecoverPasswordPage";
 import ChangePasswordPage from "./pages/ChangePasswordPage";
+import PublishedInstancesPage from "./pages/PublishedInstancesPage";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
     const { user, loading } = useAuth();
@@ -57,6 +58,7 @@ export default function Router() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/games" element={<Games />} />
+                <Route path="/published-instances" element={<PublishedInstancesPage />} />
                 <Route path="/games/tsp" element={
                     <ErrorBoundary>
                         <TSP />

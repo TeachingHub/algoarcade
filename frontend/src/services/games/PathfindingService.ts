@@ -3,6 +3,8 @@ import { createCell } from "@/utils/pathfinding";
 
 import * as gameService from "@services/games/gameService";
 
+import type { PublicationMetadata } from "@/types/publishedInstance";
+
 const COLLECTION_NAME = "pathfinding_instances";
 const DAILY_COLLECTION_NAME = "pathfinding_daily_challenges";
 const LEADERBOARD_COLLECTION_NAME = "pathfinding_leaderboards";
@@ -118,4 +120,22 @@ export async function getDailyLeaderboard(dateString: string): Promise<Pathfindi
         dateString,
         scoreDirection: "asc"
     });
+}
+
+
+// --- PUBLISH GAMES INSTANCES ---
+
+export async function publishInstance(instanceData: PathfindingInstance, metadata: PublicationMetadata): Promise<string> {
+    return gameService.createPublishedInstance(
+        encodePathfindingInstance(instanceData),
+        "pathfinding",
+        metadata
+    );
+}
+
+export async function getDecodedPublishedInstance(publicationId: string): Promise<PathfindingInstance | null> {
+    return gameService.getDecodedPublishedInstance(
+        publicationId,
+        decodePathfindingInstance
+    );
 }

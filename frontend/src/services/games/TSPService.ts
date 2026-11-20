@@ -2,6 +2,8 @@ import type { TSPInstance, Point } from "@/types/games/tsp";
 
 import * as gameService from "@services/games/gameService";
 
+import type { PublicationMetadata } from "@/types/publishedInstance";
+
 const COLLECTION_NAME = "tsp_instances";
 const DAILY_COLLECTION_NAME = "tsp_daily_challenges";
 const LEADERBOARD_COLLECTION_NAME = "tsp_leaderboards";
@@ -111,4 +113,22 @@ export async function getDailyLeaderboard(dateString: string): Promise<TSPLeader
         dateString,
         scoreDirection: "asc"
     });
+}
+
+
+// --- PUBLISH GAMES INSTANCES ---
+
+export async function publishInstance(instanceData: TSPInstance, metadata: PublicationMetadata): Promise<string> {
+    return gameService.createPublishedInstance(
+        encodeTSPInstance(instanceData),
+        "tsp",
+        metadata
+    );
+}
+
+export async function getDecodedPublishedInstance(publicationId: string): Promise<TSPInstance | null> {
+    return gameService.getDecodedPublishedInstance(
+        publicationId,
+        decodeTSPInstance
+    );
 }

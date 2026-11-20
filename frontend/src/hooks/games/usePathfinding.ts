@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
-import type { Cell, AlgorithmType, PathfindingState } from '@/types/games/pathfinding';
+import type { Cell, AlgorithmType, PathfindingState, PathfindingInstance } from '@/types/games/pathfinding';
 import {
     createEmptyGrid,
     resetGridForSolve,
@@ -9,8 +9,11 @@ import {
     tryExtendManualPath,
     type SolveStep,
 } from '@/utils/pathfinding';
+import type { PublicationMetadata } from '@/types/publishedInstance';
+
 import { getAlgorithm, ALGORITHM_LABELS } from '@/utils/pathfinding/algorithms';
 import { usePathfindingInstanceSharing } from './pathfinding/usePathfindingInstanceSharing';
+import { usePathfindingInstancePublishing } from './pathfinding/usePathfindingInstancePublishing';
 
 export type InteractionMode = 'wall' | 'erase' | 'manual' | 'visualize';
 
@@ -364,7 +367,7 @@ export function usePathfinding() {
     }, [genMaze]);
 
     const {
-        isLoading,
+        isLoading: isSharedInstanceLoading,
         shareInstance: shareInstanceRaw,
     } = usePathfindingInstanceSharing({
         onInstanceLoaded: handleSharedInstanceLoaded,
@@ -381,6 +384,37 @@ export function usePathfinding() {
         [shareInstanceRaw, state.grid]
     );
 
+        // ─── Instance Sharing ────────────────────────────────────────────────
+
+    const handlePublishedInstanceLoaded = useCallback((instance: PathfindingInstance) => {
+        setState(prev => ({
+                ...prev,
+                grid: instance.grid
+            }));
+    }, []);
+
+    const {
+        isLoading: isPublishedInstanceLoading,
+        isPublishing,
+        publishInstance: publishInstanceRaw
+    } = usePathfindingInstancePublishing({
+        onInstanceLoaded: handlePublishedInstanceLoaded
+    });
+
+    const publishInstance = useCallback(
+        (metadata: PublicationMetadata) => {
+            return publishInstanceRaw(
+                {
+                    grid: state.grid,
+                    author: metadata.creatorName
+                },
+                metadata
+            );
+        }, [publishInstanceRaw, state.grid]
+    );
+
+    // --- Compose the public API  ---
+
     return {
         state,
         algorithm,
@@ -393,7 +427,8 @@ export function usePathfinding() {
         algoComparisonPath,
         resultMessage,
         gameResult,
-        isLoading,
+        isLoading: isSharedInstanceLoading || isPublishedInstanceLoading,
+        isPublishing,
         actions: {
             handleCellInteraction,
             handleCellDrag,
@@ -407,6 +442,7 @@ export function usePathfinding() {
             genRandom,
             setSpeed,
             shareInstance,
+            publishInstance,
         },
     };
 }

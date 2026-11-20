@@ -15,6 +15,8 @@ export default function Footer() {
                         <h3 className={styles.sectionTitle}>Games</h3>
                         <Link to="/games/tsp" className={styles.footerLink}>Traveling Salesperson</Link>
                         <Link to="/games/pathfinding" className={styles.footerLink}>Pathfinding</Link>
+                        <Link to="/games/knapsack" className={styles.footerLink}>Knapsack</Link>
+                        <Link to="/games/flowshop" className={styles.footerLink}>Flowshop</Link>
                     </div>
                     <div className={styles.section}>
                         <h3 className={styles.sectionTitle}>Links</h3>
@@ -22,10 +24,11 @@ export default function Footer() {
                         <Link to="/games" className={styles.footerLink}>Games</Link>
                         <Link to="/blog" className={styles.footerLink}>Blog</Link>
                         <Link to="/profile" className={styles.footerLink}>Profile</Link>
+                        <Link to="/published-instances" className={styles.footerLink}>Community challenges</Link>
                     </div>
                     <div className={styles.section}>
                         <h3 className={styles.sectionTitle}>Contact</h3>
-                        <a href="mailto:dani@santos-studio.es" className={styles.footerLink}>dani@santos-studio.es</a>
+                        <a href="mailto:davidcerecat@gmail.com" className={styles.footerLink}>davidcerecat@gmail.com</a>
                     </div>
                 </div>
                 <div className={styles.bottom}>

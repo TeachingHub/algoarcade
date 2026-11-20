@@ -1,5 +1,6 @@
 import { db } from "@/firebase/config";
-import { addDoc, serverTimestamp, collection, doc, getDoc, setDoc, query, orderBy, limit, getDocs } from "firebase/firestore";
+import { addDoc, serverTimestamp, collection, doc, getDoc, setDoc, query, orderBy, limit, getDocs, increment, updateDoc, where } from "firebase/firestore";
+import type { PublicationMetadata, PublishedGameType, PublishedInstance } from "@/types/publishedInstance";
 
 export interface BaseLeaderboardEntry {
     userId: string;
@@ -181,3 +182,132 @@ function getTimestampMilliseconds(timestamp: any): number {
     if (timestamp._seconds) return timestamp._seconds * 1000;
     return Infinity;
 };
+
+// --- PUBLISH GAMES INSTANCES ---
+
+export async function createPublishedInstance(
+    encodedData: string,
+    gameType: PublishedGameType,
+    metadata: PublicationMetadata
+): Promise<string> {
+    try {
+        console.log("iniciando publicacion");
+        const document = await addDoc(
+            collection(db, "published_instances"),
+            {
+                data: encodedData,
+                createdAt: serverTimestamp(),
+                creatorId: metadata.creatorId,
+                creatorName: metadata.creatorName,
+                title: metadata.title.trim(),
+                gameType,
+                likes: 0,
+                playCount: 0,
+            }
+        );
+        console.log(document.id);
+        console.log("terminando publicacion");
+
+        return document.id;
+    } catch (error) {
+        console.error("Error creating published instance:", error);
+        throw new Error("Failed to publish instance");
+    }
+}
+
+export async function getPublishedInstance(
+    publicationId: string
+): Promise<PublishedInstance | null> {
+    try {
+        const documentRef = doc(db, "published_instances", publicationId);
+
+        const snapshot = await getDoc(documentRef);
+
+        if (!snapshot.exists()) {return null;}
+
+        return {
+            id: snapshot.id,
+            ...snapshot.data(),
+        } as PublishedInstance;
+    } catch (error) {
+        console.error("Error fetching published instance:", error);
+        throw new Error("Failed to load published instance");
+    }
+}
+
+export async function getDecodedPublishedInstance<T>(
+    publicationId: string,
+    decode: (encodedData: string) => T
+): Promise<T | null> {
+    try {
+        const documentRef = doc(db, "published_instances", publicationId);
+
+        const snapshot = await getDoc(documentRef);
+
+        if (!snapshot.exists()) return null;
+
+        const documentData = snapshot.data();
+
+        if (typeof documentData.data !== "string") return null;
+
+        return decode(documentData.data);
+    } catch (error) {
+        console.error("Error fetching published instance:", error);
+        throw new Error("Failed to load published instance");
+    }
+}
+
+export async function getPublishedInstances(): Promise<PublishedInstance[]> {
+    try {
+        const publishedQuery = query(
+            collection(db, "published_instances"),
+            orderBy("createdAt", "desc")
+        );
+
+        const snapshot = await getDocs(publishedQuery);
+
+        return snapshot.docs.map((document) => ({
+            id: document.id,
+            ...document.data(),
+        })) as PublishedInstance[];
+    } catch (error) {
+        console.error("Error fetching published instances:", error);
+        throw new Error("Failed to fetch published instances");
+    }
+}
+
+export async function getPublishedInstancesByCreator(
+    creatorId: string
+): Promise<PublishedInstance[]> {
+    try {
+        const publishedQuery = query(
+            collection(db, "published_instances"),
+            where("creatorId", "==", creatorId),
+            orderBy("createdAt", "desc")
+        );
+
+        const snapshot = await getDocs(publishedQuery);
+
+        return snapshot.docs.map((document) => ({
+            id: document.id,
+            ...document.data(),
+        })) as PublishedInstance[];
+    } catch (error) {
+        console.error("Error fetching creator publications:", error);
+        throw new Error("Failed to fetch creator publications");
+    }
+}
+
+export async function incrementPublishedPlayCount(publicationId: string): Promise<void> {
+    await updateDoc(
+        doc(db, "published_instances", publicationId),
+        {playCount: increment(1),}
+    );
+}
+
+export async function incrementPublishedLikes(publicationId: string): Promise<void> {
+    await updateDoc(
+        doc(db, "published_instances", publicationId),
+        {likes: increment(1),}
+    );
+}

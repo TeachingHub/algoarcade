@@ -1,10 +1,12 @@
 import { useCallback, useMemo, useState } from 'react';
-import type { Point } from '@/types/games/tsp';
+import type { Point, TSPInstance } from '@/types/games/tsp';
+import type { PublicationMetadata } from '@/types/publishedInstance';
 
 import { useTSPAlgorithms } from './tsp/useTSPAlgorithms';
 import { useTSPScenarios } from './tsp/useTSPScenarios';
 import { useTSPBuilder } from './tsp/useTSPBuilder';
 import { useTSPInstanceSharing } from './tsp/useTSPInstanceSharing';
+import { useTSPInstancePublishing } from './tsp/useTSPInstancePublishing';
 
 /**
  * Orchestrator hook for TSP Sandbox mode.
@@ -92,7 +94,7 @@ export const useTSPSandbox = (canvasSize: { width: number, height: number }) => 
     }, [algorithms, scenarios]);
 
     const {
-        isLoading,
+        isLoading: isSharedInstanceLoading,
         shareInstance: shareInstanceRaw,
     } = useTSPInstanceSharing(
         canvasSize,
@@ -111,6 +113,36 @@ export const useTSPSandbox = (canvasSize: { width: number, height: number }) => 
         },
         [shareInstanceRaw, algorithms.gameState.points]
     );
+
+    const handlePublishedInstanceLoaded = useCallback((instance: TSPInstance) => {
+        algorithms.setPoints(instance.points);
+
+        scenarios.setScenarioInfo({
+            name: "Published Challenge",
+            description: `Created by ${instance.author}`
+        });
+    }, [algorithms, scenarios]);
+
+    const {
+        isLoading: isPublishedInstanceLoading,
+        isPublishing,
+        publishInstance: publishInstanceRaw
+    } = useTSPInstancePublishing({
+        onInstanceLoaded: handlePublishedInstanceLoaded
+    });
+
+    const publishInstance = useCallback(
+        (metadata: PublicationMetadata) => {
+            return publishInstanceRaw(
+                {
+                    points: algorithms.gameState.points,
+                    author: metadata.creatorName,
+                },
+                metadata
+            );
+        }, [publishInstanceRaw, algorithms.gameState.points]
+    );
+
     // --- Compose the public API (same shape as the original hook) ---
 
     const actions = useMemo(() => ({
@@ -123,11 +155,13 @@ export const useTSPSandbox = (canvasSize: { width: number, height: number }) => 
         clearAll: algorithms.actions.clearAll,
         setSpeed: algorithms.actions.setSpeed,
         shareInstance,
+        publishInstance,
     }), [
         generateScenario,
         algorithms.actions,
         addPoint,
         shareInstance,
+        publishInstance,
     ]);
 
     return {
@@ -139,7 +173,8 @@ export const useTSPSandbox = (canvasSize: { width: number, height: number }) => 
         scenarioInfo: scenarios.scenarioInfo,
         customPointCount: scenarios.customPointCount,
         setCustomPointCount: scenarios.setCustomPointCount,
-        isLoading,
+        isLoading: isSharedInstanceLoading || isPublishedInstanceLoading,
+        isPublishing,
         pendingModeSwitch,
         confirmModeSwitch,
         cancelModeSwitch,

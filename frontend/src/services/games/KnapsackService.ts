@@ -2,6 +2,8 @@ import type { KnapsackInstance, KnapsackItem } from "@/types/games/knapsack";
 
 import * as gameService from "@services/games/gameService";
 
+import type { PublicationMetadata } from "@/types/publishedInstance";
+
 const COLLECTION_NAME = "knapsack_instances";
 const DAILY_COLLECTION_NAME = "knapsack_daily_challenges";
 const LEADERBOARD_COLLECTION_NAME = "knapsack_leaderboards";
@@ -126,4 +128,22 @@ export async function getDailyLeaderboard(dateString: string): Promise<KnapsackL
         dateString,
         scoreDirection: "desc"
     });
+}
+
+
+// --- PUBLISH GAMES INSTANCES ---
+
+export async function publishInstance(instanceData: KnapsackInstance, metadata: PublicationMetadata): Promise<string> {
+    return gameService.createPublishedInstance(
+        encodeKnapsackInstance(instanceData),
+        "knapsack",
+        metadata
+    );
+}
+
+export async function getDecodedPublishedInstance(publicationId: string): Promise<KnapsackInstance | null> {
+    return gameService.getDecodedPublishedInstance(
+        publicationId,
+        decodeKnapsackInstance
+    );
 }

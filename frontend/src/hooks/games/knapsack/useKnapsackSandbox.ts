@@ -1,10 +1,12 @@
 import { useCallback, useMemo, useState } from 'react';
-import type { KnapsackItem } from '@/types/games/knapsack';
+import type { KnapsackItem, KnapsackInstance } from '@/types/games/knapsack';
+import type { PublicationMetadata } from '@/types/publishedInstance';
 
 import { useKnapsackAlgorithms } from './useKnapsackAlgorithms';
 import { useKnapsackScenarios } from './useKnapsackScenarios';
 import { useKnapsackBuilder } from './useKnapsackBuilder';
 import { useKnapsackInstanceSharing } from './useKnapsackInstanceSharing';
+import { useKnapsackInstancePublishing } from './useKnapsackInstancePublishing';
 
 /**
  * Orchestrator hook for Knapsack Sandbox mode.
@@ -115,7 +117,7 @@ export const useKnapsackSandbox = () => {
     }, [algorithms, scenarios]);
 
     const {
-        isLoading,
+        isLoading: isSharedInstanceLoading,
         shareInstance: shareInstanceRaw,
     } = useKnapsackInstanceSharing({
         onInstanceLoaded: handleSharedInstanceLoaded,
@@ -134,6 +136,39 @@ export const useKnapsackSandbox = () => {
         [shareInstanceRaw, algorithms.gameState.items, algorithms.gameState.maxWeight, algorithms.KnapsackType]
     );
 
+    const handlePublishedInstanceLoaded = useCallback((instance: KnapsackInstance) => {
+        algorithms.setItems(instance.items);
+        algorithms.setMaxWeight(instance.maxWeight);
+        algorithms.setKnapsackType(instance.knapsackType);
+
+        scenarios.setScenarioInfo({
+            name: "Published Challenge",
+            description: `Created by ${instance.author}`
+        });
+    }, [algorithms, scenarios]);
+
+    const {
+        isLoading: isPublishedInstanceLoading,
+        isPublishing,
+        publishInstance: publishInstanceRaw
+    } = useKnapsackInstancePublishing({
+        onInstanceLoaded: handlePublishedInstanceLoaded
+    });
+
+    const publishInstance = useCallback(
+        (metadata: PublicationMetadata) => {
+            return publishInstanceRaw(
+                {
+                    items: algorithms.gameState.items,
+                    maxWeight: algorithms.gameState.maxWeight,
+                    author: metadata.creatorName,
+                    knapsackType: algorithms.KnapsackType
+                },
+                metadata
+            );
+        }, [publishInstanceRaw, algorithms.gameState.items, algorithms.gameState.maxWeight, algorithms.KnapsackType]
+    );
+
     // --- Compose the public API  ---
 
     const actions = useMemo(() => ({
@@ -147,11 +182,15 @@ export const useKnapsackSandbox = () => {
         submitManualSelection: algorithms.actions.submitManualSelection,
         clearAll: algorithms.actions.clearAll,
         shareInstance,
+        publishInstance,
     }), [
         generateScenario,
         algorithms.actions,
         addItem,
+        deleteItem,
+        setMaxWeight,
         shareInstance,
+        publishInstance,
     ]);
 
     return {
@@ -169,7 +208,8 @@ export const useKnapsackSandbox = () => {
         setCustomItemsMinWeight: scenarios.setCustomItemsMinWeight,
         customItemsMaxWeight: scenarios.customItemsMaxWeight,
         setCustomItemsMaxWeight: scenarios.setCustomItemsMaxWeight,
-        isLoading,
+        isLoading: isSharedInstanceLoading || isPublishedInstanceLoading,
+        isPublishing,
         pendingModeSwitch,
         confirmModeSwitch,
         cancelModeSwitch,

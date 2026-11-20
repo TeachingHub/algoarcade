@@ -19,6 +19,7 @@ interface FlowshopControlsProps {
     customOperationsMaxDuration: number;
     setCustomOperationsMaxDuration: (count: number) => void;
     addJob: (name: string, operations: number[], icon: string) => void;
+    canPublish: boolean;
 
     // Actions
     onRun: () => void;
@@ -27,6 +28,7 @@ interface FlowshopControlsProps {
     onReset: () => void;
     onGenerate: (count?: number, minDuration?: number, maxDuration?: number) => void;
     onShare: () => Promise<string | null>;
+    onPublish: (data: {title: string;}) => Promise<string | null>
 }
 
 export default function FlowshopControls({
@@ -41,13 +43,15 @@ export default function FlowshopControls({
     setCustomOperationsMinDuration,
     customOperationsMaxDuration,
     setCustomOperationsMaxDuration,
+    canPublish,
     addJob,
     onRun,
     onStop,
     onSubmit,
     onReset,
     onGenerate,
-    onShare
+    onShare,
+    onPublish
 }: FlowshopControlsProps) {
 
     const [isCustom, setIsCustom] = useState(false);
@@ -258,7 +262,9 @@ export default function FlowshopControls({
 
             <InstanceSharingControls
                 onShare={onShare}
+                onPublish={onPublish}
                 disabled={jobsCount === 0}
+                canPublish={canPublish}
             />
         </>
     );

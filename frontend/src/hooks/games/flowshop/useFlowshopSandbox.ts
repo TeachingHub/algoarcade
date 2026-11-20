@@ -1,10 +1,12 @@
 import { useCallback, useMemo, useState } from 'react';
-import type { Job } from '@/types/games/flowshop';
+import type { Job, FlowshopInstance } from '@/types/games/flowshop';
+import type { PublicationMetadata } from '@/types/publishedInstance';
 
 import { useFlowshopAlgorithms } from './useFlowshopAlgorithms';
 import { useFlowshopScenarios } from './useFlowshopScenarios';
 import { useFlowshopBuilder } from './useFlowshopBuilder';
 import { useFlowshopInstanceSharing } from './useFlowshopInstanceSharing';
+import { useFlowshopInstancePublishing } from '../flowshop/useFlowshopInstancePublishing';
 
 /**
  * Orchestrator hook for Flowshop Sandbox mode.
@@ -99,7 +101,7 @@ export const useFlowshopSandbox = () => {
     }, [algorithms, scenarios]);
 
     const {
-        isLoading,
+        isLoading: isSharedInstanceLoading,
         shareInstance: shareInstanceRaw,
     } = useFlowshopInstanceSharing({
         onInstanceLoaded: handleSharedInstanceLoaded,
@@ -116,6 +118,36 @@ export const useFlowshopSandbox = () => {
         [shareInstanceRaw, algorithms.gameState.jobs]
     );
 
+    
+        const handlePublishedInstanceLoaded = useCallback((instance: FlowshopInstance) => {
+            algorithms.setJobs(instance.jobs);
+    
+            scenarios.setScenarioInfo({
+                name: "Published Challenge",
+                description: `Created by ${instance.author}`
+            });
+        }, [algorithms, scenarios]);
+    
+        const {
+            isLoading: isPublishedInstanceLoading,
+            isPublishing,
+            publishInstance: publishInstanceRaw
+        } = useFlowshopInstancePublishing({
+            onInstanceLoaded: handlePublishedInstanceLoaded
+        });
+    
+        const publishInstance = useCallback(
+            (metadata: PublicationMetadata) => {
+                return publishInstanceRaw(
+                    {
+                        jobs: algorithms.gameState.jobs,
+                        author: metadata.creatorName
+                    },
+                    metadata
+                );
+            }, [publishInstanceRaw, algorithms.gameState.jobs]
+        );
+
     // --- Compose the public API  ---
 
     const actions = useMemo(() => ({
@@ -131,11 +163,14 @@ export const useFlowshopSandbox = () => {
         submitManualOrder: algorithms.actions.submitManualOrder,
         clearAll: algorithms.actions.clearAll,
         shareInstance,
+        publishInstance,
     }), [
         generateScenario,
         algorithms.actions,
         addJob,
+        deleteJob,
         shareInstance,
+        publishInstance,
     ]);
 
     return {
@@ -151,7 +186,8 @@ export const useFlowshopSandbox = () => {
         setCustomOperationsMinDuration: scenarios.setCustomOperationsMinDuration,
         customOperationsMaxDuration: scenarios.customOperationsMaxDuration,
         setCustomOperationsMaxDuration: scenarios.setCustomOperationsMaxDuration,
-        isLoading,
+        isLoading: isSharedInstanceLoading || isPublishedInstanceLoading,
+        isPublishing,
         pendingModeSwitch,
         confirmModeSwitch,
         cancelModeSwitch,

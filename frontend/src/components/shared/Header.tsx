@@ -29,6 +29,7 @@ export default function Header() {
                         {userProfile?.role === "ADMIN" && (
                             <Button style={["link"]} label="ADMIN" to="/admin" />
                         )}
+                        <Button style={["link"]} label="COMMUNITY CHALLENGES" to="/published-instances" />
                         <Button style={["link"]} label="GAMES" to="/games" />
                         <Button style={["link"]} label="BLOG" to="/blog" />
                     </div>
