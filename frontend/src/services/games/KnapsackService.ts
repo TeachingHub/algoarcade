@@ -18,7 +18,7 @@ function encodeKnapsackInstance(instance: KnapsackInstance): string {
     // 4. Extract knapsackType
     const { knapsackType } = instance;
 
-    // 4. Serialize to JSON string: [author, [[id,name,value,weight,icon], maxWeight]]
+    // 5. Serialize to JSON string: [author, [[id,name,value,weight,icon], maxWeight]]
     return JSON.stringify([author, itemsArray, maxWeight, knapsackType]);
 }
 

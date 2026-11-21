@@ -24,7 +24,6 @@ export default function InstanceSharingControls({
 
     const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
     const [publishTitle, setPublishTitle] = useState("");
-    const [publishedUrl, setPublishedUrl] = useState<string | null>(null);
 
 
     const handleShareClick = async () => {
@@ -93,7 +92,6 @@ export default function InstanceSharingControls({
                     if (url) {
                         setIsPublishModalOpen(false);
                         setPublishTitle("");
-                        setPublishedUrl(url);
                     }
                 }}
                 onCancel={() => setIsPublishModalOpen(false)}
