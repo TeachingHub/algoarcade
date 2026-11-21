@@ -121,7 +121,7 @@ export default function PublishedInstancesPage() {
                                             Likes
                                         </span>
                                         <span className={styles.statValue}>
-                                            {instance.likes ?? 0}
+                                            {instance.likes.length}
                                         </span>
                                     </div>
 

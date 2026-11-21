@@ -346,3 +346,36 @@
         flex: 1;
     }
 }
+.likeButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 0;
+    background: transparent;
+    color: var(--muted-foreground);
+    padding: 6px;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.likeButton:hover:not(:disabled) {
+    color: var(--primary);
+}
+
+.likeButtonLiked {
+    color: #ef4444;
+}
+
+.likeButtonLiked:hover:not(:disabled) {
+    color: #dc2626;
+}
+
+.likeButton:disabled {
+    cursor: wait;
+    opacity: 0.65;
+}
+
+.likeCount {
+    font-size: var(--font-size-xs);
+    font-weight: bold;
+}

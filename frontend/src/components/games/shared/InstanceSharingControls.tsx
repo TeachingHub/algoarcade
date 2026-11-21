@@ -1,4 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import {useSearchParams} from "react-router";
+import { useAuth } from "@/context/AuthContext";
+import { Heart } from "lucide-react";
+import {getPublishedInstance, togglePublishedInstanceLike} from "@services/games/gameService"
 import Button from "@/components/shared/Button";
 import Modal from "@/components/shared/Modal";
 import styles from "@/styles/components/games/tsp/TSPControls.module.css";
@@ -25,6 +29,22 @@ export default function InstanceSharingControls({
     const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
     const [publishTitle, setPublishTitle] = useState("");
 
+    const [likes, setLikes] = useState<string[]>([]);
+    const [isLiking, setIsLiking] = useState(false);
+
+    const [searchParams] = useSearchParams();
+    const { user } = useAuth();
+    
+    const publicationId = searchParams.get("publication");
+
+    useEffect(() => {
+        if (!publicationId) return;
+
+        void getPublishedInstance(publicationId).then((instance) => {
+            if (instance) setLikes(instance.likes);
+        });
+    }, [publicationId]);
+
 
     const handleShareClick = async () => {
         setIsSharing(true);
@@ -44,6 +64,26 @@ export default function InstanceSharingControls({
         }
     };
 
+    const handleLike = async () => {
+        if (!user || !publicationId || isLiking) return;
+
+        setIsLiking(true);
+
+        try {
+            const liked = await togglePublishedInstanceLike(publicationId, user.uid);
+            setLikes((currentLikes) => liked
+                ? [...currentLikes, user.uid]
+                : currentLikes.filter((userId) => userId !== user.uid)
+            );
+        } catch (error) {
+            console.error("Error toggling like: ", error);
+        } finally {
+            setIsLiking(false);
+        }
+    }
+
+    const hasLiked = !!user && likes.includes(user.uid);
+
     return (
         <>
             <div className={styles.controlPanel}> 
@@ -62,6 +102,25 @@ export default function InstanceSharingControls({
                         disabled={!canPublish || disabled}
                     />
                 </div>
+
+                {publicationId && (
+                    <button
+                        type="button"
+                        className={`${styles.likeButton} ${
+                            hasLiked ? styles.likeButtonLiked : ""
+                        }`}
+                        onClick={() => void handleLike()}
+                        disabled={!user || isLiking}
+                        aria-label={hasLiked ? "Remove like" : "Like"}
+                        title={`${likes.length} likes`}
+                    >
+                        <Heart
+                            size={22}
+                            fill={hasLiked ? "currentColor" : "none"}
+                        />
+                        <span className={styles.likeCount}>{likes.length}</span>
+                    </button>
+                )}
             </div>
 
             <Modal

@@ -1,5 +1,5 @@
 import { db } from "@/firebase/config";
-import { addDoc, serverTimestamp, collection, doc, getDoc, setDoc, query, orderBy, limit, getDocs, increment, updateDoc, where } from "firebase/firestore";
+import { addDoc, serverTimestamp, collection, doc, getDoc, setDoc, query, orderBy, limit, getDocs, increment, updateDoc, where, runTransaction } from "firebase/firestore";
 import type { PublicationMetadata, PublishedGameType, PublishedInstance } from "@/types/publishedInstance";
 
 export interface BaseLeaderboardEntry {
@@ -191,7 +191,6 @@ export async function createPublishedInstance(
     metadata: PublicationMetadata
 ): Promise<string> {
     try {
-        console.log("iniciando publicacion");
         const document = await addDoc(
             collection(db, "published_instances"),
             {
@@ -201,12 +200,10 @@ export async function createPublishedInstance(
                 creatorName: metadata.creatorName,
                 title: metadata.title.trim(),
                 gameType,
-                likes: 0,
+                likes: [],
                 playCount: 0,
             }
         );
-        console.log(document.id);
-        console.log("terminando publicacion");
 
         return document.id;
     } catch (error) {
@@ -305,9 +302,27 @@ export async function incrementPublishedPlayCount(publicationId: string): Promis
     );
 }
 
-export async function incrementPublishedLikes(publicationId: string): Promise<void> {
-    await updateDoc(
-        doc(db, "published_instances", publicationId),
-        {likes: increment(1),}
-    );
+export async function togglePublishedInstanceLike(publicationId: string, userId: string): Promise<boolean> {
+    const publicationRef = doc(db, "published_instances", publicationId);
+
+    const result = runTransaction(db, async (transaction) => {
+        const snapshot = await transaction.get(publicationRef);
+
+        if (!snapshot.exists()) {
+            throw new Error("Published instance not found");
+        }
+
+        const likes = snapshot.data().likes as string[];
+        const alreadyLiked = likes.includes(userId);
+
+        transaction.update(publicationRef, {
+            likes: alreadyLiked
+                ? likes.filter((likedUserId) => likedUserId !== userId)
+                : [... likes, userId]
+        });
+
+        return !alreadyLiked;
+    })
+
+    return result;
 }

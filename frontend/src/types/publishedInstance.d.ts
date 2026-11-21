@@ -17,6 +17,6 @@ export interface PublishedInstance {
     title: string;
     gameType: "tsp" | "knapsack" | "pathfinding" | "flowshop";
 
-    likes: number;
+    likes: string[];
     playCount: number;
 }
