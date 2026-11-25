@@ -1,5 +1,5 @@
 import { db } from "@/firebase/config";
-import { addDoc, serverTimestamp, collection, doc, getDoc, setDoc, query, orderBy, limit, getDocs, increment, updateDoc, where, runTransaction } from "firebase/firestore";
+import { addDoc, serverTimestamp, collection, doc, getDoc, setDoc, query, orderBy, limit, getDocs, increment, updateDoc, where, runTransaction, startAfter, type QueryDocumentSnapshot, type QueryConstraint } from "firebase/firestore";
 import type { PublicationMetadata, PublishedGameType, PublishedInstance } from "@/types/publishedInstance";
 
 export interface BaseLeaderboardEntry {
@@ -185,6 +185,17 @@ function getTimestampMilliseconds(timestamp: any): number {
 
 // --- PUBLISH GAMES INSTANCES ---
 
+export type PublishedInstancesSort = "newest" | "mostPlayed" | "mostLiked";
+export type PublishedInstancesCursor = QueryDocumentSnapshot;
+
+export interface PublishedInstancePage {
+    instances: PublishedInstance[];
+    lastDocument: PublishedInstancesCursor | null;
+    hasMore: boolean;
+}
+
+const PUBLISHED_INSTANCES_PAGE_SIZE = 9;
+
 export async function createPublishedInstance(
     encodedData: string,
     gameType: PublishedGameType,
@@ -201,6 +212,7 @@ export async function createPublishedInstance(
                 title: metadata.title.trim(),
                 gameType,
                 likes: [],
+                likeCount: 0,
                 playCount: 0,
             }
         );
@@ -254,19 +266,51 @@ export async function getDecodedPublishedInstance<T>(
     }
 }
 
-export async function getPublishedInstances(): Promise<PublishedInstance[]> {
+export async function getPublishedInstances(
+    sortBy: PublishedInstancesSort = "newest",
+    gameType: PublishedGameType | "all" = "all",
+    userId?: string | null,
+    cursor?: PublishedInstancesCursor | null,
+): Promise<PublishedInstancePage> {
     try {
-        const publishedQuery = query(
+        const sortField = {
+            newest: "createdAt",
+            mostPlayed: "playCount",
+            mostLiked: "likeCount"
+        }[sortBy];
+
+        const constraints: QueryConstraint[] = [];
+        if (gameType !== "all") {
+            constraints.push(where("gameType", "==", gameType));
+        }
+
+        constraints.push(orderBy(sortField, "desc"));
+
+        if (cursor) {
+            constraints.push(startAfter(cursor));
+        }
+
+        if (userId) {
+            constraints.push(where("likes", "array-contains", userId));
+        }
+
+        constraints.push(limit(PUBLISHED_INSTANCES_PAGE_SIZE + 1));
+
+        const snapshot = await getDocs(query(
             collection(db, "published_instances"),
-            orderBy("createdAt", "desc")
+            ...constraints)
         );
 
-        const snapshot = await getDocs(publishedQuery);
+        const pageDocuments = snapshot.docs.slice(0, PUBLISHED_INSTANCES_PAGE_SIZE);
 
-        return snapshot.docs.map((document) => ({
-            id: document.id,
-            ...document.data(),
-        })) as PublishedInstance[];
+        return {
+            instances: pageDocuments.map((document) => ({
+                id: document.id,
+                ...document.data(),
+            })) as PublishedInstance[],
+            lastDocument: pageDocuments[pageDocuments.length - 1] ?? null,
+            hasMore: snapshot.docs.length > PUBLISHED_INSTANCES_PAGE_SIZE
+        };
     } catch (error) {
         console.error("Error fetching published instances:", error);
         throw new Error("Failed to fetch published instances");
@@ -314,11 +358,13 @@ export async function togglePublishedInstanceLike(publicationId: string, userId:
 
         const likes = snapshot.data().likes as string[];
         const alreadyLiked = likes.includes(userId);
+        const nextLikes = alreadyLiked
+            ? likes.filter((likedUserId) => likedUserId !== userId)
+            : [... likes, userId]
 
         transaction.update(publicationRef, {
-            likes: alreadyLiked
-                ? likes.filter((likedUserId) => likedUserId !== userId)
-                : [... likes, userId]
+            likes: nextLikes,
+            likeCount: nextLikes.length
         });
 
         return !alreadyLiked;

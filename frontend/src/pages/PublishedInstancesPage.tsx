@@ -1,12 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router";
+import Button from "@/components/shared/Button";
 import Layout from "@/layouts/Layout";
 import Loader from "@/components/shared/Loader";
+import { useAuth } from "@/context/AuthContext";
 import {
     getPublishedInstances,
     incrementPublishedPlayCount,
+    type PublishedInstancesCursor,
+    type PublishedInstancesSort
 } from "@/services/games/gameService";
-import type { PublishedInstance } from "@/types/publishedInstance";
+import type { PublishedGameType, PublishedInstance } from "@/types/publishedInstance";
 import styles from "@/styles/pages/PublishedInstances.module.css"
 
 function getGamePath(gameType: PublishedInstance["gameType"]): string {
@@ -25,15 +29,37 @@ export default function PublishedInstancesPage() {
     const [error, setError] = useState<string | null>(null);
     const [openingId, setOpeningId] = useState<string | null>(null);
 
+    const [sortBy, setSortBy] = useState<PublishedInstancesSort>("newest");
+    const [cursor, setCursor] = useState<PublishedInstancesCursor | null>(null);
+    const [hasMore, setHasMore] = useState(false);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [loadMoreError, setLoadMoreError] = useState<string | null>(null);
+    const requestIdRef = useRef(0);
+    const [gameFilter, setGameFilter] = useState<PublishedGameType | "all">("all");
+    const [likedFilter, setLikedFilter] = useState(false);
+
+    const { user } = useAuth();
+
     useEffect(() => {
         let cancelled = false;
+        requestIdRef.current += 1;
 
         const loadInstances = async () => {
+            setIsLoading(true);
+            setError(null);
+            setIsLoadingMore(false);
+            setLoadMoreError(null);
+            setInstances([]);
+            setCursor(null);
+            setHasMore(false);
+
             try {
-                const result = await getPublishedInstances();
+                const result = await getPublishedInstances(sortBy, gameFilter, likedFilter ? user?.uid : null);
 
                 if (!cancelled) {
-                    setInstances(result);
+                    setInstances(result.instances);
+                    setCursor(result.lastDocument);
+                    setHasMore(result.hasMore);
                 }
             } catch (loadError) {
                 console.error("Error loading published instances:", loadError);
@@ -53,7 +79,30 @@ export default function PublishedInstancesPage() {
         return () => {
             cancelled = true;
         };
-    }, []);
+    }, [sortBy, gameFilter, likedFilter]);
+
+    const handleLoadMore = async () => {
+        if (!cursor || !hasMore || isLoadingMore) return;
+
+        const requestId = requestIdRef.current;
+        setIsLoadingMore(true);
+        setLoadMoreError(null);
+
+        try {
+            const result = await getPublishedInstances(sortBy, gameFilter, likedFilter ? user?.uid : null, cursor);
+
+            if (requestId !== requestIdRef.current) return;
+
+            setInstances((current) => [...current, ...result.instances]);
+            setCursor(result.lastDocument)
+            setHasMore(result.hasMore);
+        } catch (loadError) {
+            console.error("Error loading more published instances", loadError);
+            setLoadMoreError("Could not load more published instances.");
+        } finally {
+            if (requestId === requestIdRef.current) setIsLoadingMore(false);
+        }
+    };
 
     const handleOpen = async (instance: PublishedInstance) => {
         if (openingId !== null) return;
@@ -79,6 +128,45 @@ export default function PublishedInstancesPage() {
                     <h1 className={styles.title}>Community challenges</h1>
                     <p className={styles.subtitle}>Play challenges created by other players</p>
                 </header>
+
+                <div className={styles.filterBar}>
+                        <label className={styles.filterGroup} htmlFor="published-instance-sort">Order by
+                            <select
+                                id="published-instance-sort"
+                                value={sortBy}
+                                onChange={(event) => setSortBy(event.target.value as PublishedInstancesSort)}
+                            >
+                                <option value="newest">Most recent</option>
+                                <option value="mostPlayed">Most played</option>
+                                <option value="mostLiked">Most likes</option>
+                            </select>
+                        </label>
+
+                        <label className={styles.filterGroup} htmlFor="published-instance-game-filter">Filter game
+                            <select
+                                id="published-instance-game-filter"
+                                value={gameFilter}
+                                onChange={(event) => setGameFilter(event.target.value as PublishedGameType | "all")}
+                            >
+                                <option value="all">All games</option>
+                                <option value="tsp">TSP</option>
+                                <option value="pathfinding">Pathfinding</option>
+                                <option value="knapsack">Knapsack</option>
+                                <option value="flowshop">Flowshop</option>
+                            </select>
+                        </label>
+
+                    <label className={styles.favoritesFilter}>
+                        <input
+                            type="checkbox"
+                            checked={likedFilter}
+                            onChange={(event) => setLikedFilter(event.target.checked)}
+                            disabled={!user}
+                        />
+                        Favorites
+                    </label>
+
+                </div>
 
                 {isLoading && <Loader fullScreen={false} />}
 
@@ -121,7 +209,7 @@ export default function PublishedInstancesPage() {
                                             Likes
                                         </span>
                                         <span className={styles.statValue}>
-                                            {instance.likes.length}
+                                            {instance.likeCount}
                                         </span>
                                     </div>
 
@@ -137,6 +225,24 @@ export default function PublishedInstancesPage() {
 
                             </button>
                         ))}
+                    </div>
+                )}
+
+                {!isLoading && !error && hasMore && (
+                    <div className={styles.loadMoreContainer}>
+                        {loadMoreError && (
+                            <p className={`${styles.state} ${styles.error}`}>
+                                {loadMoreError}
+                            </p>
+                        )}
+                        <Button
+                            style={["secondary"]}
+                            //type="button"
+                            //className={styles.loadMoreButton}
+                            label={isLoadingMore ? "Loading..." : "Load more"}
+                            onClick={() => void handleLoadMore()}
+                            disabled={isLoadingMore}
+                        />
                     </div>
                 )}
             </main>

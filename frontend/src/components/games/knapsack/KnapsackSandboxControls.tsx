@@ -256,7 +256,7 @@ export default function KnapsackControls({
 
                     <div className={styles.setting}>
                         <span className={`${styles.statLabel} ${styles.sectionLabel}`}>GENERATE RANDOM INSTANCE</span>
-                        <label><input className={styles.customCheckbox} type="checkbox" checked={isCustom} onChange={(e) => setIsCustom(e.target.checked)}/>Custom</label>
+                        <label className={styles.customCheckbox}><input type="checkbox" checked={isCustom} onChange={(e) => setIsCustom(e.target.checked)}/>Custom</label>
                     </div>
 
                     {isCustom && (

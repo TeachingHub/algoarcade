@@ -165,6 +165,123 @@
     color: var(--destructive);
 }
 
+
+.sortControl,
+.loadMoreContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-xl);
+    margin-top: var(--space-xl);
+}
+
+.sortControl select,
+.loadMoreButton {
+    padding: var(--space-sm) var(--space-md);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--card);
+    color: var(--foreground);
+    font: inherit;
+}
+
+.loadMoreButton {
+    cursor: pointer;
+}
+
+.loadMoreButton:disabled {
+    cursor: wait;
+    opacity: 0.65;
+}
+
+.filterBar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    column-gap: 2rem;
+    row-gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+.filterGroup {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    white-space: nowrap;
+    color: var(--foreground);
+}
+
+.filterGroup select {
+    min-width: 150px;
+    padding: var(--space-sm);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--background);
+    color: var(--foreground);
+    font: inherit;
+    cursor: pointer;
+}
+
+.filterGroup select:focus-visible,
+.favoritesFilter input:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.favoritesFilter {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--foreground);
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.favoritesFilter input {
+    appearance: none;
+    display: grid;
+    place-content: center;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    border: 2px solid var(--border);
+    border-radius: 3px;
+    background: var(--background);
+    cursor: pointer;
+}
+
+.favoritesFilter input:checked {
+    border-color: var(--primary);
+    background: var(--primary);
+}
+
+.favoritesFilter input:checked::after {
+    width: 5px;
+    height: 9px;
+    border: solid var(--accent-foreground);
+    border-width: 0 2px 2px 0;
+    content: "";
+    transform: rotate(45deg);
+}
+
+.favoritesFilter input:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+@media (max-width: 600px) {
+    .filterBar {
+        align-items: flex-start;
+        gap: var(--space-md);
+    }
+
+    .filterGroup {
+        flex-wrap: wrap;
+        white-space: normal;
+    }
+}
+
 @media (max-width: 768px) {
     .container {
         padding: var(--space-md);
